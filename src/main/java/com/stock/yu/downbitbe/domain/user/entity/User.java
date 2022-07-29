@@ -2,24 +2,32 @@ package com.stock.yu.downbitbe.domain.user.entity;
 
 import com.stock.yu.downbitbe.domain.BaseTimeEntity;
 import com.sun.istack.NotNull;
-import lombok.Builder;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 import javax.persistence.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "USER")
-@Getter
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
+@Getter
+@ToString
 public class User extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column
+    //TODO : 소셜 로그인 아이디 저장방식 및 엔티티 자체 아이디 중복허용 결정?
     @NotNull
-    private String user_id;
+    @Column(length = 30, nullable = false, name = "user_id")
+    private String userId;
+
+    @NotNull
+    @Column
+    private String password;
 
     @Column
     @NotNull
@@ -30,20 +38,40 @@ public class User extends BaseTimeEntity {
     @NotNull
     private String nickname;
 
-    @Column
-    private float hit_rate;
+    @Column(name = "hit_rate")
+    private float hitRate;
 
-    @Column
-    @Enumerated(EnumType.STRING)
-    private Grade grade;
+//    @Column
+//    @Enumerated(EnumType.STRING)
+//    private Grade grade;
+//
+//    @Builder
+//    public User(String userId, String password, LoginType type, String nickname, float hitRate, Grade grade){
+//        this.userId = userId;
+//        this.password = password;
+//        this.type= type;
+//        this.nickname = nickname;
+//        this.hitRate = hitRate;
+//        this.grade = grade;
+//    }
 
     @Builder
-    public User(String user_id, LoginType type, String nickname, float hit_rate, Grade grade){
-        this.user_id = user_id;
+    public User(String userId, String password, LoginType type, String nickname, float hitRate){
+        this.userId = userId;
+        this.password = password;
         this.type= type;
         this.nickname = nickname;
-        this.hit_rate = hit_rate;
-        this.grade = grade;
+        this.hitRate = hitRate;
+    }
+
+    @ElementCollection(fetch = FetchType.LAZY)
+    @Builder.Default
+    private Set<Grade> gradeSet = new HashSet<>();
+
+    public void addGrade(Grade grade) {
+        gradeSet.add(grade);
     }
 
 }
+
+

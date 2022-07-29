@@ -9,7 +9,7 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "LIKE")
+@Table(name = "LIKES") // like 는 mysql 예약어
 @Getter
 @NoArgsConstructor
 public class Like {
