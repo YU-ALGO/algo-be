@@ -26,7 +26,7 @@ public class Message extends BaseTimeEntity {
     @NotNull
     private String content;
 
-    @Column
+    @Column(name = "is_read") // read 는 mysql 예약어
     @Enumerated(EnumType.STRING)
     @NotNull
     private MessageRead read;
@@ -44,16 +44,16 @@ public class Message extends BaseTimeEntity {
     @Column
     @Enumerated(EnumType.STRING)
     @NotNull
-    private DeleteCondition delete;
+    private DeleteCondition deleted; // delete 는 mysql 예약어
 
     @Builder
-    public Message(String title, String content, MessageRead read, User sender, User receiver, DeleteCondition delete){
+    public Message(String title, String content, MessageRead read, User sender, User receiver, DeleteCondition deleted){
         this.title = title;
         this.content = content;
         this.read = read;
         this.sender = sender;
         this.receiver = receiver;
-        this.delete = delete;
+        this.deleted = deleted;
     }
 
 }
