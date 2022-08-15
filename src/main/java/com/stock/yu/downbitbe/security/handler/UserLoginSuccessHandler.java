@@ -1,4 +1,4 @@
-package com.stock.yu.downbitbe.domain.user.handler;
+package com.stock.yu.downbitbe.security.handler;
 
 import com.stock.yu.downbitbe.domain.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.domain.user.entity.LoginType;
@@ -33,7 +33,6 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
         UserAuthDTO userAuth = (UserAuthDTO) authentication.getPrincipal();
         boolean isSocial = !userAuth.getType().equals(LoginType.LOCAL);
         log.info("Need Modify Member? " + isSocial);
-
         boolean isDefaultPassword = passwordEncoder.matches("1111", userAuth.getPassword());
 
         if(isSocial && isDefaultPassword) { // 소셜 로그인이면서 기본 비밀번호 사용시 연결되는 리다이렉트 링크임 -> 이름변경/비밀번호 변경 링크로 연결

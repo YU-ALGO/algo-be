@@ -14,6 +14,7 @@ import org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest;
 import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Map;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
+@Transactional
 @Service
 public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
@@ -86,6 +88,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         return userAuth;
     }
 
+    // for google login
     private User saveSocialMember(String email, LoginType type) {
 
         Optional<User> result = repository.findByUserIdAndType(email, type);
@@ -107,6 +110,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         return user;
     }
 
+    // for kakao, naver login
     private User saveSocialMember(String email, String nickname, LoginType type) {
 
         if(type.equals(LoginType.GOOGLE))
@@ -129,6 +133,18 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         repository.save(user);
 
         return user;
+    }
+
+    public User saveUser(User user) {
+        validateDuplicateUser(user);
+        return repository.save(user);
+    }
+
+    private void validateDuplicateUser(User user) {
+        User findUser = repository.findByUserId(user.getUserId());
+        if(user != null) {
+            throw new IllegalStateException("이미 가입된 회원입니다.");
+        }
     }
 
 
