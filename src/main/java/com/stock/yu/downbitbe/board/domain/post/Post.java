@@ -1,7 +1,7 @@
-package com.stock.yu.downbitbe.post.entity;
+package com.stock.yu.downbitbe.board.domain.post;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
-import com.stock.yu.downbitbe.board.domain.Board;
+import com.stock.yu.downbitbe.board.domain.board.Board;
 import com.stock.yu.downbitbe.user.entity.User;
 import com.sun.istack.NotNull;
 import lombok.Builder;

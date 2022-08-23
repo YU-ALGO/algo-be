@@ -1,13 +1,13 @@
 package com.stock.yu.downbitbe.board.application;
 
-import com.stock.yu.downbitbe.board.domain.BoardListDto;
-import com.stock.yu.downbitbe.board.domain.BoardRepository;
+import com.stock.yu.downbitbe.board.domain.board.Board;
+import com.stock.yu.downbitbe.board.domain.board.BoardListDto;
+import com.stock.yu.downbitbe.board.domain.board.BoardRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -22,6 +22,22 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
-//    public Long createBoard(Map<String, String> boardCreateDto) {   // security admin 확인 필요
-//    }
+    @Transactional
+    public Long createBoard(String name) {   // security admin 확인 필요
+        return boardRepository.save(Board.builder()
+                .name(name).build()).getId();
+    }
+
+    @Transactional
+    public Long updateBoard(String name, Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
+        return boardRepository.save(board.update(name)).getId();
+    }
+
+    @Transactional
+    public Long deleteBoard(Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
+        boardRepository.delete(board);
+        return board.getId();
+    }
 }

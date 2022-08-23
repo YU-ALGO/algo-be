@@ -1,4 +1,4 @@
-package com.stock.yu.downbitbe.board.domain;
+package com.stock.yu.downbitbe.board.domain.post;
 
 import lombok.Getter;
 import lombok.NoArgsConstructor;

@@ -1,5 +1,6 @@
 package com.stock.yu.downbitbe.post.entity;
 
+import com.stock.yu.downbitbe.board.domain.post.Post;
 import com.stock.yu.downbitbe.user.entity.User;
 import com.sun.istack.NotNull;
 import lombok.Builder;

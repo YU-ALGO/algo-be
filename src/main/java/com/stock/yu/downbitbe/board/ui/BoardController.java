@@ -1,8 +1,7 @@
 package com.stock.yu.downbitbe.board.ui;
 
 import com.stock.yu.downbitbe.board.application.BoardService;
-import com.stock.yu.downbitbe.board.domain.BoardListDto;
-import com.stock.yu.downbitbe.board.domain.PostListDto;
+import com.stock.yu.downbitbe.board.domain.board.BoardListDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
@@ -21,7 +20,17 @@ public class BoardController {
 
     @PostMapping("/api/v1/boards")
     public Long createBoard(@RequestBody Map<String, String> boardCreateDto){
-        return boardService.createBoard(boardCreateDto);
+        return boardService.createBoard(boardCreateDto.get("name"));
+    }
+
+    @PatchMapping("/api/v1/boards/{id}")
+    public Long updateBoard(@RequestBody Map<String, String> boardUpdateDto, @PathVariable Long id){
+        return boardService.updateBoard(boardUpdateDto.get("name"), id);
+    }
+
+    @DeleteMapping("/api/v1/boards/{id}")
+    public Long deleteBoard(@PathVariable Long id){
+        return boardService.deleteBoard(id);
     }
 
 }

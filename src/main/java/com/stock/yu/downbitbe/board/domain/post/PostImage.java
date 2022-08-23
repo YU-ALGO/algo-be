@@ -1,6 +1,5 @@
-package com.stock.yu.downbitbe.board.domain;
+package com.stock.yu.downbitbe.board.domain.post;
 
-import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
@@ -8,20 +7,19 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "Board")
 @Getter
 @NoArgsConstructor
-public class Board{
+public class PostImage {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "post_image_id")
     private Long id;
 
-    @Column
-    @NotNull
-    private String name;
+    @Column(name = "image_path")
+    private String path;
 
     @Builder
-    public Board(String name){
-        this.name = name;
+    public PostImage(String path){
+        this.path = path;
     }
 }
