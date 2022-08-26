@@ -35,12 +35,15 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        http.cors().and().csrf().disable();
+
         http.authorizeRequests()
                 .antMatchers("/sample/all").permitAll()
-                .antMatchers("/api/v1/**").permitAll()
+                .antMatchers("/api/v1/**", "api/v1/boards/1/posts").permitAll()
                 .antMatchers("/sample/member").hasRole("USER"); // USER 는 스프링 내부에서 인증된 사용자를 의미함
         http.formLogin();
-        http.cors().and().csrf().disable();
+
 
         http.oauth2Login().successHandler(successHandler())
                 .defaultSuccessUrl("/sample/member");
@@ -68,8 +71,8 @@ public class SecurityConfig {
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
-        //configuration.setAllowedOrigins(Collections.singletonList("http://42.82.185.184:3000")); // singletonList : 하나짜리 리스트
-        configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, "http://localhost:3000"));
+        configuration.setAllowedOrigins(Collections.singletonList("http://42.82.185.184:3000")); // singletonList : 하나짜리 리스트
+        //configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, "http://localhost:3000"));
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
