@@ -31,6 +31,7 @@ public class SecurityConfig {
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         http.authorizeRequests()
                 .antMatchers("/sample/all").permitAll()
+                .antMatchers("/api/v1/**").permitAll()
                 .antMatchers("/sample/member").hasRole("USER"); // USER 는 스프링 내부에서 인증된 사용자를 의미함
         http.formLogin();
         http.csrf().disable();

@@ -1,22 +1,24 @@
 package com.stock.yu.downbitbe.board.domain.post;
 
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 
-@Getter
-@NoArgsConstructor
-public class PostListDto {
+public class PostDto {
     private Long id;
     private String title;
+    private String content;
     private String author;
+    private Integer commentCount;
+    private Integer likeCount;
     private LocalDateTime created_at;
 
-    public PostListDto(Post post) {
+    public PostDto(Post post) {
         this.id = post.getId();
         this.title = post.getTitle();
+        this.content = post.getContent();
         this.author = post.getUser().getNickname();
+        this.commentCount = post.getComment();
+        this.likeCount = post.getLike();
         this.created_at = post.getCreatedAt();
     }
 }

@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.security.filter;
 
-import com.stock.yu.downbitbe.domain.user.dto.UserAuthDTO;
+import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.BadCredentialsException;

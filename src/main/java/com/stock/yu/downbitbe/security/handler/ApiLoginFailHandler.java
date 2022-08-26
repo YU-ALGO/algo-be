@@ -20,7 +20,7 @@ public class ApiLoginFailHandler implements AuthenticationFailureHandler {
         log.info(exception.getMessage());
 
         response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
-        // json ∏Æ≈œ
+        // json
         response.setContentType("application/json;charset=utf-8");
         JSONObject json = new JSONObject();
         String message = exception.getMessage();

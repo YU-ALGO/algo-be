@@ -23,9 +23,9 @@ public class BoardController {
         return boardService.createBoard(boardCreateDto.get("name"));
     }
 
-    @PatchMapping("/api/v1/boards/{id}")
-    public Long updateBoard(@RequestBody Map<String, String> boardUpdateDto, @PathVariable Long id){
-        return boardService.updateBoard(boardUpdateDto.get("name"), id);
+    @PatchMapping("/api/v1/boards/{board_id}")
+    public Long updateBoard(@RequestBody Map<String, String> boardUpdateDto, @PathVariable("board_id") Long boardId){
+        return boardService.updateBoard(boardUpdateDto.get("name"), boardId);
     }
 
     @DeleteMapping("/api/v1/boards/{id}")

@@ -42,7 +42,7 @@ public class ApiCheckFilter extends OncePerRequestFilter {
                 filterChain.doFilter(request, response);
             } else {
                 response.setStatus(HttpServletResponse.SC_FORBIDDEN);
-                //json ¸®ÅÏ ¹× ÇÑ±Û±úÁü ¼öÁ¤
+                //json ë¦¬í„´ ë° í•œê¸€ê¹¨ì§ ìˆ˜ì •
                 response.setContentType("application/json;charset=utf-8");
                 JSONObject json = new JSONObject();
                 String message = "FAIL CHECK API TOKEN";

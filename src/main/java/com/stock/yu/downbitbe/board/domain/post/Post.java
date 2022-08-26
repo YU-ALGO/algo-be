@@ -7,6 +7,7 @@ import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
 
@@ -38,9 +39,13 @@ public class Post extends BaseTimeEntity {
     private Board board;
 
     @Column(name = "like_count")
+    @NotNull
+    @ColumnDefault("0")
     private Integer like;
 
     @Column(name = "comment_count")
+    @NotNull
+    @ColumnDefault("0")
     private Integer comment;
 
     @Builder

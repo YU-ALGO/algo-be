@@ -1,7 +1,7 @@
 package com.stock.yu.downbitbe.security.handler;
 
-import com.stock.yu.downbitbe.domain.user.dto.UserAuthDTO;
-import com.stock.yu.downbitbe.domain.user.entity.LoginType;
+import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
+import com.stock.yu.downbitbe.user.entity.LoginType;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;

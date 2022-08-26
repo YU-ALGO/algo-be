@@ -1,7 +1,7 @@
-package com.stock.yu.downbitbe.post.entity;
+package com.stock.yu.downbitbe.board.domain.comment;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
-import com.stock.yu.downbitbe.board.domain.post.Post;
+import com.stock.yu.downbitbe.board.domain.comment.Comment;
 import com.stock.yu.downbitbe.user.entity.User;
 import com.sun.istack.NotNull;
 import lombok.Builder;
@@ -11,10 +11,10 @@ import lombok.NoArgsConstructor;
 import javax.persistence.*;
 
 @Entity
-@Table(name = "COMMENT")
+@Table(name = "REPLY_COMMENT")
 @Getter
 @NoArgsConstructor
-public class Comment extends BaseTimeEntity {
+public class ReplyComment extends BaseTimeEntity {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -28,15 +28,15 @@ public class Comment extends BaseTimeEntity {
     @NotNull
     private User user;
 
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "comment_id")
     @ManyToOne
     @NotNull
-    private Post post;
+    private Comment comment;
 
     @Builder
-    private Comment(String content, User user, Post post){
+    public ReplyComment(String content, User user, Comment comment){
         this.content = content;
         this.user = user;
-        this.post = post;
+        this.comment = comment;
     }
 }
