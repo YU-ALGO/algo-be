@@ -12,6 +12,12 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+
+import java.util.Arrays;
+import java.util.Collections;
 
 @Configuration
 @Log4j2
@@ -34,7 +40,7 @@ public class SecurityConfig {
                 .antMatchers("/api/v1/**").permitAll()
                 .antMatchers("/sample/member").hasRole("USER"); // USER 는 스프링 내부에서 인증된 사용자를 의미함
         http.formLogin();
-        http.csrf().disable();
+        http.cors().and().csrf().disable();
 
         http.oauth2Login().successHandler(successHandler())
                 .defaultSuccessUrl("/sample/member");
@@ -57,6 +63,19 @@ public class SecurityConfig {
 
 
         return http.build();
+    }
+
+    @Bean
+    CorsConfigurationSource corsConfigurationSource() {
+        CorsConfiguration configuration = new CorsConfiguration();
+        //configuration.setAllowedOrigins(Collections.singletonList("http://42.82.185.184:3000")); // singletonList : 하나짜리 리스트
+        configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, "http://localhost:3000"));
+        configuration.setAllowedMethods(Collections.singletonList("*"));
+        configuration.setAllowedHeaders(Collections.singletonList("*"));
+        configuration.setAllowCredentials(true);
+        UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
+        source.registerCorsConfiguration("/**", configuration);
+        return source;
     }
 
     @Bean

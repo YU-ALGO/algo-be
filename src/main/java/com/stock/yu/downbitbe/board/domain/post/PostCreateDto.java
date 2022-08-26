@@ -2,7 +2,9 @@ package com.stock.yu.downbitbe.board.domain.post;
 
 import com.stock.yu.downbitbe.board.domain.board.Board;
 import com.stock.yu.downbitbe.user.entity.User;
+import lombok.Getter;
 
+@Getter
 public class PostCreateDto{
     private String title;
     private String content;

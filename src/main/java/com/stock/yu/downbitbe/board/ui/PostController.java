@@ -5,6 +5,7 @@ import com.stock.yu.downbitbe.board.domain.post.PostCreateDto;
 import com.stock.yu.downbitbe.board.domain.post.PostDto;
 import com.stock.yu.downbitbe.board.domain.post.PostListDto;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.log4j.Log4j2;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/boards")
+@Log4j2
 public class PostController {
     private final PostService postService;
 
@@ -27,6 +29,14 @@ public class PostController {
 
     @PostMapping("/{board_id}/posts")
     public Long createPost(@RequestBody PostCreateDto postCreateDto, @PathVariable("board_id") Long boardId){
+        log.info("--------create-----");
+        log.info("title" + postCreateDto.getTitle());
+        log.info("content" + postCreateDto.getContent());
+
+        Long postId = postService.createPost(postCreateDto, boardId);
+
+
+
         return postService.createPost(postCreateDto, boardId);
     }
 
