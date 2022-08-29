@@ -13,7 +13,7 @@ import java.util.Date;
 
 @Log4j2
 public class JWTUtil {
-    private String secretKey = "downbit-be"; // 실무에서는 유저의 비밀번호 등을 이용해서 넣어주는게 맞음
+    private String secretKey = "downbit"; // 실무에서는 유저의 비밀번호 등을 이용해서 넣어주는게 맞음
 
     private long expire = 50 * 24 * 30; //1달
 

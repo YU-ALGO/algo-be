@@ -6,9 +6,11 @@ import com.stock.yu.downbitbe.domain.user.entity.LoginType;
 import com.stock.yu.downbitbe.domain.user.entity.User;
 import com.stock.yu.downbitbe.domain.user.repository.CustomUserRepository;
 import com.stock.yu.downbitbe.security.payload.request.LoginRequest;
+import com.stock.yu.downbitbe.security.payload.response.JwtResponse;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
@@ -20,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -32,12 +35,13 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserRepository repository;
-    private JWTUtil jwtUtil;
+
+    private final JWTUtil jwtUtil;
 
     // 리턴 값으로 토큰 반환해주면 됨
     @PostMapping("/login")
     //public ResponseEntity<Void> login(@RequestBody Map<String, String> user) throws Exception {
-    public ResponseEntity<String> login(@RequestBody LoginRequest user) throws Exception {
+    public ResponseEntity<?> login(@RequestBody LoginRequest user) throws Exception {
         // 가입되지 않은 회원인지 확인
 
         //String email = user.get("username");
@@ -46,12 +50,12 @@ public class UserController {
         String email = user.getUsername();
         String password = user.getPassword();
 
-        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, password);
-        log.info("token" + token);
+        UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
+        log.info("token" + authenticationToken);
 
         try {
             // AuthenticationManager 에 token 을 넘기면 UserDetailsService 가 받아 처리하도록 한다.
-            Authentication authentication = authenticationManager.authenticate(token);
+            Authentication authentication = authenticationManager.authenticate(authenticationToken);
             log.info("authentication"+authentication);
             // 실제 SecurityContext 에 authentication 정보를 등록한다.
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -69,6 +73,12 @@ public class UserController {
             log.info(status);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(status);
         }
+
+        UserAuthDTO userAuthDTO = (UserAuthDTO) authenticationToken.getPrincipal();
+        Set<Grade> roles = userAuthDTO.getAuthorities().stream().map(item -> Grade.valueOf(item.getAuthority())).collect(Collectors.toSet());
+
+
+
 //        Authentication authentication = authenticationManager.authenticate(token);
 //        log.info("authentication"+authentication);
 //        SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -92,7 +102,12 @@ public class UserController {
 
 
         // ResponseEntity에서 header 설정 및 만든 쿠키 넣고 응답
-        return ResponseEntity.status(HttpStatus.OK).build();
+        //return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.ok(JwtResponse.builder()
+                .userId(email)
+                .token(jwtUtil.generateToken(email))
+                .roles(roles)
+                .build());
     }
 
     //TODO 회원가입 완성하기

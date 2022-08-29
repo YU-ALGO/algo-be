@@ -25,17 +25,17 @@ public class User extends BaseTimeEntity {
     @Column(length = 30, nullable = false, name = "user_id")
     private String userId;
 
-    @NotNull
+    //@NotNull
     @Column
     private String password;
 
     @Column
-    @NotNull
+    //@NotNull
     @Enumerated(EnumType.STRING)
     private LoginType type;
 
     @Column
-    @NotNull
+    //@NotNull
     private String nickname;
 
     @Column(name = "hit_rate")
