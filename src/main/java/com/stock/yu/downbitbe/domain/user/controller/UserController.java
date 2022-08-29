@@ -74,8 +74,9 @@ public class UserController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(status);
         }
 
-        UserAuthDTO userAuthDTO = (UserAuthDTO) authenticationToken.getPrincipal();
-        Set<Grade> roles = userAuthDTO.getAuthorities().stream().map(item -> Grade.valueOf(item.getAuthority())).collect(Collectors.toSet());
+        String userId = (String) authenticationToken.getPrincipal();
+        Set<Grade> roles = repository.findByUserId(userId).getGradeSet();
+        //Set<Grade> roles = userAuthDTO.getAuthorities().stream().map(item -> Grade.valueOf(item.getAuthority())).collect(Collectors.toSet());
 
 
 
