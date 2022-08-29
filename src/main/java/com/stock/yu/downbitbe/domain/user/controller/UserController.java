@@ -11,8 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -30,7 +29,7 @@ import java.util.stream.Collectors;
 public class UserController {
 
 
-    private AuthenticationManager authenticationManager;
+    private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserRepository repository;
     private JWTUtil jwtUtil;
@@ -38,7 +37,7 @@ public class UserController {
     // 리턴 값으로 토큰 반환해주면 됨
     @PostMapping("/login")
     //public ResponseEntity<Void> login(@RequestBody Map<String, String> user) throws Exception {
-    public ResponseEntity<Void> login(@RequestBody LoginRequest user) throws Exception {
+    public ResponseEntity<String> login(@RequestBody LoginRequest user) throws Exception {
         // 가입되지 않은 회원인지 확인
 
         //String email = user.get("username");
@@ -46,9 +45,34 @@ public class UserController {
         log.info("---------start login-------");
         String email = user.getUsername();
         String password = user.getPassword();
-        Authentication authentication = authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(email, password));
-//
+
+        UsernamePasswordAuthenticationToken token = new UsernamePasswordAuthenticationToken(email, password);
+        log.info("token" + token);
+
+        try {
+            // AuthenticationManager 에 token 을 넘기면 UserDetailsService 가 받아 처리하도록 한다.
+            Authentication authentication = authenticationManager.authenticate(token);
+            log.info("authentication"+authentication);
+            // 실제 SecurityContext 에 authentication 정보를 등록한다.
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        } catch (DisabledException | LockedException | BadCredentialsException e) {
+            String status;
+            if (e.getClass().equals(BadCredentialsException.class)) {
+                status = "invalid-password";
+            } else if (e.getClass().equals(DisabledException.class)) {
+                status = "locked";
+            } else if (e.getClass().equals(LockedException.class)) {
+                status = "disable";
+            } else {
+                status = "unknown";
+            }
+            log.info(status);
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(status);
+        }
+//        Authentication authentication = authenticationManager.authenticate(token);
+//        log.info("authentication"+authentication);
 //        SecurityContextHolder.getContext().setAuthentication(authentication);
+//        log.info("context done");
 //        String jwt = jwtUtil.generateToken(email);
 //
 //        UserAuthDTO userAuthDTO = (UserAuthDTO) authentication.getPrincipal();

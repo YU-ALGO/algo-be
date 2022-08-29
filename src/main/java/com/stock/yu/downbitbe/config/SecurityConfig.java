@@ -26,6 +26,7 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -47,7 +48,7 @@ import java.util.Collections;
 public class SecurityConfig {
 
     @Autowired
-    private CustomUserDetailsService userDetailsService;
+    private UserDetailsService userDetailsService;
 
     @Autowired
     private CustomUserRepository userRepository;
@@ -63,7 +64,7 @@ public class SecurityConfig {
     }
 
     @Bean
-    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+    public SecurityFilterChain securityfilterChain(HttpSecurity http) throws Exception {
         //AuthenticationManager 설정
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
         authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
@@ -74,19 +75,18 @@ public class SecurityConfig {
         //반드시 필요
         http.authenticationManager(authenticationManager);
 
-        http.cors().and().csrf().disable()
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-                .and()
-                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager, jwtUtil()), UsernamePasswordAuthenticationFilter.class)
-                .addFilterBefore(new JwtAuthorizationFilter(authenticationManager, userRepository), UsernamePasswordAuthenticationFilter.class);
+        http.cors().and().csrf().disable();
+//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+//                .and()
+//                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager, jwtUtil()), UsernamePasswordAuthenticationFilter.class)
+//                .addFilterBefore(new JwtAuthorizationFilter(authenticationManager, userRepository), UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeRequests()
                 .antMatchers("/sample/all", "/login", "/logout").permitAll()
                 .antMatchers("/sample/member").hasRole("USER") // USER 는 스프링 내부에서 인증된 사용자를 의미함
                 .antMatchers("/api/v2/signup", "/api/v2/login", "/api/v1/login", "/images/**", "/api/v2/users/**").permitAll();
-        http.formLogin();//.loginPage(Config.WEB_BASE_URL+"/login");
-        http.formLogin().usernameParameter("username").passwordParameter("password").loginPage("/api/v2/login");
-        //http.cors().and().csrf().disable();
+        http.formLogin().loginProcessingUrl(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password").loginPage("/api/v2/login");
+        http.cors().and().csrf().disable();
 
 
         http.oauth2Login().successHandler(successHandler())
@@ -95,8 +95,6 @@ public class SecurityConfig {
 
         http.logout();
 
-        //http.addFilterBefore(apiCheckFilter(), UsernamePasswordAuthenticationFilter.class);
-        //http.addFilterBefore(apiLoginFilter(authenticationManager), UsernamePasswordAuthenticationFilter.class);
         /*
         커스텀 로그인 화면
         loginPage()
@@ -133,31 +131,17 @@ public class SecurityConfig {
         return source;
     }
 
-//    @Bean
-//    public ApiCheckFilter apiCheckFilter() throws Exception {
-//        return new ApiCheckFilter("/sample/all", jwtUtil());
-//    }
-//
-//    public ApiLoginFilter apiLoginFilter(AuthenticationManager authenticationManager) throws Exception {
-//        ApiLoginFilter apiLoginFilter = new ApiLoginFilter("/api/v2/login", jwtUtil());
-//        apiLoginFilter.setAuthenticationManager(authenticationManager);
-//
-//        apiLoginFilter.setAuthenticationFailureHandler(new ApiLoginFailHandler());
-//
-//        return apiLoginFilter;
-//    }
-
     @Bean
     public JWTUtil jwtUtil() {
         return new JWTUtil();
     }
 
-//    @Bean
-//    AccessDecisionVoter hierarchyVoter() {
-//        RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
-//        hierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
-//        return new RoleHierarchyVoter(hierarchy);
-//    }
+    @Bean
+    AccessDecisionVoter hierarchyVoter() {
+        RoleHierarchyImpl hierarchy = new RoleHierarchyImpl();
+        hierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
+        return new RoleHierarchyVoter(hierarchy);
+    }
 
 
 }

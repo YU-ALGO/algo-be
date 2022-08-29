@@ -64,7 +64,7 @@ public class User extends BaseTimeEntity {
         this.hitRate = hitRate;
     }
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private Set<Grade> gradeSet = new HashSet<>();
 
