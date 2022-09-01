@@ -27,6 +27,8 @@ public class UserTests {
     private PasswordEncoder passwordEncoder;
 
     @Test
+    @Transactional
+    @DisplayName("회원 생성 테스트(100명)")
     public void insertDummies() {
         //1 - 80 : USER
         //81 - 100 : ADMIN
@@ -57,7 +59,6 @@ public class UserTests {
     @Transactional
     @DisplayName("회원가입 테스트")
     public void signupTest() {
-
 
     }
 }

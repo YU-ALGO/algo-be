@@ -39,8 +39,10 @@ public class JWTUtil {
             DefaultClaims claims = (DefaultClaims) defaultJws.getBody();
 
             log.info("-----------------");
+            log.info("claims : " + claims);
+            log.info("subject : " + claims.get("userId"));
 
-            contentValue = claims.getSubject();
+            contentValue = (String) claims.get("userId");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());

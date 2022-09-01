@@ -31,6 +31,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         log.info("----------JwtAuthenticationFilter------------");
 
+
         ObjectMapper om = new ObjectMapper();
         LoginRequest loginRequest = null;
         try {

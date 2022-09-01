@@ -12,6 +12,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
@@ -20,6 +21,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.Cookie;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -49,6 +51,8 @@ public class UserController {
         log.info("---------start login-------");
         String email = user.getUsername();
         String password = user.getPassword();
+        log.info("username : " + user.getUsername());
+        log.info("password : " + user.getPassword());
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
         log.info("token" + authenticationToken);
@@ -62,6 +66,7 @@ public class UserController {
         } catch (DisabledException | LockedException | BadCredentialsException e) {
             String status;
             if (e.getClass().equals(BadCredentialsException.class)) {
+                log.info(((BadCredentialsException) e).getClass().getName());
                 status = "invalid-password";
             } else if (e.getClass().equals(DisabledException.class)) {
                 status = "locked";
@@ -70,6 +75,8 @@ public class UserController {
             } else {
                 status = "unknown";
             }
+
+
             log.info(status);
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(status);
         }
@@ -80,18 +87,19 @@ public class UserController {
 
 
 
-//        Authentication authentication = authenticationManager.authenticate(token);
-//        log.info("authentication"+authentication);
-//        SecurityContextHolder.getContext().setAuthentication(authentication);
-//        log.info("context done");
-//        String jwt = jwtUtil.generateToken(email);
-//
-//        UserAuthDTO userAuthDTO = (UserAuthDTO) authentication.getPrincipal();
-//
-//        List<String> roles = userAuthDTO.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList());
+/*        Authentication authentication = authenticationManager.authenticate(token);
+        log.info("authentication"+authentication);
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+        log.info("context done");
+        String jwt = jwtUtil.generateToken(email);
+
+        UserAuthDTO userAuthDTO = (UserAuthDTO) authentication.getPrincipal();
+
+        List<String> roles = userAuthDTO.getAuthorities().stream().map(item -> item.getAuthority()).collect(Collectors.toList());*/
 
         log.info("-----------");
         log.info("email : " + email);
+        log.info("user_id : " + userId);
         log.info("password : " + password);
         log.info("-----------");
 
@@ -100,13 +108,22 @@ public class UserController {
         }
 
         // 토큰 생성 및 쿠키 설정
+        ResponseCookie responseCookie = ResponseCookie.from("token",jwtUtil.generateToken(email))
+                .httpOnly(true)
+                .secure(true)
+                .path("/")
+                .maxAge(60)
+                .domain("yourdomain.net")
+                .build();
 
 
         // ResponseEntity에서 header 설정 및 만든 쿠키 넣고 응답
         //return ResponseEntity.status(HttpStatus.OK).build();
-        return ResponseEntity.ok(JwtResponse.builder()
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString())
+                .body(JwtResponse.builder()
                 .userId(email)
                 .token(jwtUtil.generateToken(email))
+                .type(repository.findByUserId(email).getType().toString())
                 .roles(roles)
                 .build());
     }

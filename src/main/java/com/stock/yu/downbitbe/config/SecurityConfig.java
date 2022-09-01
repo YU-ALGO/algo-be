@@ -53,6 +53,9 @@ public class SecurityConfig {
     @Autowired
     private CustomUserRepository userRepository;
 
+    @Autowired
+    private CustomUserDetailsService customUserDetailsService;
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
@@ -75,15 +78,19 @@ public class SecurityConfig {
         //반드시 필요
         http.authenticationManager(authenticationManager);
 
-        http.cors().and().csrf().disable();
-//                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-//                .and()
+        http.cors().and().csrf().disable()
+                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+                //.and()
 //                .addFilterBefore(new JwtAuthenticationFilter(authenticationManager, jwtUtil()), UsernamePasswordAuthenticationFilter.class)
-//                .addFilterBefore(new JwtAuthorizationFilter(authenticationManager, userRepository), UsernamePasswordAuthenticationFilter.class);
+                //.addFilter(new JwtAuthorizationFilter(authenticationManager, , jwtUtil()));
+        //           .addFilterBefore(new JwtAuthorizationFilter(authenticationManager, userRepository), UsernamePasswordAuthenticationFilter.class);
+
+        http.addFilterBefore(new JwtAuthorizationFilter(authenticationManager, customUserDetailsService, jwtUtil()), UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeRequests()
                 .antMatchers("/sample/all", "/login", "/logout").permitAll()
                 .antMatchers("/sample/member").hasRole("USER") // USER 는 스프링 내부에서 인증된 사용자를 의미함
+                .antMatchers("/api/v2/token/**").hasRole("USER")
                 .antMatchers("/api/v2/signup", "/api/v2/login", "/api/v1/login", "/images/**", "/api/v2/users/**").permitAll();
         http.formLogin().loginProcessingUrl(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password").loginPage("/api/v2/login");
         http.cors().and().csrf().disable();

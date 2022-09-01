@@ -52,7 +52,7 @@ public class PrincipalDetails implements UserDetails {
     public Collection<? extends GrantedAuthority> getAuthorities() {
         Collection<GrantedAuthority> authorities = new ArrayList<>();
         user.getGradeSet().forEach(r -> {
-            authorities.add(()->{ return String.valueOf(r);});
+            authorities.add(()-> String.valueOf(r));
         });
         return authorities;
     }
