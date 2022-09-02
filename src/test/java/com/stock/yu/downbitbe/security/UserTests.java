@@ -28,7 +28,7 @@ public class UserTests {
 
         IntStream.rangeClosed(1, 100).forEach(i -> {
             User user = User.builder()
-                    .userId("user"+i+"@zerock.org")
+                    .userId("user"+i+"@test")
                     .nickname("사용자"+i)
                     .type(LoginType.LOCAL)
                     .password( passwordEncoder.encode("1111"))

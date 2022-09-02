@@ -38,6 +38,7 @@ public class User extends BaseTimeEntity {
     @NotNull
     private String nickname;
 
+    //TODO : 주식 예측률이므로 시큐리티 구현 후 삭제
     @Column(name = "hit_rate")
     private float hitRate;
 

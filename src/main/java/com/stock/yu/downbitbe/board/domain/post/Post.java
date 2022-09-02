@@ -8,11 +8,13 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 
 @Entity
 @Table(name = "POST")
+@DynamicUpdate
 @Getter
 @NoArgsConstructor
 public class Post extends BaseTimeEntity {
@@ -56,6 +58,15 @@ public class Post extends BaseTimeEntity {
         this.board = board;
         this.like = like;
         this.comment = comment;
+    }
+
+    public Post updatePost(Post post){
+        if(post.getTitle() != null)
+            this.title = post.getTitle();
+        if(post.getContent() != null)
+            this.content = post.getContent();
+
+        return this;
     }
 
 }
