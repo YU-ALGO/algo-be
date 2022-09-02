@@ -3,7 +3,6 @@ package com.stock.yu.downbitbe.security.filter;
 import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -14,6 +13,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Enumeration;
 
 @Log4j2
 public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
@@ -29,7 +29,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         log.info("----------ApiLoginFilter------------");
         log.info("attemptAuthentication");
 
-        String userId = request.getParameter("username");
+        String userId = request.getParameter("user_id");
         String pw = request.getParameter("password");
 
         log.info("userId:"+userId);
@@ -50,7 +50,7 @@ public class ApiLoginFilter extends AbstractAuthenticationProcessingFilter {
         log.info(authResult.getPrincipal());
 
         //email address
-        String userId = ((UserAuthDTO) authResult.getPrincipal()).getUsername();
+        String userId = ((UserAuthDTO) authResult.getPrincipal()).getUserId();
 
         String token = null;
         try {

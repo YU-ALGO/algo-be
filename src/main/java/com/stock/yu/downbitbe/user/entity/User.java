@@ -25,17 +25,17 @@ public class User extends BaseTimeEntity {
     @Column(length = 30, nullable = false, name = "user_id")
     private String userId;
 
-    @NotNull
+    //@NotNull
     @Column
     private String password;
 
     @Column
-    @NotNull
+    //@NotNull
     @Enumerated(EnumType.STRING)
     private LoginType type;
 
     @Column
-    @NotNull
+    //@NotNull
     private String nickname;
 
     //TODO : 주식 예측률이므로 시큐리티 구현 후 삭제
@@ -65,7 +65,7 @@ public class User extends BaseTimeEntity {
         this.hitRate = hitRate;
     }
 
-    @ElementCollection(fetch = FetchType.LAZY)
+    @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private Set<Grade> gradeSet = new HashSet<>();
 

@@ -36,6 +36,7 @@ public class UserAuthDTO extends User implements OAuth2User {
         this.type = type;
     }
 
+    @Override
     public Map<String, Object> getAttributes() {
         return this.attr;
     }

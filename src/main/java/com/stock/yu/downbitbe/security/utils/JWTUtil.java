@@ -13,9 +13,9 @@ import java.util.Date;
 
 @Log4j2
 public class JWTUtil {
-    private String secretKey = "downbit-be";
+    private String secretKey = "downbit"; // 실무에서는 유저의 비밀번호 등을 이용해서 넣어주는게 맞음
 
-    private long expire = 50 * 24 * 30; //1占쏙옙
+    private long expire = 50 * 24 * 30; //1달
 
     public String generateToken(String userId) throws Exception {
         return Jwts.builder()
@@ -39,8 +39,10 @@ public class JWTUtil {
             DefaultClaims claims = (DefaultClaims) defaultJws.getBody();
 
             log.info("-----------------");
+            log.info("claims : " + claims);
+            log.info("subject : " + claims.get("userId"));
 
-            contentValue = claims.getSubject();
+            contentValue = (String) claims.get("userId");
         } catch (Exception e) {
             e.printStackTrace();
             log.error(e.getMessage());
