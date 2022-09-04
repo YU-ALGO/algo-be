@@ -1,5 +1,6 @@
 package com.stock.yu.downbitbe.domain.user.controller;
 
+import com.stock.yu.downbitbe.config.Config;
 import com.stock.yu.downbitbe.domain.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.domain.user.entity.Grade;
 import com.stock.yu.downbitbe.domain.user.entity.LoginType;
@@ -10,6 +11,7 @@ import com.stock.yu.downbitbe.security.payload.response.JwtResponse;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.boot.web.server.Cookie;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
@@ -21,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.Cookie;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -41,6 +42,7 @@ public class UserController {
     private final JWTUtil jwtUtil;
 
     // 리턴 값으로 토큰 반환해주면 됨
+    //@CrossOrigin(origins = "http://downbit.r-e.kr:3000", allowCredentials = "true")
     @PostMapping("/login")
     //public ResponseEntity<Void> login(@RequestBody Map<String, String> user) throws Exception {
     public ResponseEntity<?> login(@RequestBody LoginRequest user) throws Exception {
@@ -110,10 +112,10 @@ public class UserController {
         // 토큰 생성 및 쿠키 설정
         ResponseCookie responseCookie = ResponseCookie.from("token",jwtUtil.generateToken(email))
                 .httpOnly(true)
-                .secure(true)
                 .path("/")
-                .maxAge(60)
-                .domain("yourdomain.net")
+                //.sameSite("none")
+                .maxAge(600L)
+                .domain(Config.DOMAIN)
                 .build();
 
 
@@ -122,7 +124,6 @@ public class UserController {
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .body(JwtResponse.builder()
                 .userId(email)
-                .token(jwtUtil.generateToken(email))
                 .type(repository.findByUserId(email).getType().toString())
                 .roles(roles)
                 .build());

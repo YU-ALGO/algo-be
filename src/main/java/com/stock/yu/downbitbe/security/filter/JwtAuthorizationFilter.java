@@ -14,6 +14,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
+import org.springframework.web.util.WebUtils;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -22,6 +23,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.util.Arrays;
+import java.util.Enumeration;
 
 @Log4j2
 public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
@@ -38,6 +40,18 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain chain) throws IOException, ServletException {
 
+        Cookie[] cookies = ((HttpServletRequest) request).getCookies();
+        if(cookies == null) {
+            log.info("cookies is null");
+            chain.doFilter(request, response);
+            return;
+        }
+
+        String header2 = request.getHeader("Authorization");
+        log.info("header2 : " + header2);
+        Enumeration headers = request.getHeaderNames();
+        while(headers.hasMoreElements())
+            log.info("e : "+headers.nextElement());
         String header = request.getHeader("authorization");
         if (header == null || !header.startsWith("Bearer")) {
             chain.doFilter(request, response);
