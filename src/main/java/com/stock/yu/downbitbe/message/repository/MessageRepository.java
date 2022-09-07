@@ -1,7 +1,7 @@
-package com.stock.yu.downbitbe.domain.message.repository;
+package com.stock.yu.downbitbe.message.repository;
 
-import com.stock.yu.downbitbe.domain.message.entity.Message;
-import com.stock.yu.downbitbe.domain.user.entity.User;
+import com.stock.yu.downbitbe.message.entity.Message;
+import com.stock.yu.downbitbe.user.entity.User;
 import org.springframework.data.jpa.repository.EntityGraph;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;

@@ -1,6 +1,6 @@
-package com.stock.yu.downbitbe.domain.message.dto;
+package com.stock.yu.downbitbe.message.dto;
 
-import com.stock.yu.downbitbe.domain.user.entity.User;
+import com.stock.yu.downbitbe.user.entity.User;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

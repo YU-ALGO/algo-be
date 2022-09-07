@@ -1,6 +1,6 @@
-package com.stock.yu.downbitbe.domain.user.service;
+package com.stock.yu.downbitbe.user.service;
 
-import com.stock.yu.downbitbe.domain.user.entity.User;
+import com.stock.yu.downbitbe.user.entity.User;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 

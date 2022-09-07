@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.security.payload.response;
 
-import com.stock.yu.downbitbe.domain.user.entity.Grade;
+import com.stock.yu.downbitbe.user.entity.Grade;
 import lombok.Builder;
 import lombok.Data;
 

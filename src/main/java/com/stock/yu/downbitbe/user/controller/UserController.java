@@ -1,10 +1,10 @@
-package com.stock.yu.downbitbe.domain.user.controller;
+package com.stock.yu.downbitbe.user.controller;
 
-import com.stock.yu.downbitbe.domain.user.dto.UserAuthDTO;
-import com.stock.yu.downbitbe.domain.user.entity.Grade;
-import com.stock.yu.downbitbe.domain.user.entity.LoginType;
-import com.stock.yu.downbitbe.domain.user.entity.User;
-import com.stock.yu.downbitbe.domain.user.repository.CustomUserRepository;
+import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
+import com.stock.yu.downbitbe.user.entity.Grade;
+import com.stock.yu.downbitbe.user.entity.LoginType;
+import com.stock.yu.downbitbe.user.entity.User;
+import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
 import com.stock.yu.downbitbe.security.payload.request.LoginRequest;
 import com.stock.yu.downbitbe.security.payload.response.JwtResponse;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
@@ -40,11 +40,11 @@ public class UserController {
 
     private final JWTUtil jwtUtil;
 
-    // ¸®ÅÏ °ªÀ¸·Î ÅäÅ« ¹İÈ¯ÇØÁÖ¸é µÊ
+    // ë¦¬í„´ ê°’ìœ¼ë¡œ í† í° ë°˜í™˜í•´ì£¼ë©´ ë¨
     @PostMapping("/login")
     //public ResponseEntity<Void> login(@RequestBody Map<String, String> user) throws Exception {
     public ResponseEntity<?> login(@RequestBody LoginRequest user) throws Exception {
-        // °¡ÀÔµÇÁö ¾ÊÀº È¸¿øÀÎÁö È®ÀÎ
+        // ê°€ì…ë˜ì§€ ì•Šì€ íšŒì›ì¸ì§€ í™•ì¸
 
         //String email = user.get("username");
         //String password = user.get("password");
@@ -58,10 +58,10 @@ public class UserController {
         log.info("token" + authenticationToken);
 
         try {
-            // AuthenticationManager ¿¡ token À» ³Ñ±â¸é UserDetailsService °¡ ¹Ş¾Æ Ã³¸®ÇÏµµ·Ï ÇÑ´Ù.
+            // AuthenticationManager ì— token ì„ ë„˜ê¸°ë©´ UserDetailsService ê°€ ë°›ì•„ ì²˜ë¦¬í•˜ë„ë¡ í•œë‹¤.
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
             log.info("authentication"+authentication);
-            // ½ÇÁ¦ SecurityContext ¿¡ authentication Á¤º¸¸¦ µî·ÏÇÑ´Ù.
+            // ì‹¤ì œ SecurityContext ì— authentication ì •ë³´ë¥¼ ë“±ë¡í•œë‹¤.
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (DisabledException | LockedException | BadCredentialsException e) {
             String status;
@@ -104,10 +104,10 @@ public class UserController {
         log.info("-----------");
 
         if(!passwordEncoder.matches(password, repository.findByUserId(email).getPassword())) {
-            throw new IllegalArgumentException("ºñ¹Ğ¹øÈ£ ºÒÀÏÄ¡");
+            throw new IllegalArgumentException("ë¹„ë°€ë²ˆí˜¸ ë¶ˆì¼ì¹˜");
         }
 
-        // ÅäÅ« »ı¼º ¹× ÄíÅ° ¼³Á¤
+        // í† í° ìƒì„± ë° ì¿ í‚¤ ì„¤ì •
         ResponseCookie responseCookie = ResponseCookie.from("token",jwtUtil.generateToken(email))
                 .httpOnly(true)
                 .secure(true)
@@ -117,7 +117,7 @@ public class UserController {
                 .build();
 
 
-        // ResponseEntity¿¡¼­ header ¼³Á¤ ¹× ¸¸µç ÄíÅ° ³Ö°í ÀÀ´ä
+        // ResponseEntityì—ì„œ header ì„¤ì • ë° ë§Œë“  ì¿ í‚¤ ë„£ê³  ì‘ë‹µ
         //return ResponseEntity.status(HttpStatus.OK).build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, responseCookie.toString())
                 .body(JwtResponse.builder()
@@ -128,7 +128,7 @@ public class UserController {
                 .build());
     }
 
-    //TODO È¸¿ø°¡ÀÔ ¿Ï¼ºÇÏ±â
+    //TODO íšŒì›ê°€ì… ì™„ì„±í•˜ê¸°
     @Transactional
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody Map<String, String> form) {

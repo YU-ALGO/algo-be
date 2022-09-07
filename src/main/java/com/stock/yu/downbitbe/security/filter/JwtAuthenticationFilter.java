@@ -1,8 +1,8 @@
 package com.stock.yu.downbitbe.security.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.stock.yu.downbitbe.domain.user.service.CustomUserDetailsService;
-import com.stock.yu.downbitbe.domain.user.service.PrincipalDetails;
+import com.stock.yu.downbitbe.user.service.CustomUserDetailsService;
+import com.stock.yu.downbitbe.user.service.PrincipalDetails;
 import com.stock.yu.downbitbe.security.payload.request.LoginRequest;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(loginRequest.getUsername(), loginRequest.getPassword());
 
-        log.info("JwtAuthenticationFilter : ÅäÅ«»ý¼º¿Ï·á");
+        log.info("JwtAuthenticationFilter : ï¿½ï¿½Å«ï¿½ï¿½ï¿½ï¿½ï¿½Ï·ï¿½");
 
         Authentication authentication = authenticationManager.authenticate(authenticationToken);
 

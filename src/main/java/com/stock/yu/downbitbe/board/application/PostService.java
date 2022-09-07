@@ -18,7 +18,8 @@ public class PostService {
     private final PostRepository postRepository;
 
     @Transactional(readOnly = true)
-    public PostResponseDto findPostByPostId(Long postId){
+    public PostResponseDto findPostByPostId(Long boardId, Long postId){
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
         return new PostResponseDto(post);
     }
@@ -39,7 +40,11 @@ public class PostService {
     }
 
     @Transactional
-    public Long updatePost(PostUpdateRequestDto postUpdateRequestDto, Long postId, User user) {
+    public Long updatePost(PostUpdateRequestDto postUpdateRequestDto, Long boardId, Long postId, User user) {
+        if(!postUpdateRequestDto.getPostId().equals(postId) || !postUpdateRequestDto.getBoardId().equals(boardId)){
+            throw new RuntimeException("잘못된 요청입니다.");
+        }
+        boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
         if(!post.getUser().getUserId().equals(user.getUserId())){
             throw new RuntimeException("작성자와 일치하지 않습니다.");

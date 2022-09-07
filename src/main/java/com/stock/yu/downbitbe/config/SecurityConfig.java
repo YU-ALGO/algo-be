@@ -1,7 +1,7 @@
 package com.stock.yu.downbitbe.config;
 
-import com.stock.yu.downbitbe.domain.user.repository.CustomUserRepository;
-import com.stock.yu.downbitbe.domain.user.service.CustomUserDetailsService;
+import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
+import com.stock.yu.downbitbe.user.service.CustomUserDetailsService;
 import com.stock.yu.downbitbe.security.filter.JwtAuthenticationFilter;
 import com.stock.yu.downbitbe.security.filter.JwtAuthorizationFilter;
 import com.stock.yu.downbitbe.security.handler.ApiLoginFailHandler;

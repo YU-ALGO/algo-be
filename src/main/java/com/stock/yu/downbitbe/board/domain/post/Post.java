@@ -11,6 +11,7 @@ import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "POST")
@@ -23,11 +24,11 @@ public class Post extends BaseTimeEntity {
     private Long id;
 
     @Column(length = 50)
-    @NotNull
+    @NotBlank
     private String title;
 
     @Column(columnDefinition = "TEXT")
-    @NotNull
+    @NotBlank
     private String content;
 
     @JoinColumn(name = "author")
@@ -65,7 +66,6 @@ public class Post extends BaseTimeEntity {
             this.title = post.getTitle();
         if(post.getContent() != null)
             this.content = post.getContent();
-
         return this;
     }
 

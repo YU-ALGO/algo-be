@@ -1,8 +1,8 @@
 package com.stock.yu.downbitbe.security.controller;
 
-import com.stock.yu.downbitbe.domain.user.dto.UserAuthDTO;
-import com.stock.yu.downbitbe.domain.user.entity.User;
-import com.stock.yu.downbitbe.domain.user.service.PrincipalDetails;
+import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
+import com.stock.yu.downbitbe.user.entity.User;
+import com.stock.yu.downbitbe.user.service.PrincipalDetails;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;

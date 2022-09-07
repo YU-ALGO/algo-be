@@ -1,8 +1,8 @@
-package com.stock.yu.downbitbe.domain.message.service;
+package com.stock.yu.downbitbe.message.service;
 
-import com.stock.yu.downbitbe.domain.message.dto.MessageDTO;
-import com.stock.yu.downbitbe.domain.message.entity.Message;
-import com.stock.yu.downbitbe.domain.message.repository.MessageRepository;
+import com.stock.yu.downbitbe.message.dto.MessageDTO;
+import com.stock.yu.downbitbe.message.entity.Message;
+import com.stock.yu.downbitbe.message.repository.MessageRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.stereotype.Service;

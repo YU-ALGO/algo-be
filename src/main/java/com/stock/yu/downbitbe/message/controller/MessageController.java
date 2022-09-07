@@ -1,7 +1,7 @@
-package com.stock.yu.downbitbe.domain.message.controller;
+package com.stock.yu.downbitbe.message.controller;
 
-import com.stock.yu.downbitbe.domain.message.dto.MessageDTO;
-import com.stock.yu.downbitbe.domain.message.service.MessageService;
+import com.stock.yu.downbitbe.message.dto.MessageDTO;
+import com.stock.yu.downbitbe.message.service.MessageService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpStatus;
