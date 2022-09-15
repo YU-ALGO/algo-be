@@ -1,18 +1,13 @@
 package com.stock.yu.downbitbe.security.controller;
 
-import com.stock.yu.downbitbe.domain.user.dto.UserAuthDTO;
-import com.stock.yu.downbitbe.domain.user.entity.User;
-import com.stock.yu.downbitbe.domain.user.service.PrincipalDetails;
+import com.stock.yu.downbitbe.domain.user.entity.Token;
+import com.stock.yu.downbitbe.security.config.Config;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.annotation.CurrentSecurityContext;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.Cookie;
-import java.security.Principal;
 
 @Log4j2
 @RestController
@@ -22,18 +17,17 @@ public class TokenController {
 
     private final JWTUtil jwtUtil;
 
-    @PostMapping(value = "/validate")
-    public ResponseEntity<?> validateToken(@RequestBody String accessToken, @CurrentSecurityContext(expression = "authentication.principal")
-    UserAuthDTO principal) throws Exception {
-        UserAuthDTO user = principal;
+    @PostMapping(value = "/refresh")
+    public ResponseEntity<?> validateToken(@CookieValue("refreshToken") String refreshToken) throws Exception {
 
-        log.info("user_id : " + user.getUserId());
-        log.info("nickname : " + user.getNickname());
-        log.info("password : " + user.getPassword());
+        if(!jwtUtil.isValidToken(refreshToken))
+            return ResponseEntity.badRequest().build();
 
-        //String value = jwtUtil.validateAndExtract(accessToken);
+        String newToken = jwtUtil.regenerateToken(refreshToken);
 
-        //log.info("value : " + value);
+
+
+
         return ResponseEntity.ok().build();
     }
 
