@@ -33,7 +33,7 @@ public class BoardController {
     }
 
     @PostMapping("/api/v1/boards")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> createBoard(@RequestBody Map<String, String> boardCreateDto, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
         Long createBoardId = boardService.createBoard(boardCreateDto.get("name"));
         if(createBoardId == null){
@@ -43,14 +43,14 @@ public class BoardController {
     }
 
     @PatchMapping("/api/v1/boards/{board_id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> updateBoard(@RequestBody Map<String, String> boardUpdateDto, @PathVariable("board_id") Long boardId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
         Long updateBoardId = boardService.updateBoard(boardUpdateDto.get("name"), boardId);
         return ResponseEntity.status(HttpStatus.OK).body(updateBoardId);
     }
 
     @DeleteMapping("/api/v1/boards/{id}")
-    @PreAuthorize("hasRole('ADMIN')")
+    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<?> deleteBoard(@PathVariable Long id, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
         Long deleteBoardId = boardService.deleteBoard(id);
         return ResponseEntity.status(HttpStatus.OK).body(deleteBoardId);

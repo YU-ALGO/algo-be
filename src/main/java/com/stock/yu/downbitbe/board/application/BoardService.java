@@ -29,7 +29,7 @@ public class BoardService {
     }
 
     @Transactional
-    public Long createBoard(String name) {   // security admin 확인 필요
+    public Long createBoard(String name) {   //TODO : security admin 확인 필요
         return boardRepository.save(Board.builder()
                 .name(name).build()).getId();
     }

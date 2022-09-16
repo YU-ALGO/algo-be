@@ -8,6 +8,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import javax.validation.constraints.NotBlank;
 
 @Entity
 @Table(name = "POST")
+@DynamicInsert
 @DynamicUpdate
 @Getter
 @NoArgsConstructor
@@ -32,12 +34,12 @@ public class Post extends BaseTimeEntity {
     private String content;
 
     @JoinColumn(name = "author")
-    @ManyToOne(cascade = CascadeType.ALL) // 구글링 한번 더 해서 공부
+    @ManyToOne // 구글링 한번 더 해서 공부
     @NotNull
     private User user;
 
     @JoinColumn(name = "board_id")
-    @ManyToOne(cascade = CascadeType.ALL)
+    @ManyToOne
     @NotNull
     private Board board;
 
