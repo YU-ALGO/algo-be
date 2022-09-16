@@ -10,6 +10,8 @@ import com.stock.yu.downbitbe.user.entity.User;
 import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,38 +27,35 @@ public class PostController {
     private final CustomUserRepository userRepository;
 
     @GetMapping("/{board_id}/posts")
-    public List<PostListResponseDto> posts(@PathVariable("board_id") Long boardId) {
-        return postService.findAllPostsById(boardId);
+    public ResponseEntity<List<PostListResponseDto>> posts(@PathVariable("board_id") Long boardId) {
+        return ResponseEntity.status(HttpStatus.OK).body(postService.findAllPostsById(boardId));
     }
 
     @GetMapping("/{board_id}/posts/{post_id}")
-    public PostResponseDto post(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId) {
-        return postService.findPostByPostId(boardId, postId);
+    public ResponseEntity<PostResponseDto> post(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId) {
+        PostResponseDto responseDto = postService.findPostByPostId(boardId, postId);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
     }
 
     @PostMapping("/{board_id}/posts")
     public Long createPost(@RequestBody @Valid PostCreateRequestDto postCreateRequestDto, @PathVariable("board_id") Long boardId,
-                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
-        log.info("--------create-----");
-        log.info("title" + postCreateRequestDto.getTitle());
-        log.info("content" + postCreateRequestDto.getContent());
-
-        //Long postId = postService.createPost(postCreateDto, boardId);
+                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
         User user = userRepository.findByUserId(auth.getUserId());
-
 
         return postService.createPost(postCreateRequestDto, boardId, user);
     }
 
     @PatchMapping("/{board_id}/posts/{post_id}")
-    public Long updatePost(@RequestBody @Valid PostUpdateRequestDto postUpdateRequestDto, @PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId){
-        User user = new User();
+    public Long updatePost(@RequestBody @Valid PostUpdateRequestDto postUpdateRequestDto, @PathVariable("board_id") Long boardId,
+                           @PathVariable("post_id") Long postId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+        User user = userRepository.findByUserId(auth.getUserId());
         return postService.updatePost(postUpdateRequestDto, boardId, postId, user);
     }
 
     @DeleteMapping("/{board_id}/posts/{post_id}")
-    public Long deletePost(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId){
-        User user = new User();
+    public Long deletePost(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
+                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+        User user = userRepository.findByUserId(auth.getUserId());
         return postService.deletePost(postId, user);
     }
 }

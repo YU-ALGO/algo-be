@@ -51,6 +51,8 @@ public class Post extends BaseTimeEntity {
     @ColumnDefault("0")
     private Integer comment;
 
+    //TODO 조회수 필드 추가
+
     @Builder
     public Post(String title, String content, User user, Board board, Integer like, Integer comment){
         this.title = title;
@@ -68,5 +70,4 @@ public class Post extends BaseTimeEntity {
             this.content = post.getContent();
         return this;
     }
-
 }

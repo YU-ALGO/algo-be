@@ -91,8 +91,8 @@ public class SecurityConfig {
                 .antMatchers("/sample/all", "/login", "/logout").permitAll()
                 .antMatchers("/sample/member").hasRole("USER") // USER 는 스프링 내부에서 인증된 사용자를 의미함
                 .antMatchers("/api/v2/token/**").hasRole("USER")
-                .antMatchers("/api/v2/signup", "/api/v2/login", "/api/v1/login", "/images/**", "/api/v2/users/**").permitAll();
-        http.formLogin().loginProcessingUrl(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password").loginPage("/api/v2/login");
+                .antMatchers("/api/v1/signup", "/api/v2/login", "/api/v1/login", "/images/**", "/api/v1/users/**").permitAll();
+        http.formLogin().loginProcessingUrl(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password").loginPage("/api/v1/login");
         http.cors().and().csrf().disable();
 
 

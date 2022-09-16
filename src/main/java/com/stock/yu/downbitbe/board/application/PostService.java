@@ -19,14 +19,14 @@ public class PostService {
 
     @Transactional(readOnly = true)
     public PostResponseDto findPostByPostId(Long boardId, Long postId){
-        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
+        boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
         return new PostResponseDto(post);
     }
 
     @Transactional(readOnly = true)
     public List<PostListResponseDto> findAllPostsById(Long boardId) {
-        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
+        boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
         return postRepository.findAllByBoardId(boardId).stream()
                 .map(PostListResponseDto::new).collect(Collectors.toList());
     }

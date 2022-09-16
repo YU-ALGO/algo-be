@@ -17,7 +17,7 @@ import java.security.Principal;
 @Log4j2
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v2/token")
+@RequestMapping("api/v1/token")
 public class TokenController {
 
     private final JWTUtil jwtUtil;

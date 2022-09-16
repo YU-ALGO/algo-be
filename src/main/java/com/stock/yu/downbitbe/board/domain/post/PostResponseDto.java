@@ -1,17 +1,24 @@
 package com.stock.yu.downbitbe.board.domain.post;
 
-import com.stock.yu.downbitbe.user.entity.User;
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.Getter;
 
 import java.time.LocalDateTime;
 
+@Getter
 public class PostResponseDto {
     private final Long id;
     private final String title;
     private final String content;
     private final String author;
+    @JsonProperty("comment_count")
     private final Integer commentCount;
+    @JsonProperty("like_count")
     private final Integer likeCount;
-    private final LocalDateTime created_at;
+    @JsonProperty("created_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private final LocalDateTime createdAt;
 
     public PostResponseDto(Post post) {
         this.id = post.getId();
@@ -20,6 +27,6 @@ public class PostResponseDto {
         this.author = post.getUser().getNickname();
         this.commentCount = post.getComment();
         this.likeCount = post.getLike();
-        this.created_at = post.getCreatedAt();
+        this.createdAt = post.getCreatedAt();
     }
 }

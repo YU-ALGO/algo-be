@@ -22,6 +22,12 @@ public class BoardService {
                 .collect(Collectors.toList());
     }
 
+    @Transactional(readOnly = true)
+    public String findBoardById(Long boardId) {
+        Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
+        return board.getName();
+    }
+
     @Transactional
     public Long createBoard(String name) {   // security admin 확인 필요
         return boardRepository.save(Board.builder()

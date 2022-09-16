@@ -9,9 +9,7 @@ import org.junit.jupiter.api.*;
 import org.junit.jupiter.api.extension.ExtendWith;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
-import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.jupiter.MockitoExtension;
-import org.mockito.stubbing.Answer;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.util.Optional;
@@ -53,7 +51,7 @@ class PostServiceTest {
     }
 
     @Nested
-    @DisplayName("게시물 검색")
+    @DisplayName("게시글 검색")
     class FindPostById {
         Long mockPostId = null;
         Long mockBoardId = null;
@@ -131,7 +129,7 @@ class PostServiceTest {
     }
 
     @Nested
-    @DisplayName("게시물 생성")
+    @DisplayName("게시글 생성")
     class CreatePost {
         PostCreateRequestDto mockPostCreateDto = null;
 
@@ -176,16 +174,28 @@ class PostServiceTest {
     }
 
     @Nested
-    @DisplayName("게시물 수정")
+    @DisplayName("게시글 수정")
     class UpdatePost {
         Long mockPostId = null;
         Long mockBoardId = null;
-        Post theProperty;
+
+        PostUpdateRequestDto mockPostUpdateDto = null;
 
         @BeforeEach
         public void setId() {
+            String mockTitle = "title test";
+            String mockContent = "content test";
             mockBoardId = 1L;
             mockPostId = 2L;
+            mockPost = Post.builder()
+                    .title(mockTitle)
+                    .content(mockContent)
+                    .user(mockUser)
+                    .board(mockBoard)
+                    .build();
+            ReflectionTestUtils.setField(mockPost, "id", mockPostId);
+
+            mockPostUpdateDto = new PostUpdateRequestDto(mockBoardId, mockPostId, mockTitle + " update", mockContent + " update");
         }
 
         @Nested
@@ -195,17 +205,7 @@ class PostServiceTest {
             @DisplayName("게시물 수정 성공")
             void Success() {
                 //given
-                String mockTitle = "title test";
-                String mockContent = "content test";
-                mockPost = Post.builder()
-                        .title(mockTitle)
-                        .content(mockContent)
-                        .user(mockUser)
-                        .board(mockBoard)
-                        .build();
-                ReflectionTestUtils.setField(mockPost, "id", mockPostId);
 
-                PostUpdateRequestDto mockPostUpdateDto = new PostUpdateRequestDto(mockBoardId, mockPostId, mockTitle + " update", mockContent + " update");
                 when(boardRepository.findById(mockBoardId)).thenReturn(Optional.ofNullable(mockBoard));
                 when(postRepository.findById(mockPostId)).thenReturn(Optional.ofNullable(mockPost));
                 when(postRepository.save(any(Post.class))).thenAnswer(post -> {
@@ -213,7 +213,7 @@ class PostServiceTest {
                     ReflectionTestUtils.setField(p, "id", mockPostId);
                     return p;
                 });
-                
+
 
                 //when
                 Long expectedPostId = postService.updatePost(mockPostUpdateDto, mockBoardId, mockPostId, mockUser);
@@ -231,25 +231,65 @@ class PostServiceTest {
             @Test
             @DisplayName("게시판이 존재하지 않는 경우")
             void BoardNotExist() {
+                //given
+                when(boardRepository.findById(mockBoardId)).thenReturn(Optional.empty());
+
+                //when
+                IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> postService.updatePost(mockPostUpdateDto, mockBoardId, mockPostId, mockUser));
+
+                //then
+                assertThat(exception.getMessage()).isEqualTo("게시판이 존재하지 않습니다.");
 
             }
 
             @Test
-            @DisplayName("게시물이 존재하지 않는 경우")
+            @DisplayName("게시글이 존재하지 않는 경우")
             void PostNotExist() {
+                //given
+                when(boardRepository.findById(mockBoardId)).thenReturn(Optional.ofNullable(mockBoard));
+                when(postRepository.findById(mockPostId)).thenReturn(Optional.empty());
 
+                //when
+                IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> postService.updatePost(mockPostUpdateDto, mockBoardId, mockPostId, mockUser));
+
+                //then
+                assertThat(exception.getMessage()).isEqualTo("게시글이 존재하지 않습니다.");
             }
 
             @Test
             @DisplayName("작성자와 사용자가 일치하지 않는 경우")
             void CreatorNotEqual() {
+                //given
+                when(boardRepository.findById(mockBoardId)).thenReturn(Optional.ofNullable(mockBoard));
+                when(postRepository.findById(mockPostId)).thenReturn(Optional.ofNullable(mockPost));
+                User otherUser = User.builder()
+                        .userId("other@test")
+                        .password("1234")
+                        .type(LoginType.LOCAL)
+                        .nickname("test")
+                        .build();
+                ReflectionTestUtils.setField(otherUser, "id", 2L);
 
+                //when
+                RuntimeException exception = Assertions.assertThrows(RuntimeException.class, () -> postService.updatePost(mockPostUpdateDto, mockBoardId, mockPostId, otherUser));
+
+                //then
+                assertThat(exception.getMessage()).isEqualTo("작성자와 일치하지 않습니다.");
             }
         }
     }
 
 
-    @Test
-    void deletePost() {
+    @Nested
+    @DisplayName("게시글 삭제")
+    class DeletePost{
+        @Nested
+        @DisplayName("성공 케이스")
+        class Success{
+            @Test
+            void deletePost() {
+            }
+        }
     }
+
 }

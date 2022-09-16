@@ -30,7 +30,7 @@ import java.util.stream.Collectors;
 @Log4j2
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v2")
+@RequestMapping("/api/v1")
 public class UserController {
 
 
