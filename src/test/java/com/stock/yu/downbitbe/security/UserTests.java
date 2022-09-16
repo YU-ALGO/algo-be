@@ -49,6 +49,22 @@ public class UserTests {
     }
 
     @Test
+    @Transactional
+    @DisplayName("admin 생성")
+    public void insertAdmin() {
+        User user = User.builder()
+                .userId("admin")
+                .nickname("admin")
+                .type(LoginType.LOCAL)
+                .password(passwordEncoder.encode("admin"))
+                .build();
+
+        user.addGrade(Grade.ADMIN);
+
+        repository.save(user);
+    }
+
+    @Test
     public void testRead() {
         Optional<User> result = repository.findByUserIdAndType("user95@test", LoginType.LOCAL);
         User user = result.get();

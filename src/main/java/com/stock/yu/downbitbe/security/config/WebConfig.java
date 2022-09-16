@@ -1,4 +1,4 @@
-package com.stock.yu.downbitbe.config;
+package com.stock.yu.downbitbe.security.config;
 
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.servlet.config.annotation.CorsRegistry;
@@ -9,7 +9,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("http://localhost:3000")
+                .allowedOrigins(Config.WEB_BASE_URL)
                 .allowedHeaders("*")
                 .exposedHeaders("*")
                 .allowCredentials(true);
