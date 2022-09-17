@@ -8,8 +8,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public class SignupRequest {
-    @JsonProperty("user_id")
-    private String userId;
+    private String username;
     private String password;
     private String nickname;
 }

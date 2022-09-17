@@ -5,6 +5,7 @@ import com.stock.yu.downbitbe.board.domain.board.BoardRepository;
 import com.stock.yu.downbitbe.board.domain.post.*;
 import com.stock.yu.downbitbe.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -25,9 +26,9 @@ public class PostService {
     }
 
     @Transactional(readOnly = true)
-    public List<PostListResponseDto> findAllPostsById(Long boardId) {
+    public List<PostListResponseDto> findAllPostsById(Long boardId, Pageable pageable) {
         boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
-        return postRepository.findAllByBoardId(boardId).stream()
+        return postRepository.findAllByBoardId(boardId, pageable).stream()
                 .map(PostListResponseDto::new).collect(Collectors.toList());
     }
 
@@ -36,7 +37,7 @@ public class PostService {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
 
         Post post = postCreateRequestDto.toEntity(board, user);
-        return postRepository.save(post).getId();
+        return postRepository.save(post).getPostId();
     }
 
     @Transactional
@@ -49,7 +50,7 @@ public class PostService {
         if(!post.getUser().getUserId().equals(user.getUserId())){
             throw new RuntimeException("작성자와 일치하지 않습니다.");
         }
-        return postRepository.save(post.updatePost(postUpdateRequestDto.toEntity())).getId();
+        return postRepository.save(post.updatePost(postUpdateRequestDto.toEntity())).getPostId();
     }
 
     @Transactional
@@ -59,6 +60,6 @@ public class PostService {
             throw new RuntimeException("작성자와 일치하지 않습니다.");
         }
         postRepository.delete(post);
-        return post.getId();
+        return post.getPostId();
     }
 }

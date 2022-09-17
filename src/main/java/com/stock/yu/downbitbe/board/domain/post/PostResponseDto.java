@@ -21,12 +21,12 @@ public class PostResponseDto {
     private final LocalDateTime createdAt;
 
     public PostResponseDto(Post post) {
-        this.id = post.getId();
+        this.id = post.getPostId();
         this.title = post.getTitle();
         this.content = post.getContent();
         this.author = post.getUser().getNickname();
-        this.commentCount = post.getComment();
-        this.likeCount = post.getLike();
+        this.commentCount = post.getCommentCount();
+        this.likeCount = post.getLikeCount();
         this.createdAt = post.getCreatedAt();
     }
 }

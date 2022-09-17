@@ -76,9 +76,9 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         //return oAuth2User;
 
         UserAuthDTO userAuth = new UserAuthDTO(
-                user.getUserId(),
+                user.getUsername(),
                 user.getPassword(),
-                user.getType(),
+                user.getLoginType(),
                 user.getGradeSet().stream().map( grade -> new SimpleGrantedAuthority("ROLE_"+grade.name()))
                         .collect(Collectors.toList()),
                 attributes
@@ -91,17 +91,17 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
     // for google login
     private User saveSocialMember(String email, LoginType type) {
 
-        Optional<User> result = repository.findByUserIdAndType(email, type);
+        Optional<User> result = repository.findByUsernameAndLoginType(email, type);
 
         if(result.isPresent()) {
             return result.get();
         }
 
         User user = User.builder()
-                .userId(email)
+                .username(email)
                 .nickname(email)    //TODO 임시 닉네임 : email
                 .password( passwordEncoder.encode("1111")) //TODO 임시 비밀번호 : 1111
-                .type(type)
+                .loginType(type)
                 .build();
 
         user.addGrade(Grade.USER);
@@ -116,17 +116,17 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         if(type.equals(LoginType.GOOGLE))
             return saveSocialMember(email, type);
 
-        Optional<User> result = repository.findByUserIdAndType(email, type);
+        Optional<User> result = repository.findByUsernameAndLoginType(email, type);
 
         if(result.isPresent()) {
             return result.get();
         }
 
         User user = User.builder()
-                .userId(email)
+                .username(email)
                 .nickname(nickname)
                 .password( passwordEncoder.encode("1111")) //TODO 임시 비밀번호 : 1111
-                .type(type)
+                .loginType(type)
                 .build();
 
         user.addGrade(Grade.USER);
@@ -141,7 +141,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
     }
 
     private void validateDuplicateUser(User user) {
-        User findUser = repository.findByUserId(user.getUserId());
+        User findUser = repository.findByUsername(user.getUsername());
         if(user != null) {
             throw new IllegalStateException("이미 가입된 회원입니다.");
         }

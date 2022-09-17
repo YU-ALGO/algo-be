@@ -35,9 +35,9 @@ public class UserTests {
 
         IntStream.rangeClosed(1, 100).forEach(i -> {
             User user = User.builder()
-                    .userId("user"+i+"@test")
+                    .username("user"+i+"@test")
                     .nickname("사용자"+i)
-                    .type(LoginType.LOCAL)
+                    .loginType(LoginType.LOCAL)
                     .password( passwordEncoder.encode("1111"))
                     .build();
 
@@ -53,9 +53,9 @@ public class UserTests {
     @DisplayName("admin 생성")
     public void insertAdmin() {
         User user = User.builder()
-                .userId("admin")
+                .username("admin")
                 .nickname("admin")
-                .type(LoginType.LOCAL)
+                .loginType(LoginType.LOCAL)
                 .password(passwordEncoder.encode("admin"))
                 .build();
 
@@ -66,7 +66,7 @@ public class UserTests {
 
     @Test
     public void testRead() {
-        Optional<User> result = repository.findByUserIdAndType("user95@test", LoginType.LOCAL);
+        Optional<User> result = repository.findByUsernameAndLoginType("user95@test", LoginType.LOCAL);
         User user = result.get();
         System.out.println(user);
     }

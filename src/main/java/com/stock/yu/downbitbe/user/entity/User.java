@@ -1,12 +1,12 @@
 package com.stock.yu.downbitbe.user.entity;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
+import com.stock.yu.downbitbe.food.domain.AllergyInfo;
 import com.sun.istack.NotNull;
 import lombok.*;
 
 import javax.persistence.*;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 @Entity
 @Table(name = "USER")
@@ -17,62 +17,55 @@ import java.util.Set;
 @ToString
 public class User extends BaseTimeEntity {
     @Id
+    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long userId;
 
     //TODO : 소셜 로그인 아이디 저장방식 및 엔티티 자체 아이디 중복허용 결정?
     @NotNull
-    @Column(length = 30, nullable = false, name = "user_id")
-    private String userId;
+    @Column(length = 30)
+    private String username;
 
-    //@NotNull
+    @NotNull
     @Column
     private String password;
 
-    @Column
-    //@NotNull
+    @Column(name = "login_type")
+    @NotNull
     @Enumerated(EnumType.STRING)
-    private LoginType type;
+    private LoginType loginType;
 
-    @Column
-    //@NotNull
+    @Column(length = 30)
+    @NotNull
     private String nickname;
 
-    //TODO : 주식 예측률이므로 시큐리티 구현 후 삭제
-    @Column(name = "hit_rate")
-    private float hitRate;
 
 //    @Column
 //    @Enumerated(EnumType.STRING)
 //    private Grade grade;
-//
-//    @Builder
-//    public User(String userId, String password, LoginType type, String nickname, float hitRate, Grade grade){
-//        this.userId = userId;
-//        this.password = password;
-//        this.type= type;
-//        this.nickname = nickname;
-//        this.hitRate = hitRate;
-//        this.grade = grade;
-//    }
 
     @Builder
-    public User(String userId, String password, LoginType type, String nickname, float hitRate){
-        this.userId = userId;
+    public User(String username, String password, LoginType loginType, String nickname){
+        this.username = username;
         this.password = password;
-        this.type= type;
+        this.loginType= loginType;
         this.nickname = nickname;
-        this.hitRate = hitRate;
     }
 
     @ElementCollection(fetch = FetchType.EAGER)
     @Builder.Default
     private Set<Grade> gradeSet = new HashSet<>();
 
-    public void addGrade(Grade grade) {
+    //TODO : 프로필 사진
+
+    @ElementCollection
+    @CollectionTable(name = "user_allergy_info", joinColumns = @JoinColumn(name = "user_id"))
+    private Set<AllergyInfo> allergyInfoList = new HashSet<>();
+
+
+   public void addGrade(Grade grade) {
         gradeSet.add(grade);
     }
-
 }
 
 

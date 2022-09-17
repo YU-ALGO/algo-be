@@ -15,13 +15,13 @@ import java.util.stream.Collectors;
 public class CommentService {
     private final PostRepository postRepository;
     private final CommentRepository commentRepository;
-    @Transactional(readOnly = true)
-    public List<CommentDto> findAllComments(Long postId){
-        postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-        return commentRepository.findAllByPostId(postId).stream()
-                .map(CommentDto::new)
-                .collect(Collectors.toList());
-    }
+//    @Transactional(readOnly = true)
+//    public List<CommentDto> findAllComments(Long postId){
+//        postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+//        return commentRepository.findAllByPostId(postId).stream()
+//                .map(CommentDto::new)
+//                .collect(Collectors.toList());
+//    }
 
 //    @Transactional
 //    public Long createComment(){

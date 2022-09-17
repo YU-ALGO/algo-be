@@ -133,17 +133,16 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody SignupRequest request) {
 
-        if(checkUserIdDuplication(request.getUserId()).getBody().equals("true"))
+        if(checkUserIdDuplication(request.getUsername()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user_id is duplication.");
         if(checkNicknameDuplication(request.getNickname()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("nickname is duplication.");
 
         User newUser = User.builder()
-                .userId(request.getUserId())
+                .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
                 .nickname(request.getNickname())
-                .type(LoginType.LOCAL)
-                .hitRate(0)
+                .loginType(LoginType.LOCAL)
                 .build();
 
         newUser.addGrade(Grade.USER);
@@ -153,8 +152,8 @@ public class UserController {
     }
 
     @GetMapping("/users/{user_id}/exists")
-    public ResponseEntity<Boolean> checkUserIdDuplication(@RequestBody @PathVariable("user_id") String userId) {
-        boolean user = repository.existsByUserId(userId);
+    public ResponseEntity<Boolean> checkUserIdDuplication(@RequestBody @PathVariable("user_id") String username) {
+        boolean user = repository.existsByUsername(username);
 
         if(user) {
             return ResponseEntity.status(HttpStatus.OK).body(true);

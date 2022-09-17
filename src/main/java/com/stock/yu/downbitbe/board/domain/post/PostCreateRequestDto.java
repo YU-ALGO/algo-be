@@ -12,10 +12,10 @@ import javax.validation.constraints.NotBlank;
 @RequiredArgsConstructor
 public class PostCreateRequestDto {
     @NotBlank(message = "제목을 입력해주세요.")
-    private String title;
+    private final String title;
     
     @NotBlank(message = "내용을 입력해주세요")
-    private String content;
+    private final String content;
 
     public Post toEntity(Board board, User user) {
         return Post.builder()

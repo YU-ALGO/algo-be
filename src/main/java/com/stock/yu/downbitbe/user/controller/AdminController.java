@@ -27,8 +27,8 @@ public class AdminController {
     @GetMapping("/admin")
     public ResponseEntity<?> isAdmin(@CookieValue("accessToken")String accessToken) {
         try {
-            String userId = jwtUtil.validateAndExtract(accessToken);
-            User user = repository.findByUserId(userId);
+            String username = jwtUtil.validateAndExtract(accessToken);
+            User user = repository.findByUsername(username);
             if(user.getGradeSet().contains(Grade.ADMIN))
                 return ResponseEntity.ok().build();
             else

@@ -18,7 +18,7 @@ import java.util.Map;
 @ToString
 public class UserAuthDTO extends User implements OAuth2User {
 
-    private String userId;
+    private String username;
     private String nickname;
     private LoginType type;
     private Map<String, Object> attr; // OAuth2User 는 Map 타입으로 모든 인증 결과를 attributes 라는 이름으로 가짐
@@ -32,7 +32,7 @@ public class UserAuthDTO extends User implements OAuth2User {
 
     public UserAuthDTO(String username, String password, LoginType type, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
-        this.userId = username;
+        this.username = username;
         this.type = type;
     }
 

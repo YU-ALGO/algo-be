@@ -16,11 +16,11 @@ public interface CustomUserRepository extends JpaRepository<User, String> {
 //    @Query("SELECT u FROM User u WHERE u.type= :type AND u.userId= :userId")
 //    Optional<User> findByUserIdAndType(@Param("userId") String userId, @Param("type") LoginType type);
 
-    Optional<User> findByUserIdAndType(String userId, LoginType type);
+    Optional<User> findByUsernameAndLoginType(String username, LoginType type);
 
-    User findByUserId(String userId);
+    User findByUsername(String username);
 
-    Boolean existsByUserId(String userId);
+    Boolean existsByUsername(String username);
 
     Boolean existsByNickname(String nickname);
 

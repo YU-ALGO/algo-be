@@ -27,7 +27,7 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("UserDetailsService loadUserByUsername " + username);
 
-        Optional<User> result = customUserRepository.findByUserIdAndType(username, LoginType.LOCAL);
+        Optional<User> result = customUserRepository.findByUsernameAndLoginType(username, LoginType.LOCAL);
 
         if(result.isEmpty()) {
             throw new UsernameNotFoundException("Check Email or Social ");
@@ -45,16 +45,16 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info(user);
 
         UserAuthDTO userAuth = new UserAuthDTO(
-                user.getUserId(),
+                user.getUsername(),
                 user.getPassword(),
-                user.getType(),
+                user.getLoginType(),
                 user.getGradeSet().stream().map( grade ->
                         new SimpleGrantedAuthority("ROLE_"+grade.name())
                 ).collect(Collectors.toSet())
         );
 
         userAuth.setNickname(user.getNickname());
-        userAuth.setType(user.getType());
+        userAuth.setType(user.getLoginType());
 
         return userAuth;
     }

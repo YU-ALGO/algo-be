@@ -36,9 +36,9 @@ class PostServiceTest {
     @BeforeEach
     public void setUp() {
         mockUser = User.builder()
-                .userId("test@test")
+                .username("test@test")
                 .password("1234")
-                .type(LoginType.LOCAL)
+                .loginType(LoginType.LOCAL)
                 .nickname("test")
                 .build();
 
@@ -263,9 +263,9 @@ class PostServiceTest {
                 when(boardRepository.findById(mockBoardId)).thenReturn(Optional.ofNullable(mockBoard));
                 when(postRepository.findById(mockPostId)).thenReturn(Optional.ofNullable(mockPost));
                 User otherUser = User.builder()
-                        .userId("other@test")
+                        .username("other@test")
                         .password("1234")
-                        .type(LoginType.LOCAL)
+                        .loginType(LoginType.LOCAL)
                         .nickname("test")
                         .build();
                 ReflectionTestUtils.setField(otherUser, "id", 2L);

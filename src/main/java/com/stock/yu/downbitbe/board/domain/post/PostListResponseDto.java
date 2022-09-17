@@ -21,10 +21,10 @@ public class PostListResponseDto {
     private LocalDateTime createdAt;
 
     public PostListResponseDto(Post post) {
-        this.id = post.getId();
+        this.id = post.getPostId();
         this.title = post.getTitle();
         this.author = post.getUser().getNickname();
-        this.like = post.getLike();
+        this.like = post.getLikeCount();
         this.createdAt = post.getCreatedAt();
     }
 }
