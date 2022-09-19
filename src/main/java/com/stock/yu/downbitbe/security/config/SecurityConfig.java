@@ -155,6 +155,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, "http://localhost:8080"));
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
+        configuration.setExposedHeaders(Collections.singletonList("*")); // TODO: 필요한 곳에서만 사용하기
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

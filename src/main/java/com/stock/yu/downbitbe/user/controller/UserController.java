@@ -122,6 +122,7 @@ public class UserController {
         //return ResponseEntity.status(HttpStatus.OK).build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString(), viewCookie.toString())
                 .body(JwtResponse.builder()
+                        .nickname(auth.getNickname())
                         .userId(email)
                         .type(auth.getType().toString())
                         .isAdmin(roles.contains(Grade.ADMIN))

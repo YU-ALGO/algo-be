@@ -1,5 +1,6 @@
 package com.stock.yu.downbitbe.board.domain.post;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import com.stock.yu.downbitbe.BaseTimeEntity;
 import com.stock.yu.downbitbe.board.domain.board.Board;
 import com.stock.yu.downbitbe.user.entity.User;
@@ -7,11 +8,11 @@ import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 
 @Entity
@@ -40,29 +41,28 @@ public class Post extends BaseTimeEntity {
 
     @JoinColumn(name = "board_id")
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @NotNull
     private Board board;
 
     @Column(name = "like_count")
     @NotNull
     @ColumnDefault("0")
-    private Integer like;
+    private Integer likeCount;
 
     @Column(name = "comment_count")
     @NotNull
     @ColumnDefault("0")
-    private Integer comment;
+    private Integer commentCount;
 
     //TODO 조회수 필드 추가
 
     @Builder
-    public Post(String title, String content, User user, Board board, Integer like, Integer comment){
+    public Post(String title, String content, User user, Board board){
         this.title = title;
         this.content = content;
         this.user = user;
         this.board = board;
-        this.like = like;
-        this.comment = comment;
     }
 
     public Post updatePost(Post post){

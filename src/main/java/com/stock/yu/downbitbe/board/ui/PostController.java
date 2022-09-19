@@ -1,15 +1,18 @@
 package com.stock.yu.downbitbe.board.ui;
 
 import com.stock.yu.downbitbe.board.application.PostService;
-import com.stock.yu.downbitbe.board.domain.post.PostCreateRequestDto;
-import com.stock.yu.downbitbe.board.domain.post.PostResponseDto;
-import com.stock.yu.downbitbe.board.domain.post.PostListResponseDto;
-import com.stock.yu.downbitbe.board.domain.post.PostUpdateRequestDto;
+import com.stock.yu.downbitbe.board.domain.post.*;
 import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.user.entity.User;
 import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
@@ -17,6 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,9 +30,20 @@ public class PostController {
     private final PostService postService;
     private final CustomUserRepository userRepository;
 
+//    @GetMapping("/{board_id}/posts")
+//    public ResponseEntity<List<PostListResponseDto>> posts(@PathVariable("board_id") Long boardId, @RequestParam("page") int page, @RequestParam("size") int size) {
+//        PageRequest pageRequest = PageRequest.of(page - 1, size);
+//        return ResponseEntity.status(HttpStatus.OK).header("X-Total-Count").body(postService.findAllPostsById(boardId, pageRequest));
+//    }
+
     @GetMapping("/{board_id}/posts")
-    public ResponseEntity<List<PostListResponseDto>> posts(@PathVariable("board_id") Long boardId) {
-        return ResponseEntity.status(HttpStatus.OK).body(postService.findAllPostsById(boardId));
+    public ResponseEntity<?> posts(@PathVariable("board_id") Long boardId, @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+        Page<Post> postListResponse = postService.findAllPostsById(boardId, pageable);
+        HttpHeaders responseHeaders = new HttpHeaders();
+        //responseHeaders.set("X-Total-Count", String.valueOf(postListResponse.getTotalElements()));
+        responseHeaders.set("X-Page-Count", String.valueOf(postListResponse.getTotalPages()));
+        return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(postListResponse.stream()
+                .map(PostListResponseDto::new).collect(Collectors.toList()));
     }
 
     @GetMapping("/{board_id}/posts/{post_id}")

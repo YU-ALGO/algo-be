@@ -24,7 +24,7 @@ public class PostListResponseDto {
         this.id = post.getId();
         this.title = post.getTitle();
         this.author = post.getUser().getNickname();
-        this.like = post.getLike();
+        this.like = post.getLikeCount();
         this.createdAt = post.getCreatedAt();
     }
 }

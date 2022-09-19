@@ -10,7 +10,7 @@ import java.util.Set;
 @Data
 @Builder
 public class JwtResponse {
-    private String token;
+    private String nickname;
     private String type = "Bearer";
     private String userId;
     //@JsonProperty("is_admin")
