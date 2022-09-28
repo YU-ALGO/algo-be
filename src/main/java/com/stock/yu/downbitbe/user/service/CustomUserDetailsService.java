@@ -54,7 +54,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         );
 
         userAuth.setNickname(user.getNickname());
-        userAuth.setType(user.getLoginType());
+        userAuth.setLoginType(user.getLoginType());
 
         return userAuth;
     }

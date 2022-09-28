@@ -3,9 +3,22 @@ package com.stock.yu.downbitbe.board.domain.post;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
-
-import java.util.List;
+import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.data.jpa.repository.Query;
+import org.springframework.data.repository.query.Param;
 
 public interface PostRepository extends JpaRepository<Post, Long> {
-    Page<Post> findAllByBoardId(Long boardId, Pageable pageable);
+    Page<Post> findAllByBoardBoardId(Long boardId, Pageable pageable);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update Post set viewCount = viewCount + 1 where postId = :postId")
+    int updateViewCount(@Param(value = "postId") Long postId);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update Post set commentCount = commentCount + :symbol where postId = :postId")
+    int updateCommentCount(@Param(value = "postId") Long postId, @Param(value = "sign") Integer symbol);
+
+    @Modifying(clearAutomatically = true)
+    @Query("update Post set likeCount = likeCount + :symbol where postId = :postId")
+    int updateLikeCount(@Param(value = "postId") Long postId, @Param(value = "sign") Integer symbol);
 }

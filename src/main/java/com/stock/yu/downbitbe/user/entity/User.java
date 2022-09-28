@@ -4,6 +4,8 @@ import com.stock.yu.downbitbe.BaseTimeEntity;
 import com.stock.yu.downbitbe.food.domain.AllergyInfo;
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
 import java.util.*;
@@ -39,12 +41,17 @@ public class User extends BaseTimeEntity {
     @NotNull
     private String nickname;
 
+    @Column(length = 100)
+    private String introduce;
 
+    @Column(name = "profile_img")
+    private String profileImg;
+
+    // TODO : 알레르기 정보
 //    @Column
 //    @Enumerated(EnumType.STRING)
 //    private Grade grade;
 
-    @Builder
     public User(String username, String password, LoginType loginType, String nickname){
         this.username = username;
         this.password = password;
@@ -58,9 +65,17 @@ public class User extends BaseTimeEntity {
 
     //TODO : 프로필 사진
 
-    @ElementCollection
-    @CollectionTable(name = "user_allergy_info", joinColumns = @JoinColumn(name = "user_id"))
-    private Set<AllergyInfo> allergyInfoList = new HashSet<>();
+//    @ElementCollection
+//    @Builder.Default
+//    @CollectionTable(name = "user_allergy_info", joinColumns = @JoinColumn(name = "user_id"))
+//    private Set<AllergyInfo> allergyInfoList = new HashSet<>();
+
+//    @Column(table = "user_allergy_info")
+//    @Embedded
+//    AllergyInfo allergyInfo;
+
+
+    //public void addAllergyInfo(AllergyInfo allergyInfo) {allergyInfoList.add(allergyInfo);}
 
 
    public void addGrade(Grade grade) {

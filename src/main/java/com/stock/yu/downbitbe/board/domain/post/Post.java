@@ -2,6 +2,7 @@ package com.stock.yu.downbitbe.board.domain.post;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
 import com.stock.yu.downbitbe.board.domain.board.Board;
+import com.stock.yu.downbitbe.user.entity.Grade;
 import com.stock.yu.downbitbe.user.entity.User;
 import com.sun.istack.NotNull;
 import lombok.Builder;
@@ -14,7 +15,9 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name = "POST")
@@ -57,16 +60,23 @@ public class Post extends BaseTimeEntity {
     @ColumnDefault("0")
     private Integer commentCount;
 
-    @OneToMany(mappedBy = "postId",
-    cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
-            orphanRemoval = true
-    )
-    private List<PostImage> postImageList;
+//    @OneToMany(mappedBy = "postId",
+//    cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+//            orphanRemoval = true
+//    )
+//    private List<PostImage> postImageList;
+
+//    @ElementCollection
+//    @Builder.Default
+//    private Set<String> imageUrl = new HashSet<>();
+
 
     @Column(name = "view_count")
     @NotNull
     @ColumnDefault("0")
     private Long viewCount;
+
+    //TODO : 게시글 이미지
 
     @Builder
     public Post(String title, String content, User user, Board board){

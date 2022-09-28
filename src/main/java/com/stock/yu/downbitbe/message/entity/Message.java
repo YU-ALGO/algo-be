@@ -8,16 +8,17 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "MESSAGE")
 @Getter
 @NoArgsConstructor
 public class Message extends BaseTimeEntity {
-
     @Id
+    @Column(name = "message_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long messageId;
 
     @Column
     @NotNull
@@ -27,13 +28,12 @@ public class Message extends BaseTimeEntity {
     @NotNull
     private String content;
 
-    @Column(name = "is_read") // read 는 mysql 예약어
-    @Enumerated(EnumType.STRING)
+    @Column(name = "read_time")
     @NotNull
-    private MessageRead read;
+    private LocalDateTime readTime;
 
     @JoinColumn
-    @ManyToOne(fetch = FetchType.LAZY) //LAZY는 연결된 내용은 나중에 검색, EAGER는 한번에 가져옴
+    @ManyToOne(fetch = FetchType.LAZY)
     @NotNull
     private User sender;
 
@@ -48,10 +48,10 @@ public class Message extends BaseTimeEntity {
     private DeleteCondition deleted; // delete 는 mysql 예약어
 
     @Builder
-    public Message(String title, String content, MessageRead read, User sender, User receiver, DeleteCondition deleted){
+    public Message(String title, String content, LocalDateTime read, User sender, User receiver, DeleteCondition deleted){
         this.title = title;
         this.content = content;
-        this.read = read;
+        this.readTime = read;
         this.sender = sender;
         this.receiver = receiver;
         this.deleted = deleted;

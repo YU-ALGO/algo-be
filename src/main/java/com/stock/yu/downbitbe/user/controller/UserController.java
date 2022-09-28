@@ -1,5 +1,6 @@
 package com.stock.yu.downbitbe.user.controller;
 
+import com.stock.yu.downbitbe.food.domain.AllergyInfo;
 import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.user.entity.Token;
 import com.stock.yu.downbitbe.security.config.Config;
@@ -122,8 +123,9 @@ public class UserController {
         //return ResponseEntity.status(HttpStatus.OK).build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString(), viewCookie.toString())
                 .body(JwtResponse.builder()
-                        .userId(email)
-                        .type(auth.getType().toString())
+                        .nickname(auth.getNickname())
+                        .username(email)
+                        .loginType(auth.getLoginType().toString())
                         .isAdmin(roles.contains(Grade.ADMIN))
                         .build());
     }
@@ -146,13 +148,14 @@ public class UserController {
                 .build();
 
         newUser.addGrade(Grade.USER);
+        //newUser.addAllergyInfo(new AllergyInfo());
         repository.save(newUser);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/users/{user_id}/exists")
-    public ResponseEntity<Boolean> checkUserIdDuplication(@RequestBody @PathVariable("user_id") String username) {
+    @GetMapping("/users/{username}/exists")
+    public ResponseEntity<Boolean> checkUserIdDuplication(@RequestBody @PathVariable("username") String username) {
         boolean user = repository.existsByUsername(username);
 
         if(user) {

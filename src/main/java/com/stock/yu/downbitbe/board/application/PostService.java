@@ -5,15 +5,15 @@ import com.stock.yu.downbitbe.board.domain.board.BoardRepository;
 import com.stock.yu.downbitbe.board.domain.post.*;
 import com.stock.yu.downbitbe.user.entity.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
+import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
-import java.util.stream.Collectors;
-
 @RequiredArgsConstructor
 @Service
+@Slf4j
 public class PostService {
     private final BoardRepository boardRepository;
     private final PostRepository postRepository;
@@ -25,11 +25,24 @@ public class PostService {
         return new PostResponseDto(post);
     }
 
+//    @Transactional(readOnly = true)
+//    public List<PostListResponseDto> findAllPostsById(Long boardId, Pageable pageable) {
+//        boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
+//        return postRepository.findAllByBoardId(boardId, pageable).stream()
+//                .map(PostListResponseDto::new).collect(Collectors.toList());
+//    }
+
     @Transactional(readOnly = true)
-    public List<PostListResponseDto> findAllPostsById(Long boardId, Pageable pageable) {
+    public Page<Post> findAllPostsByBoardId(Long boardId, Pageable pageable) {
         boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
-        return postRepository.findAllByBoardId(boardId, pageable).stream()
-                .map(PostListResponseDto::new).collect(Collectors.toList());
+        return postRepository.findAllByBoardBoardId(boardId, pageable);
+    }
+
+    //TODO : 캐시 사용하여 중복 방지 구현
+    @Transactional
+    public int updateView(Long postId, User user){
+        postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+        return postRepository.updateViewCount(postId);
     }
 
     @Transactional

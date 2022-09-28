@@ -12,7 +12,7 @@ import org.springframework.web.bind.annotation.*;
 @Log4j2
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("api/v2/token")
+@RequestMapping("api/v1/token")
 public class TokenController {
 
     private final JWTUtil jwtUtil;

@@ -1,6 +1,5 @@
 package com.stock.yu.downbitbe.board.domain.board;
 
-import com.stock.yu.downbitbe.board.domain.board.Board;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -11,7 +10,7 @@ public class BoardListDto {
     private String name;
 
     public BoardListDto(Board board){
-        this.id = board.getId();
-        this.name = board.getName();
+        this.id = board.getBoardId();
+        this.name = board.getBoardName();
     }
 }

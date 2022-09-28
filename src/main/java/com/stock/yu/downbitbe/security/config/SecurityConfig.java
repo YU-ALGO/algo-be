@@ -84,11 +84,11 @@ public class SecurityConfig {
         http.authorizeRequests()
                 .antMatchers("/sample/all", "/login", "/logout").permitAll()
                 .antMatchers("/sample/member").hasRole("USER") // USER 는 스프링 내부에서 인증된 사용자를 의미함
-                .antMatchers("/api/v1/token/**", "/api/v1/boards/*/8*").hasRole("USER")
+                .antMatchers("/api/v1/token/**", "/api/v1/boards/").hasRole("USER")
                 .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .antMatchers("/api/v1/admin").hasRole("ADMIN")
                 .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/users/*").permitAll();
-        http.formLogin().loginPage(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password").loginPage("/api/v1/login");
+        http.formLogin().loginPage(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password");
         http.cors().and().csrf().disable();
 
 
@@ -155,6 +155,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, "http://localhost:8080"));
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
+        configuration.setExposedHeaders(Collections.singletonList("*")); // TODO: 필요한 곳에서만 사용하기
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);

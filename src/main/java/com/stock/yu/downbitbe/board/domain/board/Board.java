@@ -13,21 +13,21 @@ import javax.persistence.*;
 @NoArgsConstructor
 public class Board{
     @Id
+    @Column(name = "board_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+    private Long boardId;
 
-    @Column
+    @Column(name = "board_name")
     @NotNull
-    private String name;
+    private String boardName;
 
-    @Builder
     public Board(String name){
-        this.name = name;
+        this.boardName = name;
     }
 
     public Board update(String name) {
         if(name != null && !name.isEmpty())
-            this.name = name;
+            this.boardName = name;
         return this;
     }
 }

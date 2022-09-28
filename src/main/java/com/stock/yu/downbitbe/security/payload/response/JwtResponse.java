@@ -10,9 +10,9 @@ import java.util.Set;
 @Data
 @Builder
 public class JwtResponse {
-    private String token;
-    private String type = "Bearer";
-    private String userId;
+    private String nickname;
+    private String loginType = "Bearer";
+    private String username;
     //@JsonProperty("is_admin")
     private Boolean isAdmin;
 //    private String

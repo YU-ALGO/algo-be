@@ -25,25 +25,24 @@ public class BoardService {
     @Transactional(readOnly = true)
     public String findBoardById(Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
-        return board.getName();
+        return board.getBoardName();
     }
 
     @Transactional
     public Long createBoard(String name) {   //TODO : security admin 확인 필요
-        return boardRepository.save(Board.builder()
-                .name(name).build()).getId();
+        return boardRepository.save(new Board(name)).getBoardId();
     }
 
     @Transactional
     public Long updateBoard(String name, Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
-        return boardRepository.save(board.update(name)).getId();
+        return boardRepository.save(board.update(name)).getBoardId();
     }
 
     @Transactional
     public Long deleteBoard(Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
         boardRepository.delete(board);
-        return board.getId();
+        return board.getBoardId();
     }
 }

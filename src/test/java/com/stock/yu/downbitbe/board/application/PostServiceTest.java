@@ -42,9 +42,7 @@ class PostServiceTest {
                 .nickname("test")
                 .build();
 
-        mockBoard = Board.builder()
-                .name("test board")
-                .build();
+        mockBoard = new Board("test board");
 
         ReflectionTestUtils.setField(mockUser, "id", 1L);
         ReflectionTestUtils.setField(mockBoard, "id", 1L);
@@ -144,11 +142,11 @@ class PostServiceTest {
                 mockPostCreateDto = new PostCreateRequestDto("title test", "content test");
                 mockPost = mockPostCreateDto.toEntity(mockBoard, mockUser);
                 ReflectionTestUtils.setField(mockPost, "id", 1L);
-                when(boardRepository.findById(mockBoard.getId())).thenReturn(Optional.ofNullable(mockBoard));
+                when(boardRepository.findById(mockBoard.getBoardId())).thenReturn(Optional.ofNullable(mockBoard));
                 when(postRepository.save(any(Post.class))).thenReturn(mockPost);
 
                 //when
-                Long mockPostId = postService.createPost(mockPostCreateDto, mockBoard.getId(), mockUser);
+                Long mockPostId = postService.createPost(mockPostCreateDto, mockBoard.getBoardId(), mockUser);
 
                 //then
                 assertThat(expectedId).isEqualTo(mockPostId);
@@ -165,7 +163,7 @@ class PostServiceTest {
                 when(boardRepository.findById(any())).thenReturn(Optional.empty());
 
                 //when
-                IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> postService.createPost(mockPostCreateDto, mockBoard.getId(), mockUser));
+                IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> postService.createPost(mockPostCreateDto, mockBoard.getBoardId(), mockUser));
 
                 //then
                 assertThat(exception.getMessage()).isEqualTo("게시판이 존재하지 않습니다.");

@@ -2,23 +2,24 @@ package com.stock.yu.downbitbe.board.domain.post;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Getter;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
 
 @Getter
-@RequiredArgsConstructor
+@NoArgsConstructor
 public class PostUpdateRequestDto {
     @JsonProperty("board_id")
-    private final Long boardId;
+    private Long boardId;
 
     @JsonProperty("post_id")
-    private final Long postId;
+    private Long postId;
 
-    @NotBlank(message = "제목을 입력해주세요.")
-    private final String title;
-    @NotBlank(message = "내용을 입력해주세요.")
-    private final String content;
+    @NotBlank
+    private String title;
+    @NotBlank
+    private String content;
 
     public Post toEntity() {
         return Post.builder()
