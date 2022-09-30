@@ -34,7 +34,6 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1")
 public class UserController {
 
-
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserRepository repository;

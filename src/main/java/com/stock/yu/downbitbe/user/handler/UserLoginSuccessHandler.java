@@ -31,7 +31,7 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("onAuthenticationSuccess ");
 
         UserAuthDTO userAuth = (UserAuthDTO) authentication.getPrincipal();
-        boolean isSocial = !userAuth.getType().equals(LoginType.LOCAL);
+        boolean isSocial = !userAuth.getLoginType().equals(LoginType.LOCAL);
         log.info("Need Modify Member? " + isSocial);
 
         boolean isDefaultPassword = passwordEncoder.matches("1111", userAuth.getPassword());

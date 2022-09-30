@@ -17,12 +17,14 @@ import org.springframework.transaction.annotation.Transactional;
 public class PostService {
     private final BoardRepository boardRepository;
     private final PostRepository postRepository;
+    private final PostLikeRepository postLikeRepository;
 
     @Transactional(readOnly = true)
-    public PostResponseDto findPostByPostId(Long boardId, Long postId){
+    public PostResponseDto findPostByPostId(Long boardId, Long postId, Long userId){
         boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-        return new PostResponseDto(post);
+        Boolean isLike = postLikeRepository.existsByPostPostIdAndUserUserId(postId, userId);
+        return new PostResponseDto(post, isLike);
     }
 
 //    @Transactional(readOnly = true)
@@ -55,9 +57,6 @@ public class PostService {
 
     @Transactional
     public Long updatePost(PostUpdateRequestDto postUpdateRequestDto, Long boardId, Long postId, User user) {
-        if(!postUpdateRequestDto.getPostId().equals(postId) || !postUpdateRequestDto.getBoardId().equals(boardId)){
-            throw new RuntimeException("잘못된 요청입니다.");
-        }
         boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
         if(!post.getUser().getUserId().equals(user.getUserId())){

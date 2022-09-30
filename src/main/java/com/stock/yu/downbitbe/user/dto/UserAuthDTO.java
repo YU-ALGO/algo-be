@@ -20,7 +20,7 @@ public class UserAuthDTO extends User implements OAuth2User {
 
     private String username;
     private String nickname;
-    private LoginType type;
+    private LoginType loginType;
     private Map<String, Object> attr; // OAuth2User 는 Map 타입으로 모든 인증 결과를 attributes 라는 이름으로 가짐
 
     private String name; // OAuth2User 를 상속받기 위해 필수적으로 필요함 -> 현재 구조상 사용되지않음(null)
@@ -30,10 +30,10 @@ public class UserAuthDTO extends User implements OAuth2User {
         this.attr = attr;
     }
 
-    public UserAuthDTO(String username, String password, LoginType type, Collection<? extends GrantedAuthority> authorities) {
+    public UserAuthDTO(String username, String password, LoginType loginType, Collection<? extends GrantedAuthority> authorities) {
         super(username, password, authorities);
         this.username = username;
-        this.type = type;
+        this.loginType = loginType;
     }
 
     @Override

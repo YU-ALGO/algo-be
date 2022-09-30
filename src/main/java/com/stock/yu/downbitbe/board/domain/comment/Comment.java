@@ -5,11 +5,11 @@ import com.stock.yu.downbitbe.board.domain.post.Post;
 import com.stock.yu.downbitbe.user.entity.User;
 import com.sun.istack.NotNull;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
-import org.hibernate.annotations.DynamicUpdate;
+import org.hibernate.annotations.*;
 
 import javax.persistence.*;
+import javax.persistence.Entity;
+import javax.persistence.Table;
 
 @Entity
 @Table(name = "COMMENT")
@@ -17,8 +17,6 @@ import javax.persistence.*;
 @DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor
-@AllArgsConstructor
-@Builder
 public class Comment extends BaseTimeEntity {
     @Id
     @Column(name = "comment_id")
@@ -36,17 +34,18 @@ public class Comment extends BaseTimeEntity {
 
     @JoinColumn(name = "post_id")
     @ManyToOne
+    @OnDelete(action = OnDeleteAction.CASCADE)
     @NotNull
     private Post post;
 
     @Column
     private Long parent;
 
-    @Column(name = "is_deleted")
-    @ColumnDefault("false")
+    @Column(name = "is_deleted", columnDefinition = "tinyint(1) default 0")
     @NotNull
     private Boolean isDeleted;
 
+    @Builder
     private Comment(String content, User user, Post post, Long parent) {
         this.content = content;
         this.user = user;

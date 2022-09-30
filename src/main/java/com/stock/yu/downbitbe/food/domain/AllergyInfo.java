@@ -19,15 +19,19 @@ public class AllergyInfo {
     @Column(name = "WHEAT")
     @NotNull
     @ColumnDefault("0")
-    private Boolean wheat;
+    private Boolean wheat = false;
 
     @Column(name = "MILK")
     @NotNull
     @ColumnDefault("0")
-    private Boolean milk;
+    private Boolean milk = false;
 
     @Column(name = "BREAD")
     @NotNull
     @ColumnDefault("0")
-    private Boolean bread;
+    private Boolean bread = false;
+
+    @Column(name = "TOMATO", columnDefinition = "tinyint(1) default 0")
+    @NotNull
+    private Boolean tomato = false;
 }

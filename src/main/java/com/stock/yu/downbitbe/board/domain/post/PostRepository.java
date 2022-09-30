@@ -10,15 +10,17 @@ import org.springframework.data.repository.query.Param;
 public interface PostRepository extends JpaRepository<Post, Long> {
     Page<Post> findAllByBoardBoardId(Long boardId, Pageable pageable);
 
+    Post findPostByPostId(Long postId);
+
     @Modifying(clearAutomatically = true)
     @Query("update Post set viewCount = viewCount + 1 where postId = :postId")
     int updateViewCount(@Param(value = "postId") Long postId);
 
     @Modifying(clearAutomatically = true)
     @Query("update Post set commentCount = commentCount + :symbol where postId = :postId")
-    int updateCommentCount(@Param(value = "postId") Long postId, @Param(value = "sign") Integer symbol);
+    int updateCommentCount(@Param(value = "postId") Long postId, @Param(value = "symbol") Integer symbol);
 
     @Modifying(clearAutomatically = true)
     @Query("update Post set likeCount = likeCount + :symbol where postId = :postId")
-    int updateLikeCount(@Param(value = "postId") Long postId, @Param(value = "sign") Integer symbol);
+    int updateLikeCount(@Param(value = "postId") Long postId, @Param(value = "symbol") Integer symbol);
 }

@@ -12,11 +12,11 @@ import java.util.*;
 
 @Entity
 @Table(name = "USER")
+@SecondaryTable(name = "USER_ALLERGY_INFO", pkJoinColumns = @PrimaryKeyJoinColumn(name = "USER_ID"))
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
-@ToString
 public class User extends BaseTimeEntity {
     @Id
     @Column(name = "user_id")
@@ -70,13 +70,9 @@ public class User extends BaseTimeEntity {
 //    @CollectionTable(name = "user_allergy_info", joinColumns = @JoinColumn(name = "user_id"))
 //    private Set<AllergyInfo> allergyInfoList = new HashSet<>();
 
-//    @Column(table = "user_allergy_info")
-//    @Embedded
 //    AllergyInfo allergyInfo;
 
-
     //public void addAllergyInfo(AllergyInfo allergyInfo) {allergyInfoList.add(allergyInfo);}
-
 
    public void addGrade(Grade grade) {
         gradeSet.add(grade);

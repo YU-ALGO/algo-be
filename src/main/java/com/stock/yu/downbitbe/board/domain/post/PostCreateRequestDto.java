@@ -12,6 +12,7 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class PostCreateRequestDto {
     @NotBlank
     private String title;

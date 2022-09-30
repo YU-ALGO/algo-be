@@ -14,9 +14,6 @@ import javax.validation.constraints.NotNull;
 public class CommentCreateRequestDto {
     @NotBlank
     private String content;
-    @NotNull
-    private Boolean isReply;
-    @NotNull
     private Long parent;
 
     public Comment toEntity(Post post, User user){

@@ -1,6 +1,7 @@
 package com.stock.yu.downbitbe.board.domain.post;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -9,13 +10,8 @@ import javax.validation.constraints.NotBlank;
 
 @Getter
 @NoArgsConstructor
+@AllArgsConstructor
 public class PostUpdateRequestDto {
-    @JsonProperty("board_id")
-    private Long boardId;
-
-    @JsonProperty("post_id")
-    private Long postId;
-
     @NotBlank
     private String title;
     @NotBlank

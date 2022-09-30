@@ -17,8 +17,17 @@ public class TokenController {
 
     private final JWTUtil jwtUtil;
 
+    @GetMapping(value = "/validate")
+    public ResponseEntity<?> validateToken(@CookieValue("accessToken") String accessToken) throws Exception {
+        if(!jwtUtil.isValidToken(accessToken))
+            return ResponseEntity.badRequest().body(false);
+
+        return ResponseEntity.ok(true);
+    }
+
+
     @PostMapping(value = "/refresh")
-    public ResponseEntity<?> validateToken(@CookieValue("refreshToken") String refreshToken) throws Exception {
+    public ResponseEntity<?> validateRefreshToken(@CookieValue("refreshToken") String refreshToken) throws Exception {
 
         if(!jwtUtil.isValidToken(refreshToken))
             return ResponseEntity.badRequest().build();

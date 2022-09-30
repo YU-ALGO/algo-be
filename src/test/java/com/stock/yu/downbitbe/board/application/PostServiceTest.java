@@ -78,10 +78,10 @@ class PostServiceTest {
                 ReflectionTestUtils.setField(mockPost, "id", mockPostId);
                 when(boardRepository.findById(mockBoardId)).thenReturn(Optional.ofNullable(mockBoard));
                 when(postRepository.findById(mockPostId)).thenReturn(Optional.ofNullable(mockPost));
-                PostResponseDto mockDto = new PostResponseDto(mockPost);
+                PostResponseDto mockDto = new PostResponseDto(mockPost, false);
 
                 //when
-                PostResponseDto expectedMockDto = postService.findPostByPostId(mockBoardId, mockPostId);
+                PostResponseDto expectedMockDto = postService.findPostByPostId(mockBoardId, mockPostId, 1L);
 
                 //then
                 assertThat(expectedMockDto).usingRecursiveComparison().isEqualTo(mockDto);
@@ -98,7 +98,7 @@ class PostServiceTest {
                 when(boardRepository.findById(any())).thenReturn(Optional.empty());
 
                 //when
-                IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> postService.findPostByPostId(mockBoardId, mockPostId));
+                IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> postService.findPostByPostId(mockBoardId, mockPostId, 1L));
 
                 //then
                 assertThat(exception.getMessage()).isEqualTo("게시판이 존재하지 않습니다.");
@@ -112,7 +112,7 @@ class PostServiceTest {
                 when(postRepository.findById(any())).thenReturn(Optional.empty());
 
                 //when
-                IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> postService.findPostByPostId(mockBoardId, mockPostId));
+                IllegalArgumentException exception = Assertions.assertThrows(IllegalArgumentException.class, () -> postService.findPostByPostId(mockBoardId, mockPostId, 1L));
 
                 //then
                 assertThat(exception.getMessage()).isEqualTo("게시글이 존재하지 않습니다.");

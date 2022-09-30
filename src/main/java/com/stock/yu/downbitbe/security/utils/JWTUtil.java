@@ -13,8 +13,8 @@ import java.util.Date;
 public class JWTUtil {
     private String secretKey = "downbit"; // 실무에서는 유저의 비밀번호 등을 이용해서 넣어주는게 맞음
 
-    public static long accessExpire = 60 * 60 * 24; //2시간 / 단위 : 초
-    public static long refreshExpire = 60 * 10; //10분
+    public static long accessExpire = 60 * 10 * 6; //2시간 / 단위 : 초
+    public static long refreshExpire = 60 * 60 * 24; //10분
 
     /*
     *

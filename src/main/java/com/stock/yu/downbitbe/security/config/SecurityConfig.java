@@ -31,6 +31,7 @@ import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletResponse;
 import java.util.Arrays;
 import java.util.Collections;
 
@@ -82,11 +83,11 @@ public class SecurityConfig {
         http.addFilterBefore(new JwtAuthorizationFilter(authenticationManager, customUserDetailsService, jwtUtil()), UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeRequests()
-                .antMatchers("/sample/all", "/login", "/logout").permitAll()
+                .antMatchers("/sample/all", "/login", "/logout", "/api/v1/token/validate", "/api/v1/boards/").permitAll()
                 .antMatchers("/sample/member").hasRole("USER") // USER 는 스프링 내부에서 인증된 사용자를 의미함
-                .antMatchers("/api/v1/token/**", "/api/v1/boards/").hasRole("USER")
-                .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
-                .antMatchers("/api/v1/admin").hasRole("ADMIN")
+                .antMatchers("/api/v1/token/").hasRole("USER")
+                .antMatchers("/api/v1/admin/**", "/api/v1/admin").hasRole("ADMIN")
+                .antMatchers("api/v1/").hasRole("ADMIN")
                 .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/users/*").permitAll();
         http.formLogin().loginPage(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password");
         http.cors().and().csrf().disable();
@@ -96,8 +97,8 @@ public class SecurityConfig {
                 .defaultSuccessUrl(Config.WEB_BASE_URL);
         //http.rememberMe().tokenValiditySeconds(60*60*24*7).userDetailsService(userDetailsService); // auto login during 7days
 
-        http.logout()
-                .logoutUrl("/logout")
+        http.logout( logout -> logout
+                .logoutSuccessUrl(Config.WEB_BASE_URL)
                 .logoutRequestMatcher(new AntPathRequestMatcher("/logout"))
                 .addLogoutHandler((request, response, authentication) -> {
                     Cookie refreshToken = new Cookie("refreshToken", null);
@@ -123,7 +124,9 @@ public class SecurityConfig {
                     SecurityContextHolder.clearContext();
                 })
                 .deleteCookies("accessToken", "refreshToken", "viewListToken") // 토큰 삭제가 안됨 ㅠ
-                .invalidateHttpSession(true);
+                .invalidateHttpSession(true)
+                .logoutSuccessHandler(((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK)))
+        );
 
         /*
         커스텀 로그인 화면
@@ -152,7 +155,7 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         //configuration.setAllowedOrigins(Collections.singletonList("http://42.82.185.184:3000")); // singletonList : 하나짜리 리스트
-        configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, "http://localhost:8080"));
+        configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, "http://localhost:8080", Config.DOMAIN));
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setExposedHeaders(Collections.singletonList("*")); // TODO: 필요한 곳에서만 사용하기
@@ -173,6 +176,4 @@ public class SecurityConfig {
         hierarchy.setHierarchy("ROLE_ADMIN > ROLE_USER");
         return new RoleHierarchyVoter(hierarchy);
     }
-
-
 }

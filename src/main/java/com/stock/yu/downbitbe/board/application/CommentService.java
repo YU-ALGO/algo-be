@@ -30,14 +30,20 @@ public class CommentService {
     }
 
     @Transactional
-    public int updateCommentCount(Long postId, User user, Integer symbol){
+    public void updateCommentCount(Long postId, User user, Integer symbol){
         postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-        return postRepository.updateCommentCount(postId, symbol);
+        postRepository.updateCommentCount(postId, symbol);
     }
 
-//    @Transactional
-//    public Long updateComment(CommentUpdateRequestDto commentUpdateRequestDto, Long postId, User user){
-//    }
+    @Transactional
+    public Long updateComment(CommentUpdateRequestDto commentUpdateRequestDto, Long postId, Long commentId, User user){
+        postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
+        Comment comment = commentRepository.findById(commentId).orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+        if(!comment.getUser().getUserId().equals(user.getUserId())){
+            throw new RuntimeException("작성자와 일치하지 않습니다.");
+        }
+        return commentRepository.save(comment.updateComment(commentUpdateRequestDto.toEntity())).getCommentId();
+    }
 
     //TODO : 1. 답글이 없을때 댓글 삭제하면 댓글 완전히 삭제  2. 답글이 존재할때 댓글 삭제하면 댓글 내용만 삭제  3. 답글 삭제할때 남은 답글이 삭제할 답글이 유일하고 댓글이 삭제된거면 다 같이 삭제
     @Transactional
