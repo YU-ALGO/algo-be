@@ -7,21 +7,24 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@NoArgsConstructor
 @Getter
 public class CommentDto {
-    private Long id;
-    private String content;
-    private String author;
-
+    private final Long id;
+    private final String content;
+    private final String author;
+    private final Long parent;
+    @JsonProperty("is_deleted")
+    private final Boolean isDeleted;    // 닉네임 클릭하여 프로필 조회하는거 방지
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @JsonProperty("created_at")
-    private LocalDateTime createdAt;
+    private final LocalDateTime createdAt;
 
     public CommentDto(Comment comment){
         this.id = comment.getCommentId();
         this.content = comment.getContent();
         this.author = comment.getUser().getNickname();
+        this.parent = comment.getParent();
+        this.isDeleted = comment.getIsDeleted();
         this.createdAt = comment.getCreatedAt();
     }
 }

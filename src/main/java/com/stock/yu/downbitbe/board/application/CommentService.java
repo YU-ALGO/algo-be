@@ -25,8 +25,7 @@ public class CommentService {
     public Long createComment(CommentCreateRequestDto commentCreateRequestDto, Long postId, User user){
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
         Comment comment = commentCreateRequestDto.toEntity(post, user);
-        Long createCommentId = commentRepository.save(comment).getCommentId();
-        return createCommentId;
+        return commentRepository.save(comment).getCommentId();
     }
 
     @Transactional
@@ -53,7 +52,23 @@ public class CommentService {
         if(!comment.getUser().getUserId().equals(user.getUserId())){
             throw new RuntimeException("작성자와 일치하지 않습니다.");
         }
-        commentRepository.delete(comment);
+        if(comment.getParent() == null){
+            if(commentRepository.existsCommentByParent(comment.getCommentId())){
+                String content = "삭제된 댓글입니다.";
+                commentRepository.deleteCommentView(comment.getCommentId(), content);
+            } else{
+                commentRepository.delete(comment);
+            }
+        } else{
+            Comment parentComment = commentRepository.findById(comment.getParent()).orElseThrow(() -> new IllegalArgumentException("댓글이 존재하지 않습니다."));
+            if(parentComment.getIsDeleted()){
+                if(commentRepository.countCommentByParent(parentComment.getCommentId()) == 1){
+                    commentRepository.deleteCommentsByCommentIdAndParent(comment.getParent());
+                }
+            } else{
+                commentRepository.delete(comment);
+            }
+        }
         return comment.getCommentId();
     }
 }

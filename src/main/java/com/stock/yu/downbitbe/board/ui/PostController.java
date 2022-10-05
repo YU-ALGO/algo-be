@@ -25,6 +25,7 @@ import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -50,7 +51,7 @@ public class PostController {
 //    }
 
     @GetMapping("/{board_id}/posts")
-    public ResponseEntity<?> getPostList(@PathVariable("board_id") Long boardId, @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
+    public ResponseEntity<List<PostListResponseDto>> getPostList(@PathVariable("board_id") Long boardId, @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
         Page<Post> postListResponse = postService.findAllPostsByBoardId(boardId, pageable);
         HttpHeaders responseHeaders = new HttpHeaders();
         //responseHeaders.set("X-Total-Count", String.valueOf(postListResponse.getTotalElements()));

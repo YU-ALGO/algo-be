@@ -23,6 +23,7 @@ import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -40,7 +41,7 @@ public class CommentController {
 
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{board_id}/posts/{post_id}/comments")
-    public ResponseEntity<?> getCommentList(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId, @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
+    public ResponseEntity<List<CommentDto>> getCommentList(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId, @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable){
         Page<Comment> commentListResponse = commentService.findAllCommentsByPostId(postId, pageable);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("X-Page-Count", String.valueOf(commentListResponse.getTotalPages()));

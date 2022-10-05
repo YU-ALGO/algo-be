@@ -12,7 +12,7 @@ import java.util.*;
 
 @Entity
 @Table(name = "USER")
-@SecondaryTable(name = "USER_ALLERGY_INFO", pkJoinColumns = @PrimaryKeyJoinColumn(name = "USER_ID"))
+//@SecondaryTable(name = "USER_ALLERGY_INFO", pkJoinColumns = @PrimaryKeyJoinColumn(name = "USER_ID"))
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
