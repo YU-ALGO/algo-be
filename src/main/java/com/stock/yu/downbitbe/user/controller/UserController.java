@@ -1,5 +1,6 @@
 package com.stock.yu.downbitbe.user.controller;
 
+import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
 import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.user.entity.Token;
 import com.stock.yu.downbitbe.security.config.Config;
@@ -13,10 +14,7 @@ import com.stock.yu.downbitbe.security.payload.response.JwtResponse;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -24,6 +22,10 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -95,33 +97,18 @@ public class UserController {
 
         // 토큰 생성 및 쿠키 설정
         Token token = jwtUtil.generateToken(email, nickname);
-        ResponseCookie accessCookie = ResponseCookie.from("accessToken",token.getAccessToken())
-                .httpOnly(true)
-                .path("/")
-                //.sameSite("none")
-                .maxAge(JWTUtil.accessExpire)
-                .domain(Config.DOMAIN)
-                .build();
-
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken",token.getRefreshToken())
-                .httpOnly(true)
-                .path("/")
-                //.sameSite("none")
-                .maxAge(JWTUtil.refreshExpire)
-                .domain(Config.DOMAIN)
-                .build();
-
-        ResponseCookie viewCookie = ResponseCookie.from("viewList", "")
-                .httpOnly(true)
-                .path("/")
-                .maxAge(JWTUtil.refreshExpire)
-                .domain(Config.DOMAIN)
-                .build();
+        LoginCookiesDTO loginCookiesDTO = jwtUtil.setLoginCookies(token, roles.contains(Grade.ADMIN));
 
         // ResponseEntity에서 header 설정 및 만든 쿠키 넣고 응답
         //return ResponseEntity.status(HttpStatus.OK).build();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString(), viewCookie.toString())
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
+                        loginCookiesDTO.getAccessCookie().toString(),
+                        loginCookiesDTO.getRefreshCookie().toString(),
+                        loginCookiesDTO.getViewListCookie().toString(),
+                        loginCookiesDTO.getIsLoginCookie().toString(),
+                        loginCookiesDTO.getIsAdminCookie().toString())
                 .body(JwtResponse.builder()
+                        .nickname(auth.getNickname())
                         .userId(email)
                         .type(auth.getType().toString())
                         .isAdmin(roles.contains(Grade.ADMIN))

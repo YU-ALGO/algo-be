@@ -43,8 +43,8 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         OAuth2User oAuth2User = super.loadUser(userRequest);
 
         log.info("=====================");
-        oAuth2User.getAttributes().forEach((k,v) -> {
-            log.info(k+": "+v);
+        oAuth2User.getAttributes().forEach((k, v) -> {
+            log.info(k + ": " + v);
         });
 
         String email = null;
@@ -54,7 +54,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         //TODO : profile 사진 추가하기
-        if(clientName.equals("Google")) {
+        if (clientName.equals("Google")) {
             email = oAuth2User.getAttribute("email");
             type = LoginType.GOOGLE;
         } else if (clientName.equals("Naver")) {
@@ -67,7 +67,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
             Map<String, Object> response = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
             attributes = response;
             email = (String) response.get("email");
-            nickname = (String)((Map<String, Object>) response.get("profile")).get("nickname");
+            nickname = (String) ((Map<String, Object>) response.get("profile")).get("nickname");
             type = LoginType.KAKAO;
         }
         log.info("EMAIL: " + email);
@@ -79,7 +79,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
                 user.getUserId(),
                 user.getPassword(),
                 user.getType(),
-                user.getGradeSet().stream().map( grade -> new SimpleGrantedAuthority("ROLE_"+grade.name()))
+                user.getGradeSet().stream().map(grade -> new SimpleGrantedAuthority("ROLE_" + grade.name()))
                         .collect(Collectors.toList()),
                 attributes
         );
@@ -93,14 +93,14 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
         Optional<User> result = repository.findByUserIdAndType(email, type);
 
-        if(result.isPresent()) {
+        if (result.isPresent()) {
             return result.get();
         }
 
         User user = User.builder()
                 .userId(email)
                 .nickname(email)    //TODO 임시 닉네임 : email
-                .password( passwordEncoder.encode("1111")) //TODO 임시 비밀번호 : 1111
+                .password(passwordEncoder.encode("1111")) //TODO 임시 비밀번호 : 1111
                 .type(type)
                 .build();
 
@@ -113,19 +113,19 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
     // for kakao, naver login
     private User saveSocialMember(String email, String nickname, LoginType type) {
 
-        if(type.equals(LoginType.GOOGLE))
+        if (type.equals(LoginType.GOOGLE))
             return saveSocialMember(email, type);
 
         Optional<User> result = repository.findByUserIdAndType(email, type);
 
-        if(result.isPresent()) {
+        if (result.isPresent()) {
             return result.get();
         }
 
         User user = User.builder()
                 .userId(email)
                 .nickname(nickname)
-                .password( passwordEncoder.encode("1111")) //TODO 임시 비밀번호 : 1111
+                .password(passwordEncoder.encode("1111")) //TODO 임시 비밀번호 : 1111
                 .type(type)
                 .build();
 
@@ -142,10 +142,9 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
     private void validateDuplicateUser(User user) {
         User findUser = repository.findByUserId(user.getUserId());
-        if(user != null) {
+        if (findUser != null) {
             throw new IllegalStateException("이미 가입된 회원입니다.");
         }
     }
-
 
 }

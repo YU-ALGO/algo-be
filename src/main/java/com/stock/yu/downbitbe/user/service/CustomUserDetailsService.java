@@ -27,13 +27,16 @@ public class CustomUserDetailsService implements UserDetailsService {
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         log.info("UserDetailsService loadUserByUsername " + username);
 
-        Optional<User> result = customUserRepository.findByUserIdAndType(username, LoginType.LOCAL);
+        //TODO : 확인 필요
+        //Optional<User> result = customUserRepository.findByUserIdAndType(username, LoginType.LOCAL);
+        User user = customUserRepository.findByUserId(username);
 
-        if(result.isEmpty()) {
-            throw new UsernameNotFoundException("Check Email or Social ");
-        }
-
-        User user = result.get();
+//        if(result.isEmpty()) {
+//            throw new UsernameNotFoundException("Check Email or Social ");
+//        }
+//
+//        User user = result.get();
+        //////////////////////////////////
 
         /*List<User> result = customUserRepository.findByUserIdAndType(username, LoginType.LOCAL);
         if(result.isEmpty()) {

@@ -1,9 +1,12 @@
 package com.stock.yu.downbitbe.security.utils;
 
+import com.stock.yu.downbitbe.security.config.Config;
+import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
 import com.stock.yu.downbitbe.user.entity.Token;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.ResponseCookie;
 
 import java.nio.charset.StandardCharsets;
 import java.time.ZonedDateTime;
@@ -13,8 +16,8 @@ import java.util.Date;
 public class JWTUtil {
     private String secretKey = "downbit"; // 실무에서는 유저의 비밀번호 등을 이용해서 넣어주는게 맞음
 
-    public static long accessExpire = 60 * 60 * 24; //2시간 / 단위 : 초
-    public static long refreshExpire = 60 * 10; //10분
+    public static long accessExpire = 60 * 10; //10분
+    public static long refreshExpire = 60 * 60 * 24; //24시간
 
     /*
     *
@@ -93,5 +96,52 @@ public class JWTUtil {
         }
 
         return userId;
+    }
+
+    public LoginCookiesDTO setLoginCookies(Token token, boolean isAdmin) throws Exception {
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken",token.getAccessToken())
+                .httpOnly(true)
+                .path("/")
+                //.sameSite("none")
+                .maxAge(JWTUtil.accessExpire)
+                .domain(Config.DOMAIN)
+                .build();
+
+        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken",token.getRefreshToken())
+                .httpOnly(true)
+                .path("/")
+                //.sameSite("none")
+                .maxAge(JWTUtil.refreshExpire)
+                .domain(Config.DOMAIN)
+                .build();
+
+        ResponseCookie viewCookie = ResponseCookie.from("viewList", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(JWTUtil.refreshExpire)
+                .domain(Config.DOMAIN)
+                .build();
+
+        ResponseCookie isLoginCookie = ResponseCookie.from("isLogin", "true")
+                .path("/")
+                .maxAge(JWTUtil.accessExpire)
+                .domain(Config.DOMAIN)
+                .build();
+
+        ResponseCookie isAdminCookie = ResponseCookie.from("isAdmin", String.valueOf(isAdmin))
+                .path("/")
+                .maxAge(JWTUtil.accessExpire)
+                .domain(Config.DOMAIN)
+                .build();
+
+        LoginCookiesDTO loginCookiesDTO = LoginCookiesDTO.builder()
+                .accessCookie(accessCookie)
+                .refreshCookie(refreshCookie)
+                .viewListCookie(viewCookie)
+                .isLoginCookie(isLoginCookie)
+                .isAdminCookie(isAdminCookie)
+                .build();
+
+        return loginCookiesDTO;
     }
 }

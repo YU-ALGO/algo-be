@@ -38,7 +38,7 @@ public class PostController {
     }
 
     @PostMapping("/{board_id}/posts")
-    public Long createPost(@RequestBody @Valid PostCreateRequestDto postCreateRequestDto, @PathVariable("board_id") Long boardId,
+    public Long createPost(@RequestBody PostCreateRequestDto postCreateRequestDto, @PathVariable("board_id") Long boardId,
                            @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
         User user = userRepository.findByUserId(auth.getUserId());
 

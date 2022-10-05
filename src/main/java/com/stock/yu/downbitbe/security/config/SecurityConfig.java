@@ -1,6 +1,7 @@
 package com.stock.yu.downbitbe.security.config;
 
 import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
+import com.stock.yu.downbitbe.user.service.CustomOAuth2UserDetailsService;
 import com.stock.yu.downbitbe.user.service.CustomUserDetailsService;
 import com.stock.yu.downbitbe.security.filter.JwtAuthorizationFilter;
 import com.stock.yu.downbitbe.security.handler.UserLoginSuccessHandler;
@@ -20,7 +21,6 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -41,8 +41,6 @@ import java.util.Collections;
 @EnableGlobalMethodSecurity(prePostEnabled = true) //권한 관리의 다른 방법
 public class SecurityConfig {
 
-    @Autowired
-    private UserDetailsService userDetailsService;
 
     @Autowired
     private CustomUserRepository userRepository;
@@ -55,6 +53,10 @@ public class SecurityConfig {
         return new BCryptPasswordEncoder();
     }
 
+    public CustomOAuth2UserDetailsService oAuth2UserDetailsService() {
+        return new CustomOAuth2UserDetailsService(userRepository, passwordEncoder());
+    }
+
     @Bean
     public AuthenticationManager authenticationManager(AuthenticationConfiguration authenticationConfiguration) throws Exception {
         return authenticationConfiguration.getAuthenticationManager();
@@ -64,7 +66,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityfilterChain(HttpSecurity http) throws Exception {
         //AuthenticationManager 설정
         AuthenticationManagerBuilder authenticationManagerBuilder = http.getSharedObject(AuthenticationManagerBuilder.class);
-        authenticationManagerBuilder.userDetailsService(userDetailsService).passwordEncoder(passwordEncoder());
+        authenticationManagerBuilder.userDetailsService(customUserDetailsService).passwordEncoder(passwordEncoder());
         // Get AuthenticationManager
         AuthenticationManager authenticationManager = authenticationManagerBuilder.build();
 
@@ -82,19 +84,20 @@ public class SecurityConfig {
         http.addFilterBefore(new JwtAuthorizationFilter(authenticationManager, customUserDetailsService, jwtUtil()), UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeRequests()
-                .antMatchers("/sample/all", "/login", "/logout").permitAll()
+                .antMatchers("/sample/all", "/login", "/logout", "/login/**").permitAll()
                 .antMatchers("/sample/member").hasRole("USER") // USER 는 스프링 내부에서 인증된 사용자를 의미함
-                .antMatchers("/api/v1/token/**", "/api/v1/boards/*/8*").hasRole("USER")
+                .antMatchers("/api/v1/token/**").hasRole("USER")
                 .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .antMatchers("/api/v1/admin").hasRole("ADMIN")
+                .antMatchers("/oauth2/authorization/**").permitAll()
                 .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/users/*").permitAll();
-        http.formLogin().loginPage(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password").loginPage("/api/v1/login");
+        http.formLogin().loginPage(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password");
         http.cors().and().csrf().disable();
 
-
-        http.oauth2Login().successHandler(successHandler())
-                .defaultSuccessUrl(Config.WEB_BASE_URL);
-        //http.rememberMe().tokenValiditySeconds(60*60*24*7).userDetailsService(userDetailsService); // auto login during 7days
+        //http.oauth2Login().loginPage(Config.WEB_BASE_URL+"/login").successHandler(successHandler()).defaultSuccessUrl(Config.WEB_BASE_URL).userInfoEndpoint().userService(oAuth2UserDetailsService());
+        http.oauth2Login().defaultSuccessUrl(Config.WEB_BASE_URL).successHandler(successHandler())
+                                .userInfoEndpoint()
+                                        .userService(oAuth2UserDetailsService());
 
         http.logout()
                 .logoutUrl("/logout")
@@ -122,7 +125,7 @@ public class SecurityConfig {
 
                     SecurityContextHolder.clearContext();
                 })
-                .deleteCookies("accessToken", "refreshToken", "viewListToken") // 토큰 삭제가 안됨 ㅠ
+                .deleteCookies("accessToken", "refreshToken", "viewList", "isLogin", "isAdmin") // 토큰 삭제가 안됨 ㅠ
                 .invalidateHttpSession(true);
 
         /*
@@ -145,7 +148,7 @@ public class SecurityConfig {
 
     @Bean
     public UserLoginSuccessHandler successHandler() {
-        return new UserLoginSuccessHandler(passwordEncoder());
+        return new UserLoginSuccessHandler(passwordEncoder(), jwtUtil());
     }
 
     @Bean
@@ -155,6 +158,7 @@ public class SecurityConfig {
         configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, "http://localhost:8080"));
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
+        configuration.setExposedHeaders(Collections.singletonList("*"));
         configuration.setAllowCredentials(true);
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
