@@ -88,8 +88,8 @@ public class SecurityConfig {
                 .antMatchers("/api/v1/token/").hasRole("USER")
                 .antMatchers("/api/v1/admin/**", "/api/v1/admin").hasRole("ADMIN")
                 .antMatchers("api/v1/").hasRole("ADMIN")
-                .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/users/*").permitAll()
-                .anyRequest().permitAll();
+                .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts","/api/v1/boards/*/posts/*/comments", "/api/v1/users/*").permitAll()
+                .antMatchers(HttpMethod.OPTIONS).permitAll();
         http.formLogin().loginPage(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password");
         http.cors().and().csrf().disable();
 
@@ -117,14 +117,24 @@ public class SecurityConfig {
                     viewListCookie.setHttpOnly(true);
                     viewListCookie.setMaxAge(0);
                     viewListCookie.setDomain(Config.DOMAIN);
+                    Cookie isLoginCookie = new Cookie("isLogin", null);
+                    isLoginCookie.setPath("/");
+                    isLoginCookie.setMaxAge(0);
+                    isLoginCookie.setDomain(Config.DOMAIN);
+                    Cookie isAdminCookie = new Cookie("isAdmin", null);
+                    isAdminCookie.setPath("/");
+                    isAdminCookie.setMaxAge(0);
+                    isAdminCookie.setDomain(Config.DOMAIN);
 
                     response.addCookie(refreshToken);
                     response.addCookie(accessToken);
                     response.addCookie(viewListCookie);
+                    response.addCookie(isLoginCookie);
+                    response.addCookie(isAdminCookie);
 
                     SecurityContextHolder.clearContext();
                 })
-                .deleteCookies("accessToken", "refreshToken", "viewListToken") // 토큰 삭제가 안됨 ㅠ
+                .deleteCookies("accessToken", "refreshToken", "viewList", "isLogin", "isAdmin") // 토큰 삭제가 안됨 ㅠ
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler(((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK)))
         );
@@ -156,7 +166,8 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         //configuration.setAllowedOrigins(Collections.singletonList("http://42.82.185.184:3000")); // singletonList : 하나짜리 리스트
-        configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, "http://localhost:8080", Config.DOMAIN));
+        //configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, "http://localhost:8080", Config.DOMAIN));
+        configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, Config.SERVER_BASE_URL));
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setExposedHeaders(Collections.singletonList("*")); // TODO: 필요한 곳에서만 사용하기

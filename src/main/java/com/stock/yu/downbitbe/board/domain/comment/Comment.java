@@ -38,7 +38,6 @@ public class Comment extends BaseTimeEntity {
     @NotNull
     private Post post;
 
-    @Column
     private Long parent;
 
     @Column(name = "is_deleted", columnDefinition = "tinyint(1) default 0")

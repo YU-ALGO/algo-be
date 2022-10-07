@@ -1,6 +1,7 @@
 package com.stock.yu.downbitbe.user.controller;
 
 import com.stock.yu.downbitbe.food.domain.AllergyInfo;
+import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
 import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.user.entity.Token;
 import com.stock.yu.downbitbe.security.config.Config;
@@ -40,11 +41,9 @@ public class UserController {
 
     private final JWTUtil jwtUtil;
 
-    // 리턴 값으로 토큰 반환해주면 됨
     @PostMapping("/login")
     //public ResponseEntity<Void> login(@RequestBody Map<String, String> user) throws Exception {
     public ResponseEntity<?> login(@RequestBody LoginRequest user) throws Exception {
-        // 가입되지 않은 회원인지 확인
 
         log.info("---------start login-------");
         String email = user.getUsername();
@@ -58,11 +57,9 @@ public class UserController {
         UserAuthDTO auth = null;
 
         try {
-            // AuthenticationManager 에 token 을 넘기면 UserDetailsService 가 받아 처리하도록 한다.
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
             log.info("authentication"+authentication);
             auth = (UserAuthDTO) authentication.getPrincipal();
-            // 실제 SecurityContext 에 authentication 정보를 등록한다.
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (DisabledException | LockedException | BadCredentialsException e) {
             String status;
@@ -85,7 +82,6 @@ public class UserController {
         String userId = (String) authenticationToken.getPrincipal();
         String nickname = auth.getNickname();
         Set<Grade> roles = auth.getAuthorities().stream().map(item -> Grade.valueOf(item.getAuthority().replace("ROLE_",""))).collect(Collectors.toSet());
-        //Set<Grade> roles = authenticationToken.getAuthorities();
 
         log.info("-----------");
         log.info("email : " + email);
@@ -93,34 +89,15 @@ public class UserController {
         log.info("password : " + password);
         log.info("-----------");
 
-        // 토큰 생성 및 쿠키 설정
         Token token = jwtUtil.generateToken(email, nickname);
-        ResponseCookie accessCookie = ResponseCookie.from("accessToken",token.getAccessToken())
-                .httpOnly(true)
-                .path("/")
-                //.sameSite("none")
-                .maxAge(JWTUtil.accessExpire)
-                .domain(Config.DOMAIN)
-                .build();
+        LoginCookiesDTO loginCookiesDTO = jwtUtil.setLoginCookies(token, roles.contains(Grade.ADMIN));
 
-        ResponseCookie refreshCookie = ResponseCookie.from("refreshToken",token.getRefreshToken())
-                .httpOnly(true)
-                .path("/")
-                //.sameSite("none")
-                .maxAge(JWTUtil.refreshExpire)
-                .domain(Config.DOMAIN)
-                .build();
-
-        ResponseCookie viewCookie = ResponseCookie.from("viewList", "")
-                .httpOnly(true)
-                .path("/")
-                .maxAge(JWTUtil.refreshExpire)
-                .domain(Config.DOMAIN)
-                .build();
-
-        // ResponseEntity에서 header 설정 및 만든 쿠키 넣고 응답
-        //return ResponseEntity.status(HttpStatus.OK).build();
-        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, accessCookie.toString(), refreshCookie.toString(), viewCookie.toString())
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
+                        loginCookiesDTO.getAccessCookie().toString(),
+                        loginCookiesDTO.getRefreshCookie().toString(),
+                        loginCookiesDTO.getViewListCookie().toString(),
+                        loginCookiesDTO.getIsLoginCookie().toString(),
+                        loginCookiesDTO.getIsAdminCookie().toString())
                 .body(JwtResponse.builder()
                         .nickname(auth.getNickname())
                         .username(email)
@@ -129,7 +106,6 @@ public class UserController {
                         .build());
     }
 
-    //TODO 회원가입 완성하기
     @Transactional
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody SignupRequest request) {
@@ -147,7 +123,6 @@ public class UserController {
                 .build();
 
         newUser.addGrade(Grade.USER);
-        //newUser.addAllergyInfo(new AllergyInfo());
         repository.save(newUser);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();

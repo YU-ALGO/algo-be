@@ -35,9 +35,9 @@ public class PostService {
 //    }
 
     @Transactional(readOnly = true)
-    public Page<Post> findAllPostsByBoardId(Long boardId, Pageable pageable) {
+    public Page<PostListResponseDto> findAllPostsByBoardId(Long boardId, Pageable pageable, String keyword, PostSearchType searchType) {
         boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
-        return postRepository.findAllByBoardBoardId(boardId, pageable);
+        return postRepository.findAllByBoardBoardId(boardId, pageable, keyword, searchType);
     }
 
     //TODO : 캐시 사용하여 중복 방지 구현

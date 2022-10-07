@@ -7,8 +7,8 @@ import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
-public interface PostRepository extends JpaRepository<Post, Long> {
-    Page<Post> findAllByBoardBoardId(Long boardId, Pageable pageable);
+public interface PostRepository extends JpaRepository<Post, Long>, PostRepositoryCustom {
+    //Page<PostListResponseDto> findAllByBoardBoardId(Long boardId, Pageable pageable);
 
     Post findPostByPostId(Long postId);
 

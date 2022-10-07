@@ -51,13 +51,12 @@ public class PostController {
 //    }
 
     @GetMapping("/{board_id}/posts")
-    public ResponseEntity<List<PostListResponseDto>> getPostList(@PathVariable("board_id") Long boardId, @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable) {
-        Page<Post> postListResponse = postService.findAllPostsByBoardId(boardId, pageable);
+    public ResponseEntity<List<PostListResponseDto>> getPostList(@PathVariable("board_id") Long boardId, @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
+                                                                 @RequestParam(value = "keyword", required = false) String keyword, @RequestParam(value = "searchType", required = false) PostSearchType searchType) {
+        Page<PostListResponseDto> postListResponse = postService.findAllPostsByBoardId(boardId, pageable, keyword, searchType);
         HttpHeaders responseHeaders = new HttpHeaders();
-        //responseHeaders.set("X-Total-Count", String.valueOf(postListResponse.getTotalElements()));
         responseHeaders.set("X-Page-Count", String.valueOf(postListResponse.getTotalPages()));
-        return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(postListResponse.stream()
-                .map(PostListResponseDto::new).collect(Collectors.toList()));
+        return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(postListResponse.stream().collect(Collectors.toList()));
     }
 
     @PreAuthorize("isAuthenticated()")

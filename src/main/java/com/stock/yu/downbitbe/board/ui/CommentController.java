@@ -5,6 +5,7 @@ import com.stock.yu.downbitbe.board.domain.comment.Comment;
 import com.stock.yu.downbitbe.board.domain.comment.CommentCreateRequestDto;
 import com.stock.yu.downbitbe.board.domain.comment.CommentDto;
 import com.stock.yu.downbitbe.board.domain.comment.CommentUpdateRequestDto;
+import com.stock.yu.downbitbe.security.config.Config;
 import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.user.entity.User;
 import com.stock.yu.downbitbe.user.repository.CustomUserRepository;

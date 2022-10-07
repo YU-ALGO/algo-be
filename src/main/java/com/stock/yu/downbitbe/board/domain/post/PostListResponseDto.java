@@ -2,6 +2,7 @@ package com.stock.yu.downbitbe.board.domain.post;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;
+import com.querydsl.core.annotations.QueryProjection;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
@@ -16,18 +17,24 @@ public class PostListResponseDto {
     private String author;
     @JsonProperty("like_count")
     private Integer likeCount;
+
+    @JsonProperty("comment_count")
+    private Integer commentCount;
+
     @JsonProperty("view_count")
     private Long viewCount;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @JsonProperty("created_at")
     private LocalDateTime createdAt;
 
-    public PostListResponseDto(Post post) {
-        this.id = post.getPostId();
-        this.title = post.getTitle();
-        this.author = post.getUser().getNickname();
-        this.likeCount = post.getLikeCount();
-        this.viewCount = post.getViewCount();
-        this.createdAt = post.getCreatedAt();
+    @QueryProjection
+    public PostListResponseDto(Long postId, String title, String nickname, Integer likeCount, Integer commentCount, Long viewCount, LocalDateTime createdAt) {
+        this.id = postId;
+        this.title = title;
+        this.author = nickname;
+        this.likeCount = likeCount;
+        this.commentCount = commentCount;
+        this.viewCount = viewCount;
+        this.createdAt = createdAt;
     }
 }
