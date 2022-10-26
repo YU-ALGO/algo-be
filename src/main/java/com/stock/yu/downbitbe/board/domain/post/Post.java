@@ -15,6 +15,7 @@ import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -60,11 +61,13 @@ public class Post extends BaseTimeEntity {
     @ColumnDefault("0")
     private Integer commentCount;
 
-//    @OneToMany(mappedBy = "postId",
-//    cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
+//    @OneToMany(fetch = FetchType.LAZY,
+//            cascade = {CascadeType.PERSIST, CascadeType.REMOVE},
 //            orphanRemoval = true
 //    )
-//    private List<PostImage> postImageList;
+
+    @ElementCollection
+    private List<String> postImg = new ArrayList<String>();
 
 //    @ElementCollection
 //    @Builder.Default
@@ -75,8 +78,6 @@ public class Post extends BaseTimeEntity {
     @NotNull
     @ColumnDefault("0")
     private Long viewCount;
-
-    //TODO : 게시글 이미지
 
     @Builder
     public Post(String title, String content, User user, Board board){
@@ -92,5 +93,9 @@ public class Post extends BaseTimeEntity {
         if(post.getContent() != null)
             this.content = post.getContent();
         return this;
+    }
+
+    public void addImage(String url){
+        postImg.add(url);
     }
 }

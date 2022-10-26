@@ -22,6 +22,8 @@ public class Food {
     private Long code;
 
     // TODO : 영양성분표
+    @Column
+    private String nutrition;
 
     @Column(name = "like_count")
     private Integer likeCount;

@@ -8,4 +8,6 @@ public class Config {
     public static String DOMAIN = "downbit.r-e.kr";
     public static String WEB_BASE_URL = "http://"+DOMAIN+":"+WEB_PORT;
     public static String SERVER_BASE_URL = "http://"+SERVER_DOMAIN+":"+SERVER_PORT;
+
+    public static String UPLOAD_FILE_PATH = "D://";
 }

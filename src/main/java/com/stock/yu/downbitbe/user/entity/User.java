@@ -70,13 +70,7 @@ public class User extends BaseTimeEntity {
 //    @CollectionTable(name = "user_allergy_info", joinColumns = @JoinColumn(name = "user_id"))
 //    private Set<AllergyInfo> allergyInfoList = new HashSet<>();
 
-//    AllergyInfo allergyInfo;
-
-    //public void addAllergyInfo(AllergyInfo allergyInfo) {allergyInfoList.add(allergyInfo);}
-
    public void addGrade(Grade grade) {
         gradeSet.add(grade);
     }
 }
-
-

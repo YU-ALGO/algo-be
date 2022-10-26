@@ -27,13 +27,6 @@ public class PostService {
         return new PostResponseDto(post, isLike);
     }
 
-//    @Transactional(readOnly = true)
-//    public List<PostListResponseDto> findAllPostsById(Long boardId, Pageable pageable) {
-//        boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
-//        return postRepository.findAllByBoardId(boardId, pageable).stream()
-//                .map(PostListResponseDto::new).collect(Collectors.toList());
-//    }
-
     @Transactional(readOnly = true)
     public Page<PostListResponseDto> findAllPostsByBoardId(Long boardId, Pageable pageable, String keyword, PostSearchType searchType) {
         boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
