@@ -1,26 +1,27 @@
 package com.stock.yu.downbitbe.user.controller;
 
-import com.stock.yu.downbitbe.food.domain.AllergyInfo;
-import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
-import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
-import com.stock.yu.downbitbe.user.entity.Token;
-import com.stock.yu.downbitbe.security.config.Config;
-import com.stock.yu.downbitbe.user.entity.Grade;
-import com.stock.yu.downbitbe.user.entity.LoginType;
-import com.stock.yu.downbitbe.user.entity.User;
-import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
 import com.stock.yu.downbitbe.security.payload.request.LoginRequest;
 import com.stock.yu.downbitbe.security.payload.request.SignupRequest;
 import com.stock.yu.downbitbe.security.payload.response.JwtResponse;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
+import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
+import com.stock.yu.downbitbe.food.domain.AllergyInfo;
+import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
+import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
+import com.stock.yu.downbitbe.user.entity.Grade;
+import com.stock.yu.downbitbe.user.entity.LoginType;
+import com.stock.yu.downbitbe.user.entity.Token;
+import com.stock.yu.downbitbe.user.entity.User;
+import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
+import com.stock.yu.downbitbe.user.service.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
@@ -38,11 +39,11 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserRepository repository;
+    private final MailService mailService;
 
     private final JWTUtil jwtUtil;
 
     @PostMapping("/login")
-    //public ResponseEntity<Void> login(@RequestBody Map<String, String> user) throws Exception {
     public ResponseEntity<?> login(@RequestBody LoginRequest user) throws Exception {
 
         log.info("---------start login-------");
@@ -58,7 +59,7 @@ public class UserController {
 
         try {
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
-            log.info("authentication"+authentication);
+            log.info("authentication" + authentication);
             auth = (UserAuthDTO) authentication.getPrincipal();
             SecurityContextHolder.getContext().setAuthentication(authentication);
         } catch (DisabledException | LockedException | BadCredentialsException e) {
@@ -89,9 +90,11 @@ public class UserController {
         log.info("password : " + password);
         log.info("-----------");
 
+        // 토큰 생성 및 쿠키 설정
         Token token = jwtUtil.generateToken(email, nickname);
         LoginCookiesDTO loginCookiesDTO = jwtUtil.setLoginCookies(token, roles.contains(Grade.ADMIN));
 
+        // ResponseEntity에서 header 설정 및 만든 쿠키 넣고 응답
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
                         loginCookiesDTO.getAccessCookie().toString(),
                         loginCookiesDTO.getRefreshCookie().toString(),
@@ -106,13 +109,14 @@ public class UserController {
                         .build());
     }
 
+    //TODO 회원가입 완성하기
     @Transactional
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody SignupRequest request) {
 
         if(checkUserIdDuplication(request.getUsername()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user_id is duplication.");
-        if(checkNicknameDuplication(request.getNickname()).getBody().equals("true"))
+        if (checkNicknameDuplication(request.getNickname()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("nickname is duplication.");
 
         User newUser = User.builder()
@@ -132,7 +136,7 @@ public class UserController {
     public ResponseEntity<Boolean> checkUserIdDuplication(@RequestBody @PathVariable("username") String username) {
         boolean user = repository.existsByUsername(username);
 
-        if(user) {
+        if (user) {
             return ResponseEntity.status(HttpStatus.OK).body(true);
         }
 
@@ -144,10 +148,44 @@ public class UserController {
     public ResponseEntity<Boolean> checkNicknameDuplication(@RequestParam("nickname") String nickname) {
         boolean isExist = repository.existsByNickname(nickname);
 
-        if(isExist)
+        if (isExist)
             return ResponseEntity.status(HttpStatus.OK).body(true);
         else
             return ResponseEntity.status(HttpStatus.OK).body(false);
+    }
+
+    @PostMapping("/users/mail")
+    public ResponseEntity<Boolean> sendMail(@CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+        mailService.sendMail(repository.findByUserId(auth.getUserId()));
+
+        return ResponseEntity.ok(true);
+    }
+
+    @GetMapping("/users/validate")
+    public ResponseEntity<?> validateCode(@RequestParam("code") int code, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+        boolean isValidate = mailService.validateCode(repository.findByUserId(auth.getUserId()), code);
+        if (isValidate)
+            return ResponseEntity.ok().build();
+        else
+            return ResponseEntity.badRequest().body("인증 시간 초과");
+    }
+
+    @PostMapping("/users/newpassword")
+    public ResponseEntity<?> changePassword(@RequestBody @PathVariable("newPassword") String newPassword, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+        /* 로컬 유저 여부 확인 */
+        if(!auth.getType().equals(LoginType.LOCAL))
+            return ResponseEntity.badRequest().body("소셜 회원은 비밀번호를 변경할 수 없습니다");
+
+        User user = repository.findByUserId(auth.getUserId());
+        String newEncodingPassword = passwordEncoder.encode(newPassword);
+
+        /* 기존 비밀번호와 일치 여부 확인 */
+        if(user.getPassword().equals(newEncodingPassword))
+            return ResponseEntity.badRequest().body("이전 비밀번호와 일치합니다.");
+
+        user.updatePassword(newEncodingPassword);
+        repository.save(user);
+        return ResponseEntity.ok().build();
     }
 
 }

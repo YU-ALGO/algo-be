@@ -14,11 +14,26 @@ import java.util.Date;
 
 @Log4j2
 public class JWTUtil {
-    private String secretKey = "downbit";
+    private String secretKey = "downbit"; // 실무에서는 유저의 비밀번호 등을 이용해서 넣어주는게 맞음
 
-    public static long accessExpire = 60 * 10 * 6;
-    public static long refreshExpire = 60 * 60 * 24;
+    public static long accessExpire = 60 * 10 * 6; //60분
+    public static long refreshExpire = 60 * 60 * 24; //24시간
 
+    /*
+    *
+    * refreshToken
+    * 유효기간 : 24시간
+    * subject : userId
+    * claims : [nickname]
+    *
+    * accessToken
+    * 유효기간 : 10분
+    * subject : userId
+    * claims : [null]
+    *
+    *
+    *
+    * */
 
     public Token generateToken(String userId, String nickname) throws Exception {
         String refreshToken = Jwts.builder()
@@ -47,6 +62,7 @@ public class JWTUtil {
         String userId = Jwts.parser().setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
                 .parseClaimsJws(refreshToken).getBody().getSubject();
 
+        //TODO : DB의 accessToken 값과 비교하는 코드 추가 필요
 
         String accessToken = Jwts.builder()
                 .setIssuedAt(new Date())

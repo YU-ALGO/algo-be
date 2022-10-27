@@ -6,6 +6,7 @@ import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Getter
 @NoArgsConstructor
 public class Message extends BaseTimeEntity {
+
     @Id
     @Column(name = "message_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -28,12 +30,11 @@ public class Message extends BaseTimeEntity {
     @NotNull
     private String content;
 
-    @Column(name = "read_time")
-    @NotNull
+    @Column(name = "read_time", updatable = false)
     private LocalDateTime readTime;
 
     @JoinColumn
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY) //LAZY는 연결된 내용은 나중에 검색, EAGER는 한번에 가져옴
     @NotNull
     private User sender;
 

@@ -1,25 +1,23 @@
 package com.stock.yu.downbitbe.user.entity;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
-import com.stock.yu.downbitbe.food.domain.AllergyInfo;
 import com.sun.istack.NotNull;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.HashSet;
+import java.util.Set;
 
 @Entity
 @Table(name = "USER")
-//@SecondaryTable(name = "USER_ALLERGY_INFO", pkJoinColumns = @PrimaryKeyJoinColumn(name = "USER_ID"))
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@DynamicUpdate
+@ToString
 public class User extends BaseTimeEntity {
     @Id
-    @Column(name = "user_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long userId;
 
@@ -72,5 +70,11 @@ public class User extends BaseTimeEntity {
 
    public void addGrade(Grade grade) {
         gradeSet.add(grade);
+    }
+
+    public User updatePassword(String password){
+        if(password != null)
+            this.password = password;
+        return this;
     }
 }

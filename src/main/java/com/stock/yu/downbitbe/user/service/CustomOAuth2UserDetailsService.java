@@ -54,21 +54,27 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
         //TODO : profile 사진 추가하기
-        if(clientName.equals("Google")) {
-            email = oAuth2User.getAttribute("email");
-            type = LoginType.GOOGLE;
-        } else if (clientName.equals("Naver")) {
-            Map<String, Object> response = (Map<String, Object>) oAuth2User.getAttributes().get("response");
-            attributes = response;
-            email = (String) response.get("email");
-            nickname = (String) response.get("nickname");
-            type = LoginType.NAVER;
-        } else if (clientName.equals("Kakao")) {
-            Map<String, Object> response = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
-            attributes = response;
-            email = (String) response.get("email");
-            nickname = (String)((Map<String, Object>) response.get("profile")).get("nickname");
-            type = LoginType.KAKAO;
+        switch (clientName) {
+            case "Google":
+                email = oAuth2User.getAttribute("email");
+                type = LoginType.GOOGLE;
+                break;
+            case "Naver": {
+                Map<String, Object> response = (Map<String, Object>) oAuth2User.getAttributes().get("response");
+                attributes = response;
+                email = (String) response.get("email");
+                nickname = (String) response.get("nickname");
+                type = LoginType.NAVER;
+                break;
+            }
+            case "Kakao": {
+                Map<String, Object> response = (Map<String, Object>) oAuth2User.getAttributes().get("kakao_account");
+                attributes = response;
+                email = (String) response.get("email");
+                nickname = (String) ((Map<String, Object>) response.get("profile")).get("nickname");
+                type = LoginType.KAKAO;
+                break;
+            }
         }
         log.info("EMAIL: " + email);
         User user = saveSocialMember(email, nickname, type);
@@ -76,7 +82,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         //return oAuth2User;
 
         UserAuthDTO userAuth = new UserAuthDTO(
-                user.getUsername(),
+                user.getUserId(),
                 user.getPassword(),
                 user.getLoginType(),
                 user.getGradeSet().stream().map( grade -> new SimpleGrantedAuthority("ROLE_"+grade.name()))
@@ -93,7 +99,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
         Optional<User> result = repository.findByUsernameAndLoginType(email, type);
 
-        if(result.isPresent()) {
+        if (result.isPresent()) {
             return result.get();
         }
 
@@ -113,12 +119,12 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
     // for kakao, naver login
     private User saveSocialMember(String email, String nickname, LoginType type) {
 
-        if(type.equals(LoginType.GOOGLE))
+        if (type.equals(LoginType.GOOGLE))
             return saveSocialMember(email, type);
 
         Optional<User> result = repository.findByUsernameAndLoginType(email, type);
 
-        if(result.isPresent()) {
+        if (result.isPresent()  && result.get().getType() != LoginType.LOCAL) {
             return result.get();
         }
 
@@ -145,6 +151,8 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         if(user != null) {
             throw new IllegalStateException("이미 가입된 회원입니다.");
         }
+        if (findUser.getLoginType() == LoginType.LOCAL)
+            throw new IllegalStateException("회원 시스템에 등록된 계정입니다");
     }
 
 
