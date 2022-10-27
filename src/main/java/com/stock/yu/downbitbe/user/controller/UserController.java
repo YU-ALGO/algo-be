@@ -156,14 +156,14 @@ public class UserController {
 
     @PostMapping("/users/mail")
     public ResponseEntity<Boolean> sendMail(@CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
-        mailService.sendMail(repository.findByUserId(auth.getUserId()));
+        mailService.sendMail(repository.findByUsername(auth.getUsername()));
 
         return ResponseEntity.ok(true);
     }
 
     @GetMapping("/users/validate")
     public ResponseEntity<?> validateCode(@RequestParam("code") int code, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
-        boolean isValidate = mailService.validateCode(repository.findByUserId(auth.getUserId()), code);
+        boolean isValidate = mailService.validateCode(repository.findByUsername(auth.getUsername()), code);
         if (isValidate)
             return ResponseEntity.ok().build();
         else
@@ -173,10 +173,10 @@ public class UserController {
     @PostMapping("/users/newpassword")
     public ResponseEntity<?> changePassword(@RequestBody @PathVariable("newPassword") String newPassword, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
         /* 로컬 유저 여부 확인 */
-        if(!auth.getType().equals(LoginType.LOCAL))
+        if(!auth.getLoginType().equals(LoginType.LOCAL))
             return ResponseEntity.badRequest().body("소셜 회원은 비밀번호를 변경할 수 없습니다");
 
-        User user = repository.findByUserId(auth.getUserId());
+        User user = repository.findByUsername(auth.getUsername());
         String newEncodingPassword = passwordEncoder.encode(newPassword);
 
         /* 기존 비밀번호와 일치 여부 확인 */

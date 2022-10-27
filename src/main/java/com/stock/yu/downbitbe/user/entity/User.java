@@ -3,6 +3,7 @@ package com.stock.yu.downbitbe.user.entity;
 import com.stock.yu.downbitbe.BaseTimeEntity;
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.HashSet;

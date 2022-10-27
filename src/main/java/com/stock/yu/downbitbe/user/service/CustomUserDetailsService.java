@@ -29,7 +29,7 @@ public class CustomUserDetailsService implements UserDetailsService {
 
         //TODO : 확인 필요
         //Optional<User> result = customUserRepository.findByUserIdAndType(username, LoginType.LOCAL);
-        User user = customUserRepository.findByUserId(username);
+        User user = customUserRepository.findByUsername(username);
 
 //        if(result.isEmpty()) {
 //            throw new UsernameNotFoundException("Check Email or Social ");

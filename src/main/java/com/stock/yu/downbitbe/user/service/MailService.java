@@ -34,13 +34,13 @@ public class MailService {
         content.append("님의 인증요청 코드\n");
         content.append(code);
 
-        msg.setTo(user.getUserId());
+        msg.setTo(user.getUsername());
         msg.setSubject(subject.toString());
         msg.setText(content.toString());
         javaMailSender.send(msg);
 
         MailCode mailCode = MailCode.builder()
-                .userId(user.getId())
+                .userId(user.getUserId())
                 //.user(user)
                 .code(code)
                 .build();

@@ -55,7 +55,7 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
         Token token = null;
         LoginCookiesDTO loginCookiesDTO = null;
         try {
-            token = jwtUtil.generateToken(userAuth.getUserId(), userAuth.getNickname());
+            token = jwtUtil.generateToken(userAuth.getUsername(), userAuth.getNickname());
             loginCookiesDTO = jwtUtil.setLoginCookies(token, false);
         } catch (Exception e) {
             throw new RuntimeException(e);

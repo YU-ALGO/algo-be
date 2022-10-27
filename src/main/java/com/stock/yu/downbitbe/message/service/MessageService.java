@@ -1,9 +1,7 @@
 package com.stock.yu.downbitbe.message.service;
 
-import com.stock.yu.downbitbe.message.dto.MessageDTO;
 import com.stock.yu.downbitbe.message.entity.Message;
 import com.stock.yu.downbitbe.message.repository.MessageRepository;
-import com.stock.yu.downbitbe.user.entity.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -17,7 +15,7 @@ public class MessageService {
     private final MessageRepository messageRepository;
 
     @Transactional(readOnly = true)
-    public List<MessageDTO> findAllMessageBySender(long senderId) {
+    public List<Message> findAllMessageBySender(long senderId) {
         return messageRepository.findAllBySender(senderId);
     }
 

@@ -101,7 +101,7 @@ public class SecurityConfig {
                 .antMatchers("/oauth2/authorization/**").permitAll()
                 .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts","/api/v1/boards/*/posts/*/comments", "/api/v1/users/*").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/users/validate").permitAll()
-                .antMatchers(HttpMethod.POST, "/api/v1/users/mail").permitAll();
+                .antMatchers(HttpMethod.POST, "/api/v1/users/mail").permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll();
         http.formLogin().loginPage(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password");
         http.cors().and().csrf().disable();

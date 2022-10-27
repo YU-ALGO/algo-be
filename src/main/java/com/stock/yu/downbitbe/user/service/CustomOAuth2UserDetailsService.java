@@ -82,7 +82,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         //return oAuth2User;
 
         UserAuthDTO userAuth = new UserAuthDTO(
-                user.getUserId(),
+                user.getUsername(),
                 user.getPassword(),
                 user.getLoginType(),
                 user.getGradeSet().stream().map( grade -> new SimpleGrantedAuthority("ROLE_"+grade.name()))
@@ -124,7 +124,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
         Optional<User> result = repository.findByUsernameAndLoginType(email, type);
 
-        if (result.isPresent()  && result.get().getType() != LoginType.LOCAL) {
+        if (result.isPresent()  && result.get().getLoginType() != LoginType.LOCAL) {
             return result.get();
         }
 
