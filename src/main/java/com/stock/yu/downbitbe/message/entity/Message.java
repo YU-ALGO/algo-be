@@ -6,8 +6,10 @@ import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
+import java.time.LocalDateTime;
 
 @Entity
 @Table(name = "MESSAGE")
@@ -27,10 +29,8 @@ public class Message extends BaseTimeEntity {
     @NotNull
     private String content;
 
-    @Column(name = "is_read") // read 는 mysql 예약어
-    @Enumerated(EnumType.STRING)
-    @NotNull
-    private MessageRead read;
+    @Column(name = "read_time", updatable = false)
+    private LocalDateTime readTime;
 
     @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY) //LAZY는 연결된 내용은 나중에 검색, EAGER는 한번에 가져옴
@@ -48,10 +48,10 @@ public class Message extends BaseTimeEntity {
     private DeleteCondition deleted; // delete 는 mysql 예약어
 
     @Builder
-    public Message(String title, String content, MessageRead read, User sender, User receiver, DeleteCondition deleted){
+    public Message(String title, String content, LocalDateTime readTime, User sender, User receiver, DeleteCondition deleted){
         this.title = title;
         this.content = content;
-        this.read = read;
+        this.readTime = readTime;
         this.sender = sender;
         this.receiver = receiver;
         this.deleted = deleted;

@@ -1,8 +1,10 @@
 package com.stock.yu.downbitbe.user.entity;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
+import com.stock.yu.downbitbe.board.domain.post.Post;
 import com.sun.istack.NotNull;
 import lombok.*;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -14,6 +16,7 @@ import java.util.Set;
 @AllArgsConstructor
 @NoArgsConstructor
 @Getter
+@DynamicUpdate
 @ToString
 public class User extends BaseTimeEntity {
     @Id
@@ -73,6 +76,11 @@ public class User extends BaseTimeEntity {
         gradeSet.add(grade);
     }
 
+    public User updatePassword(String password){
+        if(password != null)
+            this.password = password;
+        return this;
+    }
 }
 
 

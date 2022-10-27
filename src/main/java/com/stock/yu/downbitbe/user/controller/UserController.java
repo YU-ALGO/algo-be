@@ -44,7 +44,6 @@ public class UserController {
 
     // 리턴 값으로 토큰 반환해주면 됨
     @PostMapping("/login")
-    //public ResponseEntity<Void> login(@RequestBody Map<String, String> user) throws Exception {
     public ResponseEntity<?> login(@RequestBody LoginRequest user) throws Exception {
         // 가입되지 않은 회원인지 확인
 
@@ -100,7 +99,6 @@ public class UserController {
         LoginCookiesDTO loginCookiesDTO = jwtUtil.setLoginCookies(token, roles.contains(Grade.ADMIN));
 
         // ResponseEntity에서 header 설정 및 만든 쿠키 넣고 응답
-        //return ResponseEntity.status(HttpStatus.OK).build();
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
                         loginCookiesDTO.getAccessCookie().toString(),
                         loginCookiesDTO.getRefreshCookie().toString(),
@@ -175,6 +173,24 @@ public class UserController {
             return ResponseEntity.ok().build();
         else
             return ResponseEntity.badRequest().body("인증 시간 초과");
+    }
+
+    @PostMapping("/users/newpassword")
+    public ResponseEntity<?> changePassword(@RequestBody @PathVariable("newPassword") String newPassword, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+        /* 로컬 유저 여부 확인 */
+        if(!auth.getType().equals(LoginType.LOCAL))
+            return ResponseEntity.badRequest().body("소셜 회원은 비밀번호를 변경할 수 없습니다");
+
+        User user = repository.findByUserId(auth.getUserId());
+        String newEncodingPassword = passwordEncoder.encode(newPassword);
+
+        /* 기존 비밀번호와 일치 여부 확인 */
+        if(user.getPassword().equals(newEncodingPassword))
+            return ResponseEntity.badRequest().body("이전 비밀번호와 일치합니다.");
+
+        user.updatePassword(newEncodingPassword);
+        repository.save(user);
+        return ResponseEntity.ok().build();
     }
 
 }

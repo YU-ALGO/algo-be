@@ -32,7 +32,7 @@ public class MessageServiceImpl implements MessageService {
 
     @Override
     public MessageDTO get(Long id) {
-        Optional<Message> result = messageRepository.getWithSender(id);
+        Optional<Message> result = messageRepository.getAllMessagesBySender(id);
 
         if(result.isPresent())
             return entityToDTO(result.get());
@@ -45,7 +45,7 @@ public class MessageServiceImpl implements MessageService {
     }
 
     @Override
-    public List<MessageDTO> getAllWithWriter(Long senderId) {
+    public List<MessageDTO> getAllMessagesBySender(Long senderId) {
         List<Message> messageList = messageRepository.getList(senderId);
 
         return messageList.stream().map(message -> entityToDTO(message)).collect(Collectors.toList());
