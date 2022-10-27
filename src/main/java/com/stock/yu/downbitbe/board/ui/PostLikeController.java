@@ -26,7 +26,7 @@ public class PostLikeController {
     private final CustomUserRepository userRepository;
 
     @PostMapping("{board_id}/posts/{post_id}/likes")
-    public ResponseEntity<?> createPostLike(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
+    public ResponseEntity<Long> createPostLike(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
                                             @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
         User user = userRepository.findByUsername(auth.getUsername());
         Long ret = postLikeService.createPostLike(boardId, postId, user);
@@ -35,7 +35,7 @@ public class PostLikeController {
     }
 
     @DeleteMapping("{board_id}/posts/{post_id}/likes")
-    public ResponseEntity<?> deletePostLike(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
+    public ResponseEntity<Long> deletePostLike(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
                                             @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
         User user = userRepository.findByUsername(auth.getUsername());
         Long ret = postLikeService.deletePostLike(boardId, postId, user);

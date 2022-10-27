@@ -1,4 +1,4 @@
-package com.stock.yu.downbitbe.board.domain.post;
+package com.stock.yu.downbitbe.food.domain;
 
 import com.stock.yu.downbitbe.user.entity.User;
 import lombok.Builder;
@@ -11,14 +11,14 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 
 @Entity
-@Table(name = "POST_LIKE")
+@Table(name = "FOOD_LIKE")
 @Getter
 @NoArgsConstructor
-public class PostLike {
+public class FoodLike {
     @Id
-    @Column(name = "post_like_id")
+    @Column(name= "food_like_id")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long postLikeId;
+    private Long foodLikeId;
 
     @JoinColumn(name = "user_id")
     @ManyToOne
@@ -26,15 +26,15 @@ public class PostLike {
     @NotNull
     private User user;
 
-    @JoinColumn(name = "post_id")
+    @JoinColumn(name = "food_id")
     @ManyToOne
     @OnDelete(action = OnDeleteAction.CASCADE)
     @NotNull
-    private Post post;
+    private Food food;
 
     @Builder
-    public PostLike(User user, Post post){
+    public FoodLike(User user, Food food){
         this.user = user;
-        this.post = post;
+        this.food = food;
     }
 }

@@ -1,5 +1,6 @@
 package com.stock.yu.downbitbe.food.domain;
 
+import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 
@@ -31,4 +32,25 @@ public class Food {
     //TODO : 사진 여러개..?
     @Column(name = "food_image_url")
     private String foodImageUrl;
+
+    @Builder
+    public Food(String foodName, Long code, String nutrition, String foodImageUrl){
+        this.foodName = foodName;
+        this.code = code;
+        this.nutrition = nutrition;
+        this.foodImageUrl = foodImageUrl;
+    }
+
+
+    public Food updateFood(Food food) {
+        if(food.getFoodName() != null)
+            this.foodName = food.getFoodName();
+        if(food.getCode() != null)
+            this.code = food.getCode();
+        if(food.getNutrition() != null)
+            this.nutrition = food.getNutrition();
+        if(food.getFoodImageUrl() != null)
+            this.foodImageUrl = food.getFoodImageUrl();
+        return this;
+    }
 }

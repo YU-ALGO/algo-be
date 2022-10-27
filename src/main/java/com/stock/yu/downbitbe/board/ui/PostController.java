@@ -60,26 +60,29 @@ public class PostController {
 
     @PostMapping("/{board_id}/posts")
     @PreAuthorize("isAuthenticated()")
-    public Long createPost(final @RequestBody @Valid PostCreateRequestDto postCreateRequestDto, @PathVariable("board_id") Long boardId,
-                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+    public ResponseEntity<Long> createPost(final @RequestBody @Valid PostCreateRequestDto postCreateRequestDto, @PathVariable("board_id") Long boardId,
+                                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
         User user = userRepository.findByUsername(auth.getUsername());
 
-        return postService.createPost(postCreateRequestDto, boardId, user);
+        Long ret = postService.createPost(postCreateRequestDto, boardId, user);
+        return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
     @PreAuthorize("isAuthenticated() and (#auth.username == @postRepository.findPostByPostId(#postId).user.username)")
     @PatchMapping("/{board_id}/posts/{post_id}")
-    public Long updatePost(final @RequestBody @Valid PostUpdateRequestDto postUpdateRequestDto, @PathVariable("board_id") Long boardId,
-                           @PathVariable("post_id") Long postId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+    public ResponseEntity<Long> updatePost(final @RequestBody @Valid PostUpdateRequestDto postUpdateRequestDto, @PathVariable("board_id") Long boardId,
+                                           @PathVariable("post_id") Long postId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
         User user = userRepository.findByUsername(auth.getUsername());
-        return postService.updatePost(postUpdateRequestDto, boardId, postId, user);
+        Long ret = postService.updatePost(postUpdateRequestDto, boardId, postId, user);
+        return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
     @PreAuthorize("isAuthenticated() and (#auth.username == @postRepository.findPostByPostId(#postId).user.username)")
     @DeleteMapping("/{board_id}/posts/{post_id}")
-    public Long deletePost(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
+    public ResponseEntity<Long> deletePost(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
                            @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
         User user = userRepository.findByUsername(auth.getUsername());
-        return postService.deletePost(postId, user);
+        Long ret = postService.deletePost(postId, user);
+        return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 }
