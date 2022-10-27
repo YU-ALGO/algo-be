@@ -1,31 +1,30 @@
 package com.stock.yu.downbitbe.user.controller;
 
-import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
-import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
-import com.stock.yu.downbitbe.user.entity.Token;
-import com.stock.yu.downbitbe.security.config.Config;
-import com.stock.yu.downbitbe.user.entity.Grade;
-import com.stock.yu.downbitbe.user.entity.LoginType;
-import com.stock.yu.downbitbe.user.entity.User;
-import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
 import com.stock.yu.downbitbe.security.payload.request.LoginRequest;
 import com.stock.yu.downbitbe.security.payload.request.SignupRequest;
 import com.stock.yu.downbitbe.security.payload.response.JwtResponse;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
+import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
+import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
+import com.stock.yu.downbitbe.user.entity.Grade;
+import com.stock.yu.downbitbe.user.entity.LoginType;
+import com.stock.yu.downbitbe.user.entity.Token;
+import com.stock.yu.downbitbe.user.entity.User;
+import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
+import com.stock.yu.downbitbe.user.service.MailService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.*;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -39,6 +38,7 @@ public class UserController {
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
     private final CustomUserRepository repository;
+    private final MailService mailService;
 
     private final JWTUtil jwtUtil;
 
@@ -62,7 +62,7 @@ public class UserController {
         try {
             // AuthenticationManager 에 token 을 넘기면 UserDetailsService 가 받아 처리하도록 한다.
             Authentication authentication = authenticationManager.authenticate(authenticationToken);
-            log.info("authentication"+authentication);
+            log.info("authentication" + authentication);
             auth = (UserAuthDTO) authentication.getPrincipal();
             // 실제 SecurityContext 에 authentication 정보를 등록한다.
             SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -86,7 +86,7 @@ public class UserController {
 
         String userId = (String) authenticationToken.getPrincipal();
         String nickname = auth.getNickname();
-        Set<Grade> roles = auth.getAuthorities().stream().map(item -> Grade.valueOf(item.getAuthority().replace("ROLE_",""))).collect(Collectors.toSet());
+        Set<Grade> roles = auth.getAuthorities().stream().map(item -> Grade.valueOf(item.getAuthority().replace("ROLE_", ""))).collect(Collectors.toSet());
         //Set<Grade> roles = authenticationToken.getAuthorities();
 
         log.info("-----------");
@@ -120,9 +120,9 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity<String> signUp(@RequestBody SignupRequest request) {
 
-        if(checkUserIdDuplication(request.getUserId()).getBody().equals("true"))
+        if (checkUserIdDuplication(request.getUserId()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user_id is duplication.");
-        if(checkNicknameDuplication(request.getNickname()).getBody().equals("true"))
+        if (checkNicknameDuplication(request.getNickname()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("nickname is duplication.");
 
         User newUser = User.builder()
@@ -143,7 +143,7 @@ public class UserController {
     public ResponseEntity<Boolean> checkUserIdDuplication(@RequestBody @PathVariable("user_id") String userId) {
         boolean user = repository.existsByUserId(userId);
 
-        if(user) {
+        if (user) {
             return ResponseEntity.status(HttpStatus.OK).body(true);
         }
 
@@ -155,10 +155,26 @@ public class UserController {
     public ResponseEntity<Boolean> checkNicknameDuplication(@RequestParam("nickname") String nickname) {
         boolean isExist = repository.existsByNickname(nickname);
 
-        if(isExist)
+        if (isExist)
             return ResponseEntity.status(HttpStatus.OK).body(true);
         else
             return ResponseEntity.status(HttpStatus.OK).body(false);
+    }
+
+    @PostMapping("/users/mail")
+    public ResponseEntity<Boolean> sendMail(@CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+        mailService.sendMail(repository.findByUserId(auth.getUserId()));
+
+        return ResponseEntity.ok(true);
+    }
+
+    @GetMapping("/users/validate")
+    public ResponseEntity<?> validateCode(@RequestParam("code") int code, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+        boolean isValidate = mailService.validateCode(repository.findByUserId(auth.getUserId()), code);
+        if (isValidate)
+            return ResponseEntity.ok().build();
+        else
+            return ResponseEntity.badRequest().body("인증 시간 초과");
     }
 
 }

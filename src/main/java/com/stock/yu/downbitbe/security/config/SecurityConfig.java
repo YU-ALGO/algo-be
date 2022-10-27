@@ -6,10 +6,14 @@ import com.stock.yu.downbitbe.user.service.CustomUserDetailsService;
 import com.stock.yu.downbitbe.security.filter.JwtAuthorizationFilter;
 import com.stock.yu.downbitbe.security.handler.UserLoginSuccessHandler;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
+import com.stock.yu.downbitbe.user.utils.MailUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpMethod;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.security.access.AccessDecisionVoter;
 import org.springframework.security.access.hierarchicalroles.RoleHierarchyImpl;
 import org.springframework.security.access.vote.RoleHierarchyVoter;
@@ -25,6 +29,7 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.header.writers.frameoptions.XFrameOptionsHeaderWriter;
 import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
@@ -62,6 +67,7 @@ public class SecurityConfig {
         return authenticationConfiguration.getAuthenticationManager();
     }
 
+
     @Bean
     public SecurityFilterChain securityfilterChain(HttpSecurity http) throws Exception {
         //AuthenticationManager 설정
@@ -90,7 +96,10 @@ public class SecurityConfig {
                 .antMatchers("/api/v1/admin/**").hasRole("ADMIN")
                 .antMatchers("/api/v1/admin").hasRole("ADMIN")
                 .antMatchers("/oauth2/authorization/**").permitAll()
-                .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/users/*").permitAll();
+                .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/users/*").permitAll()
+                .antMatchers(HttpMethod.GET, "/api/v1/users/validate").permitAll()
+                .antMatchers(HttpMethod.POST, "/api/v1/users/mail").permitAll();
+
         http.formLogin().loginPage(Config.WEB_BASE_URL+"/login").usernameParameter("username").passwordParameter("password");
         http.cors().and().csrf().disable();
 
@@ -118,10 +127,23 @@ public class SecurityConfig {
                     viewListCookie.setHttpOnly(true);
                     viewListCookie.setMaxAge(0);
                     viewListCookie.setDomain(Config.DOMAIN);
+                    Cookie isLoginCookie = new Cookie("isLogin", null);
+                    isLoginCookie.setPath("/");
+                    isLoginCookie.setHttpOnly(false);
+                    isLoginCookie.setMaxAge(0);
+                    isLoginCookie.setDomain(Config.DOMAIN);
+                    Cookie isAdminCookie = new Cookie("isLogin", null);
+                    isAdminCookie.setPath("/");
+                    isAdminCookie.setHttpOnly(false);
+                    isAdminCookie.setMaxAge(0);
+                    isAdminCookie.setDomain(Config.DOMAIN);
+
 
                     response.addCookie(refreshToken);
                     response.addCookie(accessToken);
                     response.addCookie(viewListCookie);
+                    response.addCookie(isLoginCookie);
+                    response.addCookie(isAdminCookie);
 
                     SecurityContextHolder.clearContext();
                 })
@@ -155,7 +177,7 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         //configuration.setAllowedOrigins(Collections.singletonList("http://42.82.185.184:3000")); // singletonList : 하나짜리 리스트
-        configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, "http://localhost:8080"));
+        configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, Config.SERVER_BASE_URL));
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setExposedHeaders(Collections.singletonList("*"));
@@ -169,6 +191,11 @@ public class SecurityConfig {
     public JWTUtil jwtUtil() {
         return new JWTUtil();
     }
+
+//    @Bean
+//    public JavaMailSender emailSender(){
+//        return new JavaMailSenderImpl();
+//    }
 
     @Bean
     AccessDecisionVoter hierarchyVoter() {
