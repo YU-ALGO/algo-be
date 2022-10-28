@@ -1,4 +1,4 @@
-package com.stock.yu.downbitbe.message.entity;
+package com.stock.yu.downbitbe.message.domain;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
 import com.stock.yu.downbitbe.user.entity.User;
@@ -6,7 +6,6 @@ import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import org.springframework.data.annotation.CreatedDate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -58,4 +57,8 @@ public class Message extends BaseTimeEntity {
         this.deleted = deleted;
     }
 
+    public Message updateTime(){
+        this.readTime = LocalDateTime.now();
+        return this;
+    }
 }
