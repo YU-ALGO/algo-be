@@ -30,39 +30,37 @@ public class MessageService {
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new IllegalArgumentException("쪽지가 존재하지 않습니다."));
         if(Objects.equals(message.getReceiver().getUserId(), userId)){
             if(message.getReadTime() == null) {
-                message.updateTime();
+                messageRepository.save(message.updateTime());
             }
         }
         return new MessageDto(message);
     }
 
     @Transactional(readOnly = true)
-    public Long getNonReadMessageCount(Long userId){
-        Long messageCount = messageRepository.countNonReadMessageByUserId(userId);
-        return null;
+    public Integer getNonReadMessageCount(Long userId){
+        return messageRepository.countNonReadMessageByUserId(userId);
     }
 
-
-//    default Message dtoToEntity(MessageDTO messageDTO) {
-//        Message message = Message.builder()
-//                .title(messageDTO.getTitle())
-//                .content(messageDTO.getContent())
-//                .sender(User.builder().id(messageDTO.getSenderId()).build())
-//                .build();
-//
-//        return message;
-//    }
-//
-//    default MessageDTO entityToDTO(Message message) {
-//        MessageDTO messageDTO = MessageDTO.builder()
-//                .id(message.getId())
-//                .title(message.getTitle())
-//                .content(message.getContent())
-//                .senderId(message.getSender().getId())
-//                .regDate(message.getCreatedAt())
-//                .modDate(message.getModifiedAt())
-//                .build();
-//
-//        return messageDTO;
-//    }
+    @Transactional
+    public Long deleteMessage(Long messageId, Long userId){
+        Message message = messageRepository.findById(messageId).orElseThrow(() -> new IllegalArgumentException("쪽지가 존재하지 않습니다."));
+        if(Objects.equals(message.getReceiver().getUserId(), userId)){
+            if(message.getDeleted() == DeleteCondition.SENDER){
+                messageRepository.delete(message);
+            } else if(message.getDeleted() == DeleteCondition.NONE){
+                Long result = messageRepository.updateDeleteCondition(messageId, DeleteCondition.RECEIVER);
+                if(result == 0)
+                    throw new RuntimeException("삭제에 실패했습니다.");
+            }
+        } else if(Objects.equals(message.getSender().getUserId(), userId)){
+            if(message.getDeleted() == DeleteCondition.RECEIVER){
+                messageRepository.delete(message);
+            } else if(message.getDeleted() == DeleteCondition.NONE){
+                Long result = messageRepository.updateDeleteCondition(messageId, DeleteCondition.SENDER);
+                if(result == 0)
+                    throw new RuntimeException("삭제에 실패했습니다.");
+            }
+        }
+        return message.getMessageId();
+    }
 }

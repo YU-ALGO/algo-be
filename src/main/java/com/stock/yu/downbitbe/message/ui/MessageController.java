@@ -6,6 +6,7 @@ import com.stock.yu.downbitbe.message.domain.SendMessageListDto;
 import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.user.entity.User;
 import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
+import com.stock.yu.downbitbe.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -28,13 +29,13 @@ import java.util.stream.Collectors;
 @RequestMapping("/api/v1/messages")
 public class MessageController {
     private final MessageService messageService;
-    private final CustomUserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping("/inboxes")
     public ResponseEntity<List<ReceiveMessageListDto>> getReceiveMessageList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                                                              @RequestParam(value = "not_read", required = false) Boolean notRead,
                                                                              @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
-        User user = userRepository.findByUsername(auth.getUsername());
+        User user = userService.findByUsername(auth.getUsername());
         Page<ReceiveMessageListDto> receiveMessageList = messageService.findAllMessagesByReceiver(user.getUserId(), notRead, pageable);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("X-Page-Count", String.valueOf(receiveMessageList.getTotalPages()));
@@ -44,7 +45,7 @@ public class MessageController {
     @GetMapping("/outboxes")
     public ResponseEntity<List<SendMessageListDto>> getSendMessageList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                                                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
-        User user = userRepository.findByUsername(auth.getUsername());
+        User user = userService.findByUsername(auth.getUsername());
         Page<SendMessageListDto> sendMessageList = messageService.findAllMessagesBySender(user.getUserId(), pageable);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("X-Page-Count", String.valueOf(sendMessageList.getTotalPages()));

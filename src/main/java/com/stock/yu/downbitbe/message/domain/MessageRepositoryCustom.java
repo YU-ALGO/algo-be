@@ -1,5 +1,7 @@
 package com.stock.yu.downbitbe.message.domain;
 
 public interface MessageRepositoryCustom {
-    Long countNonReadMessageByUserId(Long userId);
+    Integer countNonReadMessageByUserId(Long userId);
+
+    Long updateDeleteCondition(Long messageId, DeleteCondition receiver);
 }

@@ -6,6 +6,9 @@ import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -13,6 +16,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "MESSAGE")
 @Getter
+@DynamicUpdate
 @NoArgsConstructor
 public class Message extends BaseTimeEntity {
 
@@ -43,6 +47,7 @@ public class Message extends BaseTimeEntity {
     private User receiver;
 
     @Column
+    @ColumnDefault("NONE")
     @Enumerated(EnumType.STRING)
     @NotNull
     private DeleteCondition deleted; // delete 는 mysql 예약어

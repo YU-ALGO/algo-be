@@ -3,8 +3,10 @@ package com.stock.yu.downbitbe.food.domain;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.ColumnDefault;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "FOOD")
@@ -26,7 +28,15 @@ public class Food {
     @Column
     private String nutrition;
 
+    @Column
+    private String rawMaterials;
+
+    @Column
+    private String productKind;
+
     @Column(name = "like_count")
+    @NotNull
+    @ColumnDefault("0")
     private Integer likeCount;
 
     //TODO : 사진 여러개..?
@@ -34,10 +44,12 @@ public class Food {
     private String foodImageUrl;
 
     @Builder
-    public Food(String foodName, Long code, String nutrition, String foodImageUrl){
+    public Food(String foodName, Long code, String nutrition, String rawMaterials, String productKind, String foodImageUrl){
         this.foodName = foodName;
         this.code = code;
         this.nutrition = nutrition;
+        this.rawMaterials = rawMaterials;
+        this.productKind = productKind;
         this.foodImageUrl = foodImageUrl;
     }
 
@@ -49,6 +61,10 @@ public class Food {
             this.code = food.getCode();
         if(food.getNutrition() != null)
             this.nutrition = food.getNutrition();
+        if(food.getRawMaterials() != null)
+            this.rawMaterials = food.getRawMaterials();
+        if(food.getProductKind() != null)
+            this.productKind = food.getProductKind();
         if(food.getFoodImageUrl() != null)
             this.foodImageUrl = food.getFoodImageUrl();
         return this;
