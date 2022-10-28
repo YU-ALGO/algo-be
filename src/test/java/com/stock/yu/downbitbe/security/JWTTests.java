@@ -23,8 +23,8 @@ public class JWTTests {
         String accessId = jwtUtil.validateAndExtract(token.getAccessToken());
         String refreshId = jwtUtil.validateAndExtract(token.getRefreshToken());
 
-        if(!userId.equals(accessId)) throw new RuntimeException("������ ��ū userId�� ����ġ");
-        if(!userId.equals(refreshId)) throw new RuntimeException("�������� ��ū userId�� ����ġ");
+        if(!userId.equals(accessId)) throw new RuntimeException("엑세스 토큰 userId값 미일치");
+        if(!userId.equals(refreshId)) throw new RuntimeException("리프레쉬 토큰 userID값 미일치");
 
         System.out.println(userId + " == " + accessId + " == " + refreshId);
     }

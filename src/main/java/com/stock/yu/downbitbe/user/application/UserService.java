@@ -62,9 +62,9 @@ public class UserService {
         User user = userRepository.findByUsername(userAuthDTO.getUsername());
         String newEncodingPassword = passwordEncoder.encode(password);
 
-        /* ���� ��й�ȣ�� ��ġ ���� Ȯ�� */
+        /* 기존 비밀번호와 일치 여부 확인 */
         if(user.getPassword().equals(newEncodingPassword))
-            throw new RuntimeException("���� ��й�ȣ�� ��ġ�մϴ�.");
+            throw new RuntimeException("이전 비밀번호와 일치합니다.");
 
         user.updatePassword(newEncodingPassword);
         userRepository.save(user);
