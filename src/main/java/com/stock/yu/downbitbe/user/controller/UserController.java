@@ -5,15 +5,13 @@ import com.stock.yu.downbitbe.security.payload.request.SignupRequest;
 import com.stock.yu.downbitbe.security.payload.response.JwtResponse;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
-import com.stock.yu.downbitbe.food.domain.AllergyInfo;
-import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
 import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.user.entity.Grade;
 import com.stock.yu.downbitbe.user.entity.LoginType;
 import com.stock.yu.downbitbe.user.entity.Token;
-import com.stock.yu.downbitbe.user.entity.User;
-import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
 import com.stock.yu.downbitbe.user.service.MailService;
+import com.stock.yu.downbitbe.user.service.UserAllergyInfoService;
+import com.stock.yu.downbitbe.user.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
@@ -23,7 +21,6 @@ import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
@@ -37,9 +34,9 @@ import java.util.stream.Collectors;
 public class UserController {
 
     private final AuthenticationManager authenticationManager;
-    private final PasswordEncoder passwordEncoder;
-    private final CustomUserRepository repository;
     private final MailService mailService;
+    private final UserService userService;
+    private final UserAllergyInfoService userAllergyInfoService;
 
     private final JWTUtil jwtUtil;
 
@@ -119,22 +116,14 @@ public class UserController {
         if (checkNicknameDuplication(request.getNickname()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("nickname is duplication.");
 
-        User newUser = User.builder()
-                .username(request.getUsername())
-                .password(passwordEncoder.encode(request.getPassword()))
-                .nickname(request.getNickname())
-                .loginType(LoginType.LOCAL)
-                .build();
-
-        newUser.addGrade(Grade.USER);
-        repository.save(newUser);
+        userService.signUp(request);
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/users/{username}/exists")
     public ResponseEntity<Boolean> checkUserIdDuplication(@RequestBody @PathVariable("username") String username) {
-        boolean user = repository.existsByUsername(username);
+        boolean user = userService.existsByUsername(username);
 
         if (user) {
             return ResponseEntity.status(HttpStatus.OK).body(true);
@@ -146,7 +135,7 @@ public class UserController {
 
     @GetMapping("/users/exists")
     public ResponseEntity<Boolean> checkNicknameDuplication(@RequestParam("nickname") String nickname) {
-        boolean isExist = repository.existsByNickname(nickname);
+        boolean isExist = userService.existsByNickname(nickname);
 
         if (isExist)
             return ResponseEntity.status(HttpStatus.OK).body(true);
@@ -156,14 +145,14 @@ public class UserController {
 
     @PostMapping("/users/mail")
     public ResponseEntity<Boolean> sendMail(@CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
-        mailService.sendMail(repository.findByUsername(auth.getUsername()));
+        mailService.sendMail(userService.findByUsername(auth.getUsername()));
 
         return ResponseEntity.ok(true);
     }
 
     @GetMapping("/users/validate")
     public ResponseEntity<?> validateCode(@RequestParam("code") int code, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
-        boolean isValidate = mailService.validateCode(repository.findByUsername(auth.getUsername()), code);
+        boolean isValidate = mailService.validateCode(userService.findByUsername(auth.getUsername()), code);
         if (isValidate)
             return ResponseEntity.ok().build();
         else
@@ -176,15 +165,7 @@ public class UserController {
         if(!auth.getLoginType().equals(LoginType.LOCAL))
             return ResponseEntity.badRequest().body("소셜 회원은 비밀번호를 변경할 수 없습니다");
 
-        User user = repository.findByUsername(auth.getUsername());
-        String newEncodingPassword = passwordEncoder.encode(newPassword);
-
-        /* 기존 비밀번호와 일치 여부 확인 */
-        if(user.getPassword().equals(newEncodingPassword))
-            return ResponseEntity.badRequest().body("이전 비밀번호와 일치합니다.");
-
-        user.updatePassword(newEncodingPassword);
-        repository.save(user);
+        userService.passwordChange(auth, newPassword);
         return ResponseEntity.ok().build();
     }
 

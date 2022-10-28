@@ -20,9 +20,13 @@ public interface CustomUserRepository extends JpaRepository<User, String> {
 
     User findByUsername(String username);
 
+    User findByNickname(String nickname);
+
     Boolean existsByUsername(String username);
 
     Boolean existsByNickname(String nickname);
+
+
 
     /*@EntityGraph(attributePaths = {"gradeSet"}, type = EntityGraph.EntityGraphType.LOAD)
     List<User> findByUserIdAndType(String userId, LoginType type);*/
