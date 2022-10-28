@@ -1,11 +1,10 @@
 package com.stock.yu.downbitbe.board.ui;
 
-import com.stock.yu.downbitbe.board.application.PostLikeService;
 import com.stock.yu.downbitbe.board.application.PostService;
 import com.stock.yu.downbitbe.board.domain.post.*;
 import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
 import com.stock.yu.downbitbe.user.entity.User;
-import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
+import com.stock.yu.downbitbe.user.service.UserService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -37,7 +36,7 @@ import java.util.stream.Collectors;
 })
 public class PostController {
     private final PostService postService;
-    private final CustomUserRepository userRepository;
+    private final UserService userService;
 
     @GetMapping("/{board_id}/posts")
     public ResponseEntity<List<PostListResponseDto>> getPostList(@PathVariable("board_id") Long boardId, @PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
@@ -52,7 +51,7 @@ public class PostController {
     @GetMapping("/{board_id}/posts/{post_id}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
                                                    @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
-        User user = userRepository.findByUsername(auth.getUsername());
+        User user = userService.findByUsername(auth.getUsername());
         PostResponseDto responseDto = postService.findPostByPostId(boardId, postId, user.getUserId());
         int ret = postService.updateView(postId, user);
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);
@@ -62,7 +61,7 @@ public class PostController {
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Long> createPost(final @RequestBody @Valid PostCreateRequestDto postCreateRequestDto, @PathVariable("board_id") Long boardId,
                                            @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
-        User user = userRepository.findByUsername(auth.getUsername());
+        User user = userService.findByUsername(auth.getUsername());
 
         Long ret = postService.createPost(postCreateRequestDto, boardId, user);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
@@ -72,7 +71,7 @@ public class PostController {
     @PatchMapping("/{board_id}/posts/{post_id}")
     public ResponseEntity<Long> updatePost(final @RequestBody @Valid PostUpdateRequestDto postUpdateRequestDto, @PathVariable("board_id") Long boardId,
                                            @PathVariable("post_id") Long postId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
-        User user = userRepository.findByUsername(auth.getUsername());
+        User user = userService.findByUsername(auth.getUsername());
         Long ret = postService.updatePost(postUpdateRequestDto, boardId, postId, user);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
@@ -81,7 +80,7 @@ public class PostController {
     @DeleteMapping("/{board_id}/posts/{post_id}")
     public ResponseEntity<Long> deletePost(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
                            @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
-        User user = userRepository.findByUsername(auth.getUsername());
+        User user = userService.findByUsername(auth.getUsername());
         Long ret = postService.deletePost(postId, user);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
