@@ -1,20 +1,16 @@
 package com.stock.yu.downbitbe.security;
 
-import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
-import com.stock.yu.downbitbe.user.entity.Grade;
-import com.stock.yu.downbitbe.user.entity.LoginType;
-import com.stock.yu.downbitbe.user.entity.User;
-import com.stock.yu.downbitbe.user.repository.CustomUserRepository;
+import com.stock.yu.downbitbe.user.domain.Grade;
+import com.stock.yu.downbitbe.user.domain.LoginType;
+import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.domain.CustomUserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.test.web.servlet.MockMvc;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 

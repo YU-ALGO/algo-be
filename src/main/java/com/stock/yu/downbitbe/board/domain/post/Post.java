@@ -2,8 +2,7 @@ package com.stock.yu.downbitbe.board.domain.post;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
 import com.stock.yu.downbitbe.board.domain.board.Board;
-import com.stock.yu.downbitbe.user.entity.Grade;
-import com.stock.yu.downbitbe.user.entity.User;
+import com.stock.yu.downbitbe.user.domain.User;
 import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
@@ -11,14 +10,11 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.*;
 
 import javax.persistence.*;
-import javax.persistence.CascadeType;
 import javax.persistence.Entity;
 import javax.persistence.Table;
 import javax.validation.constraints.NotBlank;
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 @Entity
 @Table(name = "POST")

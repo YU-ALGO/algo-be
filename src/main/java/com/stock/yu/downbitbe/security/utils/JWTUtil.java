@@ -1,8 +1,8 @@
 package com.stock.yu.downbitbe.security.utils;
 
 import com.stock.yu.downbitbe.security.config.Config;
-import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
-import com.stock.yu.downbitbe.user.entity.Token;
+import com.stock.yu.downbitbe.user.domain.LoginCookiesDTO;
+import com.stock.yu.downbitbe.user.domain.Token;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import lombok.extern.log4j.Log4j2;

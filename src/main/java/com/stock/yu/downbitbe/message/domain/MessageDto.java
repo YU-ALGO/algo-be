@@ -16,6 +16,7 @@ public class MessageDto {
     @JsonProperty("receiver_name")
     private final String receiverName;
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    @JsonProperty("created_at")
     private final LocalDateTime createdAt;
 
     public MessageDto(Message message){

@@ -2,9 +2,9 @@ package com.stock.yu.downbitbe.board.ui;
 
 import com.stock.yu.downbitbe.board.application.PostService;
 import com.stock.yu.downbitbe.board.domain.post.*;
-import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
-import com.stock.yu.downbitbe.user.entity.User;
-import com.stock.yu.downbitbe.user.service.UserService;
+import com.stock.yu.downbitbe.user.domain.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.application.UserService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;

@@ -2,13 +2,12 @@ package com.stock.yu.downbitbe.security.handler;
 
 import com.stock.yu.downbitbe.security.config.Config;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
-import com.stock.yu.downbitbe.user.dto.LoginCookiesDTO;
-import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
-import com.stock.yu.downbitbe.user.entity.LoginType;
-import com.stock.yu.downbitbe.user.entity.Token;
+import com.stock.yu.downbitbe.user.domain.LoginCookiesDTO;
+import com.stock.yu.downbitbe.user.domain.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.LoginType;
+import com.stock.yu.downbitbe.user.domain.Token;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
-import org.springframework.http.ResponseCookie;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultRedirectStrategy;
@@ -16,14 +15,9 @@ import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 
 import javax.servlet.ServletException;
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.TreeMap;
 
 @Log4j2
 public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {

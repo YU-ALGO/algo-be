@@ -1,11 +1,8 @@
 package com.stock.yu.downbitbe.security.controller;
 
-import com.stock.yu.downbitbe.user.entity.Token;
-import com.stock.yu.downbitbe.security.config.Config;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
-import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 

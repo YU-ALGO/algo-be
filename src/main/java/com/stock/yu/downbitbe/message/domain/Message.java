@@ -1,13 +1,12 @@
 package com.stock.yu.downbitbe.message.domain;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
-import com.stock.yu.downbitbe.user.entity.User;
+import com.stock.yu.downbitbe.user.domain.User;
 import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
-import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -36,6 +35,11 @@ public class Message extends BaseTimeEntity {
     @Column(name = "read_time", updatable = false)
     private LocalDateTime readTime;
 
+    @Column(name = "is_read")
+    @ColumnDefault("0")
+    @NotNull
+    private Boolean isRead;
+
     @JoinColumn
     @ManyToOne(fetch = FetchType.LAZY) //LAZY는 연결된 내용은 나중에 검색, EAGER는 한번에 가져옴
     @NotNull
@@ -53,17 +57,16 @@ public class Message extends BaseTimeEntity {
     private DeleteCondition deleted; // delete 는 mysql 예약어
 
     @Builder
-    public Message(String title, String content, LocalDateTime read, User sender, User receiver, DeleteCondition deleted){
+    public Message(String title, String content, User sender, User receiver){
         this.title = title;
         this.content = content;
-        this.readTime = read;
         this.sender = sender;
         this.receiver = receiver;
-        this.deleted = deleted;
     }
 
-    public Message updateTime(){
+    public Message updateRead(){
         this.readTime = LocalDateTime.now();
+        this.isRead = true;
         return this;
     }
 }

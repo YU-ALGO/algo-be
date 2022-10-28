@@ -2,7 +2,7 @@ package com.stock.yu.downbitbe.board.domain.comment;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
 import com.stock.yu.downbitbe.board.domain.post.Post;
-import com.stock.yu.downbitbe.user.entity.User;
+import com.stock.yu.downbitbe.user.domain.User;
 import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.annotations.*;

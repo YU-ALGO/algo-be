@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.security.filter;
 
-import com.stock.yu.downbitbe.user.service.CustomUserDetailsService;
+import com.stock.yu.downbitbe.user.application.CustomUserDetailsService;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -9,7 +9,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
-import org.springframework.web.bind.annotation.CookieValue;
 
 import javax.servlet.FilterChain;
 import javax.servlet.ServletException;
@@ -17,11 +16,6 @@ import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
-import java.net.URLDecoder;
-import java.nio.charset.StandardCharsets;
-import java.rmi.RemoteException;
-import java.util.Base64;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Map;
 

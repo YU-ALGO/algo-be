@@ -1,6 +1,7 @@
 package com.stock.yu.downbitbe.message.application;
 
 import com.stock.yu.downbitbe.message.domain.*;
+import com.stock.yu.downbitbe.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -16,13 +17,13 @@ public class MessageService {
     private final MessageRepository messageRepository;
 
     @Transactional(readOnly = true)
-    public Page<ReceiveMessageListDto> findAllMessagesByReceiver(Long receiverId, Boolean notRead, Pageable pageable) {
-        return null;
+    public Page<ReceiveMessageListDto> findAllMessagesByReceiver(Pageable pageable, Long receiverId, Boolean notRead, String keyword) {
+        return messageRepository.findAllByReceiverId(receiverId, pageable, notRead, keyword);
     }
 
     @Transactional(readOnly = true)
-    public Page<SendMessageListDto> findAllMessagesBySender(Long senderId, Pageable pageable) {
-        return null;
+    public Page<SendMessageListDto> findAllMessagesBySender(Pageable pageable, Long senderId, String keyword) {
+        return messageRepository.findAllBySenderId(senderId, pageable, keyword);
     }
 
     @Transactional(readOnly = true)
@@ -30,7 +31,7 @@ public class MessageService {
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new IllegalArgumentException("쪽지가 존재하지 않습니다."));
         if(Objects.equals(message.getReceiver().getUserId(), userId)){
             if(message.getReadTime() == null) {
-                messageRepository.save(message.updateTime());
+                messageRepository.save(message.updateRead());
             }
         }
         return new MessageDto(message);
@@ -41,6 +42,11 @@ public class MessageService {
         return messageRepository.countNonReadMessageByUserId(userId);
     }
 
+    @Transactional
+    public Long createMessage(MessageCreateRequestDto messageCreateRequestDto, User receiver, User sender) {
+        Message message = messageCreateRequestDto.toEntity(sender, receiver);
+        return messageRepository.save(message).getMessageId();
+    }
     @Transactional
     public Long deleteMessage(Long messageId, Long userId){
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new IllegalArgumentException("쪽지가 존재하지 않습니다."));

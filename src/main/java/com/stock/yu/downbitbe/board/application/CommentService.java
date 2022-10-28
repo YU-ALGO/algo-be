@@ -3,7 +3,7 @@ package com.stock.yu.downbitbe.board.application;
 import com.stock.yu.downbitbe.board.domain.comment.*;
 import com.stock.yu.downbitbe.board.domain.post.Post;
 import com.stock.yu.downbitbe.board.domain.post.PostRepository;
-import com.stock.yu.downbitbe.user.entity.User;
+import com.stock.yu.downbitbe.user.domain.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

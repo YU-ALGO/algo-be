@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.security;
 
-import com.stock.yu.downbitbe.user.entity.Token;
+import com.stock.yu.downbitbe.user.domain.Token;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -23,8 +23,8 @@ public class JWTTests {
         String accessId = jwtUtil.validateAndExtract(token.getAccessToken());
         String refreshId = jwtUtil.validateAndExtract(token.getRefreshToken());
 
-        if(!userId.equals(accessId)) throw new RuntimeException("¿¢¼¼½º ÅäÅ« userId°ª ¹ÌÀÏÄ¡");
-        if(!userId.equals(refreshId)) throw new RuntimeException("¸®ÇÁ·¹½¬ ÅäÅ« userId°ª ¹ÌÀÏÄ¡");
+        if(!userId.equals(accessId)) throw new RuntimeException("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å« userIdï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡");
+        if(!userId.equals(refreshId)) throw new RuntimeException("ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Å« userIdï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Ä¡");
 
         System.out.println(userId + " == " + accessId + " == " + refreshId);
     }

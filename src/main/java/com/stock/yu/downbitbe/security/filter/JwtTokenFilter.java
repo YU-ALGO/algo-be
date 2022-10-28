@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.security.filter;
 
-import com.stock.yu.downbitbe.user.service.CustomUserDetailsService;
+import com.stock.yu.downbitbe.user.application.CustomUserDetailsService;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import org.springframework.web.filter.OncePerRequestFilter;
 

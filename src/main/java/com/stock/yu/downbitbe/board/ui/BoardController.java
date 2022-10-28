@@ -2,14 +2,12 @@ package com.stock.yu.downbitbe.board.ui;
 
 import com.stock.yu.downbitbe.board.application.BoardService;
 import com.stock.yu.downbitbe.board.domain.board.BoardListDto;
-import com.stock.yu.downbitbe.user.dto.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.UserAuthDTO;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 

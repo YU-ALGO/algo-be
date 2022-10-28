@@ -1,13 +1,11 @@
 package com.stock.yu.downbitbe.board.domain.comment;
 
 import com.stock.yu.downbitbe.board.domain.post.Post;
-import com.stock.yu.downbitbe.user.entity.User;
+import com.stock.yu.downbitbe.user.domain.User;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 
 import javax.validation.constraints.NotBlank;
-import javax.validation.constraints.NotNull;
 
 @Getter
 @NoArgsConstructor
