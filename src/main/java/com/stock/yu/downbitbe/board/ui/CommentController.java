@@ -5,7 +5,7 @@ import com.stock.yu.downbitbe.board.domain.comment.Comment;
 import com.stock.yu.downbitbe.board.domain.comment.CommentCreateRequestDto;
 import com.stock.yu.downbitbe.board.domain.comment.CommentDto;
 import com.stock.yu.downbitbe.board.domain.comment.CommentUpdateRequestDto;
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -51,7 +51,7 @@ public class CommentController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{board_id}/posts/{post_id}/comments")
     public ResponseEntity<?> createComment(final @RequestBody @Valid CommentCreateRequestDto commentCreateRequestDto, @PathVariable("board_id") Long boardId,
-                                           @PathVariable("post_id") Long postId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+                                           @PathVariable("post_id") Long postId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         Long commentId = commentService.createComment(commentCreateRequestDto, postId, user);
         if(commentId == null){ // TODO : 실패시 반환값 확인후 조건문 다시 작성
@@ -64,7 +64,7 @@ public class CommentController {
     @PreAuthorize("isAuthenticated() and (#auth.username == @commentRepository.findCommentByCommentId(#commentId).user.username)")
     @PatchMapping("/{board_id}/posts/{post_id}/comments/{comment_id}")
     public ResponseEntity<?> updateComment(final @RequestBody @Valid CommentUpdateRequestDto commentUpdateRequestDto, @PathVariable("board_id") Long boardId,
-                                           @PathVariable("post_id") Long postId, @PathVariable("comment_id") Long commentId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+                                           @PathVariable("post_id") Long postId, @PathVariable("comment_id") Long commentId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         Long updateResult = commentService.updateComment(commentUpdateRequestDto, postId, commentId, user);
         if(updateResult == null){
@@ -75,7 +75,7 @@ public class CommentController {
 
     @PreAuthorize("isAuthenticated() and (#auth.username == @commentRepository.findCommentByCommentId(#commentId).user.username)")
     @DeleteMapping("/{board_id}/posts/{post_id}/comments/{comment_id}")
-    public ResponseEntity<?> deleteComment(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId, @PathVariable("comment_id") Long commentId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+    public ResponseEntity<?> deleteComment(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId, @PathVariable("comment_id") Long commentId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         Long deleteResult = commentService.deleteComment(postId, commentId, user);
         if(deleteResult == null){

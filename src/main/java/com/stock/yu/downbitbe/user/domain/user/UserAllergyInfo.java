@@ -51,4 +51,8 @@ public class UserAllergyInfo {
 
         return allergyInfoMap;
     }
+
+    public void updateAllergyInfo(AllergyInfo allergyInfo) {
+        this.allergyInfo = allergyInfo;
+    }
 }

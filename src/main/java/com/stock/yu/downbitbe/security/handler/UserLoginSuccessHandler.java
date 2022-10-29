@@ -2,8 +2,8 @@ package com.stock.yu.downbitbe.security.handler;
 
 import com.stock.yu.downbitbe.security.config.Config;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
-import com.stock.yu.downbitbe.user.domain.user.LoginCookiesDTO;
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.LoginCookies;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.LoginType;
 import com.stock.yu.downbitbe.user.domain.user.Token;
 import lombok.extern.log4j.Log4j2;
@@ -37,7 +37,7 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("---------------------------");
         log.info("onAuthenticationSuccess ");
 
-        UserAuthDTO userAuth = (UserAuthDTO) authentication.getPrincipal();
+        UserAuthDto userAuth = (UserAuthDto) authentication.getPrincipal();
         boolean isSocial = !userAuth.getLoginType().equals(LoginType.LOCAL);
         log.info("Need Modify Member? " + isSocial);
         boolean isDefaultPassword = passwordEncoder.matches("1111", userAuth.getPassword());
@@ -47,19 +47,19 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
 //        }
 
         Token token = null;
-        LoginCookiesDTO loginCookiesDTO = null;
+        LoginCookies loginCookies = null;
         try {
             token = jwtUtil.generateToken(userAuth.getUsername(), userAuth.getNickname());
-            loginCookiesDTO = jwtUtil.setLoginCookies(token, false);
+            loginCookies = jwtUtil.setLoginCookies(token, false);
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
-        response.addHeader(HttpHeaders.SET_COOKIE, loginCookiesDTO.getIsLoginCookie().toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, loginCookiesDTO.getIsAdminCookie().toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, loginCookiesDTO.getAccessCookie().toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, loginCookiesDTO.getViewListCookie().toString());
-        response.addHeader(HttpHeaders.SET_COOKIE, loginCookiesDTO.getRefreshCookie().toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, loginCookies.getIsLoginCookie().toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, loginCookies.getIsAdminCookie().toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, loginCookies.getAccessCookie().toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, loginCookies.getViewListCookie().toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, loginCookies.getRefreshCookie().toString());
 
         //TODO : 아래로 수정할 것 - 홈으로 갔을 때 특정 헤더를 붙이면 프론트에서
         response.sendRedirect(Config.WEB_BASE_URL);

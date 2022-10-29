@@ -4,7 +4,7 @@ import com.stock.yu.downbitbe.food.application.FoodService;
 import com.stock.yu.downbitbe.food.domain.FoodListResponseDto;
 import com.stock.yu.downbitbe.food.domain.FoodRequestDto;
 import com.stock.yu.downbitbe.food.domain.FoodResponseDto;
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
 import lombok.RequiredArgsConstructor;
@@ -40,7 +40,7 @@ public class FoodController {
     }
 
     @GetMapping("/{food_id}")
-    public ResponseEntity<FoodResponseDto> getFood(@PathVariable("food_id") Long foodId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+    public ResponseEntity<FoodResponseDto> getFood(@PathVariable("food_id") Long foodId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         FoodResponseDto responseDto = foodService.findFoodByFoodId(foodId, user.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(responseDto);

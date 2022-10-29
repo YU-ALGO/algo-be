@@ -3,7 +3,7 @@ package com.stock.yu.downbitbe.user.ui;
 import com.stock.yu.downbitbe.user.application.UserBlockService;
 import com.stock.yu.downbitbe.user.domain.userBlock.UserBlock;
 import com.stock.yu.downbitbe.user.domain.userBlock.UserBlockListDto;
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
 import lombok.RequiredArgsConstructor;
@@ -30,7 +30,7 @@ public class UserBlockController {
 
     @GetMapping("")
     public ResponseEntity<List<UserBlockListDto>> getUserBlockList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                   @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+                                                                   @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         Page<UserBlock> userBlockListDto = userBlockService.findAllBlocksByUserId(pageable, user.getUserId());
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -39,7 +39,7 @@ public class UserBlockController {
     }
 
     @PostMapping("")
-    public ResponseEntity<Long> createUserBlock(@RequestBody Map<String, String> UserBlockCreateRequestDto, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+    public ResponseEntity<Long> createUserBlock(@RequestBody Map<String, String> UserBlockCreateRequestDto, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         User userBlock = userService.findByUsername(UserBlockCreateRequestDto.get("blockUserName"));
         Long ret = userBlockService.createUserBlock(user, userBlock);
@@ -47,7 +47,7 @@ public class UserBlockController {
     }
 
     @DeleteMapping("{block_id}")
-    public ResponseEntity<Long> deleteUserBlock(@PathVariable("block_id") Long blockId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+    public ResponseEntity<Long> deleteUserBlock(@PathVariable("block_id") Long blockId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         Long ret = userBlockService.deleteUserBlock(user, blockId);
         return ResponseEntity.status(HttpStatus.OK).body(ret);

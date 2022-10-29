@@ -7,10 +7,11 @@ import org.springframework.http.ResponseCookie;
 @Setter
 @Builder
 @AllArgsConstructor
-public class LoginCookiesDTO {
+public class LoginCookies {
     private ResponseCookie accessCookie;
     private ResponseCookie refreshCookie;
     private ResponseCookie viewListCookie;
     private ResponseCookie isLoginCookie;
     private ResponseCookie isAdminCookie;
+
 }

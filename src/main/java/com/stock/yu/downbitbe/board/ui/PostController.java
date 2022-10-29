@@ -2,7 +2,7 @@ package com.stock.yu.downbitbe.board.ui;
 
 import com.stock.yu.downbitbe.board.application.PostService;
 import com.stock.yu.downbitbe.board.domain.post.*;
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
@@ -50,7 +50,7 @@ public class PostController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{board_id}/posts/{post_id}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
-                                                   @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+                                                   @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         User user = userService.findByUsername(auth.getUsername());
         PostResponseDto responseDto = postService.findPostByPostId(boardId, postId, user.getUserId());
         int ret = postService.updateView(postId, user);
@@ -60,7 +60,7 @@ public class PostController {
     @PostMapping("/{board_id}/posts")
     @PreAuthorize("isAuthenticated()")
     public ResponseEntity<Long> createPost(final @RequestBody @Valid PostCreateRequestDto postCreateRequestDto, @PathVariable("board_id") Long boardId,
-                                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+                                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         User user = userService.findByUsername(auth.getUsername());
 
         Long ret = postService.createPost(postCreateRequestDto, boardId, user);
@@ -70,7 +70,7 @@ public class PostController {
     @PreAuthorize("isAuthenticated() and (#auth.username == @postRepository.findPostByPostId(#postId).user.username)")
     @PatchMapping("/{board_id}/posts/{post_id}")
     public ResponseEntity<Long> updatePost(final @RequestBody @Valid PostUpdateRequestDto postUpdateRequestDto, @PathVariable("board_id") Long boardId,
-                                           @PathVariable("post_id") Long postId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+                                           @PathVariable("post_id") Long postId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         User user = userService.findByUsername(auth.getUsername());
         Long ret = postService.updatePost(postUpdateRequestDto, boardId, postId, user);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
@@ -79,7 +79,7 @@ public class PostController {
     @PreAuthorize("isAuthenticated() and (#auth.username == @postRepository.findPostByPostId(#postId).user.username)")
     @DeleteMapping("/{board_id}/posts/{post_id}")
     public ResponseEntity<Long> deletePost(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
-                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) {
+                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         User user = userService.findByUsername(auth.getUsername());
         Long ret = postService.deletePost(postId, user);
         return ResponseEntity.status(HttpStatus.OK).body(ret);

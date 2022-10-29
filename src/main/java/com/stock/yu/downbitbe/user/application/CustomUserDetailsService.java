@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.user.application;
 
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.domain.user.CustomUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -44,7 +44,7 @@ public class CustomUserDetailsService implements UserDetailsService {
         log.info("---------------------------");
         log.info(user);
 
-        UserAuthDTO userAuth = new UserAuthDTO(
+        UserAuthDto userAuth = new UserAuthDto(
                 user.getUsername(),
                 user.getPassword(),
                 user.getLoginType(),

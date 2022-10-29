@@ -1,7 +1,7 @@
 package com.stock.yu.downbitbe.security.utils;
 
 import com.stock.yu.downbitbe.security.config.Config;
-import com.stock.yu.downbitbe.user.domain.user.LoginCookiesDTO;
+import com.stock.yu.downbitbe.user.domain.user.LoginCookies;
 import com.stock.yu.downbitbe.user.domain.user.Token;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -98,7 +98,7 @@ public class JWTUtil {
         return userId;
     }
 
-    public LoginCookiesDTO setLoginCookies(Token token, boolean isAdmin) throws Exception {
+    public LoginCookies setLoginCookies(Token token, boolean isAdmin) throws Exception {
         ResponseCookie accessCookie = ResponseCookie.from("accessToken",token.getAccessToken())
                 .httpOnly(true)
                 .path("/")
@@ -134,7 +134,7 @@ public class JWTUtil {
                 .domain(Config.DOMAIN)
                 .build();
 
-        LoginCookiesDTO loginCookiesDTO = LoginCookiesDTO.builder()
+        LoginCookies loginCookies = LoginCookies.builder()
                 .accessCookie(accessCookie)
                 .refreshCookie(refreshCookie)
                 .viewListCookie(viewCookie)
@@ -142,6 +142,6 @@ public class JWTUtil {
                 .isAdminCookie(isAdminCookie)
                 .build();
 
-        return loginCookiesDTO;
+        return loginCookies;
     }
 }

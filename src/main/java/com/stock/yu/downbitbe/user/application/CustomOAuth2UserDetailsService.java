@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.user.application;
 
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.Grade;
 import com.stock.yu.downbitbe.user.domain.user.LoginType;
 import com.stock.yu.downbitbe.user.domain.user.User;
@@ -80,7 +80,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
         //return oAuth2User;
 
-        UserAuthDTO userAuth = new UserAuthDTO(
+        UserAuthDto userAuth = new UserAuthDto(
                 user.getUsername(),
                 user.getPassword(),
                 user.getLoginType(),

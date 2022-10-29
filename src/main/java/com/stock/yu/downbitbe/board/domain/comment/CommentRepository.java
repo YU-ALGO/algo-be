@@ -1,11 +1,14 @@
 package com.stock.yu.downbitbe.board.domain.comment;
 
+import com.stock.yu.downbitbe.user.domain.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
+
+import java.util.List;
 
 public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Query("select m from Comment m where m.post.postId = :postId order by COALESCE(m.parent, m.commentId), m.commentId")
@@ -25,4 +28,6 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Modifying
     @Query("delete from Comment c where c.parent = :id or c.commentId = :id")
     Long deleteCommentsByCommentIdAndParent(@Param(value = "id")Long parent);
+
+    List<Comment> findAllByUserNickname(String nickname);
 }

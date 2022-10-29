@@ -2,7 +2,7 @@ package com.stock.yu.downbitbe.board.ui;
 
 import com.stock.yu.downbitbe.board.application.PostImageService;
 import com.stock.yu.downbitbe.security.config.Config;
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -24,7 +24,7 @@ public class PostImageController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{board_id}/posts/images")
     public ResponseEntity<String> uploadPostImage(@PathVariable("board_id") Long boardId, @RequestParam("image") MultipartFile image,
-                                                @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth) throws IOException {
+                                                @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) throws IOException {
         String uploadFilename = postImageService.uploadPostImage(boardId, auth.getUsername(), image);
 
         return ResponseEntity.status(HttpStatus.OK).body(uploadFilename);

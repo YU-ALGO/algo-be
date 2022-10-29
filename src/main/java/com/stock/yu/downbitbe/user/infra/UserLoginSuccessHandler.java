@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.user.infra;
 
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.LoginType;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.Authentication;
@@ -30,7 +30,7 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("---------------------------");
         log.info("onAuthenticationSuccess ");
 
-        UserAuthDTO userAuth = (UserAuthDTO) authentication.getPrincipal();
+        UserAuthDto userAuth = (UserAuthDto) authentication.getPrincipal();
         boolean isSocial = !userAuth.getLoginType().equals(LoginType.LOCAL);
         log.info("Need Modify Member? " + isSocial);
 

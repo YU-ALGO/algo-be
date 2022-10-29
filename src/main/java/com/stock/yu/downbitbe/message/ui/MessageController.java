@@ -5,7 +5,7 @@ import com.stock.yu.downbitbe.message.domain.MessageCreateRequestDto;
 import com.stock.yu.downbitbe.message.domain.MessageDto;
 import com.stock.yu.downbitbe.message.domain.ReceiveMessageListDto;
 import com.stock.yu.downbitbe.message.domain.SendMessageListDto;
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
 import lombok.RequiredArgsConstructor;
@@ -34,7 +34,7 @@ public class MessageController {
     public ResponseEntity<List<ReceiveMessageListDto>> getReceiveMessageList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                                                              @RequestParam(value = "keyword", required = false) String keyword,
                                                                              @RequestParam(value = "not_read", required = false) Boolean notRead,
-                                                                             @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+                                                                             @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         Page<ReceiveMessageListDto> receiveMessageList = messageService.findAllMessagesByReceiver(pageable, user.getUserId(), notRead, keyword);
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -45,7 +45,7 @@ public class MessageController {
     @GetMapping("/outboxes")
     public ResponseEntity<List<SendMessageListDto>> getSendMessageList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                                                        @RequestParam(value = "keyword", required = false) String keyword,
-                                                                          @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+                                                                          @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         Page<SendMessageListDto> sendMessageList = messageService.findAllMessagesBySender(pageable, user.getUserId(), keyword);
         HttpHeaders responseHeaders = new HttpHeaders();
@@ -55,7 +55,7 @@ public class MessageController {
 
     @GetMapping("{message_id}")
     public ResponseEntity<MessageDto> getMessage(@PathVariable("message_id") Long messageId,
-                                                 @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+                                                 @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         MessageDto messageDto = messageService.findMessageByMessageId(messageId, user.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(messageDto);
@@ -63,7 +63,7 @@ public class MessageController {
 
     @PostMapping("")
     public ResponseEntity<Long> createMessage(final @RequestBody @Valid MessageCreateRequestDto messageCreateRequestDto,
-                                              @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+                                              @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User receiver = userService.findByNickname(messageCreateRequestDto.getReceiverName());
         User sender = userService.findByUsername(auth.getUsername());
         Long ret = messageService.createMessage(messageCreateRequestDto, receiver, sender);
@@ -72,7 +72,7 @@ public class MessageController {
 
     @DeleteMapping("{message_id}")
     public ResponseEntity<Long> deleteMessage(@PathVariable("message_id") Long messageId,
-                                              @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
+                                              @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         Long ret = messageService.deleteMessage(messageId, user.getUserId());
         return ResponseEntity.status(HttpStatus.OK).body(ret);

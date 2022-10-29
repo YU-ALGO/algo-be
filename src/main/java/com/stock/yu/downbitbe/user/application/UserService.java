@@ -1,11 +1,8 @@
 package com.stock.yu.downbitbe.user.application;
 
-import com.stock.yu.downbitbe.user.domain.user.SignupRequestDto;
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
-import com.stock.yu.downbitbe.user.domain.user.Grade;
-import com.stock.yu.downbitbe.user.domain.user.LoginType;
-import com.stock.yu.downbitbe.user.domain.user.User;
-import com.stock.yu.downbitbe.user.domain.user.CustomUserRepository;
+import com.nimbusds.openid.connect.sdk.UserInfoResponse;
+import com.stock.yu.downbitbe.food.domain.AllergyInfo;
+import com.stock.yu.downbitbe.user.domain.user.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -19,6 +16,7 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final CustomUserRepository userRepository;
+    private final UserAllergyInfoRepository userAllergyInfoRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
@@ -58,7 +56,7 @@ public class UserService {
     }
 
     @Transactional
-    public void passwordChange(UserAuthDTO userAuthDTO, String password) {
+    public void passwordChange(UserAuthDto userAuthDTO, String password) {
         User user = userRepository.findByUsername(userAuthDTO.getUsername());
         String newEncodingPassword = passwordEncoder.encode(password);
 
@@ -69,6 +67,34 @@ public class UserService {
         user.updatePassword(newEncodingPassword);
         userRepository.save(user);
 
+    }
+
+    @Transactional
+    public void nicknameChange(UserAuthDto userAuthDTO, String newNickname) {
+        User user = userRepository.findByUsername(userAuthDTO.getUsername());
+
+        user.updateNickname(newNickname);
+        userRepository.save(user);
+
+    }
+
+    @Transactional
+    public void introduceChange(UserAuthDto userAuthDTO, String newIntroduce) {
+        User user = userRepository.findByUsername(userAuthDTO.getUsername());
+
+        user.updateIntroduce(newIntroduce);
+        userRepository.save(user);
+
+    }
+
+    @Transactional
+    public void allergyChange(UserAuthDto userAuthDTO, AllergyInfo newAllergyInfo) {
+        User user = userRepository.findByUsername(userAuthDTO.getUsername());
+
+        UserAllergyInfo userAllergyInfo = userAllergyInfoRepository.findByUserId(user.getUserId());
+        userAllergyInfo.updateAllergyInfo(newAllergyInfo);
+
+        userAllergyInfoRepository.save(userAllergyInfo);
     }
 
     @Transactional(readOnly = true)
