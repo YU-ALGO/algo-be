@@ -2,8 +2,8 @@ package com.stock.yu.downbitbe.food.ui;
 
 
 import com.stock.yu.downbitbe.food.application.FoodLikeService;
-import com.stock.yu.downbitbe.user.domain.UserAuthDTO;
-import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;

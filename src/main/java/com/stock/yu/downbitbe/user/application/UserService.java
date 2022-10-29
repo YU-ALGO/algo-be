@@ -1,11 +1,11 @@
 package com.stock.yu.downbitbe.user.application;
 
-import com.stock.yu.downbitbe.security.payload.request.SignupRequest;
-import com.stock.yu.downbitbe.user.domain.UserAuthDTO;
-import com.stock.yu.downbitbe.user.domain.Grade;
-import com.stock.yu.downbitbe.user.domain.LoginType;
-import com.stock.yu.downbitbe.user.domain.User;
-import com.stock.yu.downbitbe.user.domain.CustomUserRepository;
+import com.stock.yu.downbitbe.user.domain.user.SignupRequestDto;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.Grade;
+import com.stock.yu.downbitbe.user.domain.user.LoginType;
+import com.stock.yu.downbitbe.user.domain.user.User;
+import com.stock.yu.downbitbe.user.domain.user.CustomUserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -42,7 +42,7 @@ public class UserService {
     }
 
     @Transactional
-    public void signUp(SignupRequest request) {
+    public void signUp(SignupRequestDto request) {
         User newUser = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))

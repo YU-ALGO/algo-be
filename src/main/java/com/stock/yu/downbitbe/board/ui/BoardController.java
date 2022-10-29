@@ -2,7 +2,7 @@ package com.stock.yu.downbitbe.board.ui;
 
 import com.stock.yu.downbitbe.board.application.BoardService;
 import com.stock.yu.downbitbe.board.domain.board.BoardListDto;
-import com.stock.yu.downbitbe.user.domain.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;

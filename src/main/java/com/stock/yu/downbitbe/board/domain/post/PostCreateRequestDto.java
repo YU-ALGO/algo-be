@@ -1,7 +1,7 @@
 package com.stock.yu.downbitbe.board.domain.post;
 
 import com.stock.yu.downbitbe.board.domain.board.Board;
-import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.domain.user.User;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

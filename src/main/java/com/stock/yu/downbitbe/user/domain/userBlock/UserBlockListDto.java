@@ -1,4 +1,4 @@
-package com.stock.yu.downbitbe.user.domain;
+package com.stock.yu.downbitbe.user.domain.userBlock;
 
 import com.fasterxml.jackson.annotation.JsonFormat;
 import com.fasterxml.jackson.annotation.JsonProperty;

@@ -1,9 +1,9 @@
 package com.stock.yu.downbitbe.security;
 
-import com.stock.yu.downbitbe.user.domain.Grade;
-import com.stock.yu.downbitbe.user.domain.LoginType;
-import com.stock.yu.downbitbe.user.domain.User;
-import com.stock.yu.downbitbe.user.domain.CustomUserRepository;
+import com.stock.yu.downbitbe.user.domain.user.Grade;
+import com.stock.yu.downbitbe.user.domain.user.LoginType;
+import com.stock.yu.downbitbe.user.domain.user.User;
+import com.stock.yu.downbitbe.user.domain.user.CustomUserRepository;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;

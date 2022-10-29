@@ -1,7 +1,7 @@
 package com.stock.yu.downbitbe.message.application;
 
 import com.stock.yu.downbitbe.message.domain.*;
-import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

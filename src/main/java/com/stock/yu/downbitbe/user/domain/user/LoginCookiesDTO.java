@@ -1,4 +1,4 @@
-package com.stock.yu.downbitbe.user.domain;
+package com.stock.yu.downbitbe.user.domain.user;
 
 import lombok.*;
 import org.springframework.http.ResponseCookie;

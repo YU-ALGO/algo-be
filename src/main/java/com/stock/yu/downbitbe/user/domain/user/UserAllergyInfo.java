@@ -1,4 +1,4 @@
-package com.stock.yu.downbitbe.user.domain;
+package com.stock.yu.downbitbe.user.domain.user;
 
 import com.stock.yu.downbitbe.food.domain.AllergyInfo;
 

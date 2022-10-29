@@ -1,8 +1,8 @@
 package com.stock.yu.downbitbe.user.application;
 
-import com.stock.yu.downbitbe.user.domain.MailCode;
-import com.stock.yu.downbitbe.user.domain.User;
-import com.stock.yu.downbitbe.user.domain.MailCodeRepository;
+import com.stock.yu.downbitbe.user.domain.user.MailCode;
+import com.stock.yu.downbitbe.user.domain.user.User;
+import com.stock.yu.downbitbe.user.domain.user.MailCodeRepository;
 import com.stock.yu.downbitbe.user.utils.MailUtil;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;

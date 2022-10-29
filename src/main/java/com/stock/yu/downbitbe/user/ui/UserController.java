@@ -1,14 +1,14 @@
 package com.stock.yu.downbitbe.user.ui;
 
-import com.stock.yu.downbitbe.security.payload.request.LoginRequest;
-import com.stock.yu.downbitbe.security.payload.request.SignupRequest;
-import com.stock.yu.downbitbe.security.payload.response.JwtResponse;
+import com.stock.yu.downbitbe.user.domain.user.LoginRequestDto;
+import com.stock.yu.downbitbe.user.domain.user.SignupRequestDto;
+import com.stock.yu.downbitbe.user.domain.user.UserInfoResponseDto;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
-import com.stock.yu.downbitbe.user.domain.LoginCookiesDTO;
-import com.stock.yu.downbitbe.user.domain.UserAuthDTO;
-import com.stock.yu.downbitbe.user.domain.Grade;
-import com.stock.yu.downbitbe.user.domain.LoginType;
-import com.stock.yu.downbitbe.user.domain.Token;
+import com.stock.yu.downbitbe.user.domain.user.LoginCookiesDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.Grade;
+import com.stock.yu.downbitbe.user.domain.user.LoginType;
+import com.stock.yu.downbitbe.user.domain.user.Token;
 import com.stock.yu.downbitbe.user.application.MailService;
 import com.stock.yu.downbitbe.user.application.UserAllergyInfoService;
 import com.stock.yu.downbitbe.user.application.UserService;
@@ -41,7 +41,7 @@ public class UserController {
     private final JWTUtil jwtUtil;
 
     @PostMapping("/login")
-    public ResponseEntity<?> login(@RequestBody LoginRequest user) throws Exception {
+    public ResponseEntity<?> login(@RequestBody LoginRequestDto user) throws Exception {
 
         log.info("---------start login-------");
         String email = user.getUsername();
@@ -98,7 +98,7 @@ public class UserController {
                         loginCookiesDTO.getViewListCookie().toString(),
                         loginCookiesDTO.getIsLoginCookie().toString(),
                         loginCookiesDTO.getIsAdminCookie().toString())
-                .body(JwtResponse.builder()
+                .body(UserInfoResponseDto.builder()
                         .nickname(auth.getNickname())
                         .username(email)
                         .loginType(auth.getLoginType().toString())
@@ -109,7 +109,7 @@ public class UserController {
     //TODO 회원가입 완성하기
     @Transactional
     @PostMapping("/signup")
-    public ResponseEntity<String> signUp(@RequestBody SignupRequest request) {
+    public ResponseEntity<String> signUp(@RequestBody SignupRequestDto request) {
 
         if(checkUserIdDuplication(request.getUsername()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user_id is duplication.");

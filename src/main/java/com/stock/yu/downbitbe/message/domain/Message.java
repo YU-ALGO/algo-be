@@ -1,7 +1,7 @@
 package com.stock.yu.downbitbe.message.domain;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
-import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.domain.user.User;
 import com.sun.istack.NotNull;
 import lombok.Builder;
 import lombok.Getter;

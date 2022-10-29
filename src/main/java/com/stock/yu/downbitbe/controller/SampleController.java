@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.controller;
 
-import com.stock.yu.downbitbe.user.domain.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;

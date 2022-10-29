@@ -1,10 +1,10 @@
 package com.stock.yu.downbitbe.user.ui;
 
 import com.stock.yu.downbitbe.user.application.UserBlockService;
-import com.stock.yu.downbitbe.user.domain.UserBlock;
-import com.stock.yu.downbitbe.user.domain.UserBlockListDto;
-import com.stock.yu.downbitbe.user.domain.UserAuthDTO;
-import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.domain.userBlock.UserBlock;
+import com.stock.yu.downbitbe.user.domain.userBlock.UserBlockListDto;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;

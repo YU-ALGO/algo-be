@@ -1,15 +1,11 @@
-package com.stock.yu.downbitbe.security.payload.response;
+package com.stock.yu.downbitbe.user.domain.user;
 
 import lombok.Builder;
 import lombok.Data;
-import lombok.Getter;
-import lombok.RequiredArgsConstructor;
-
-import java.util.Set;
 
 @Data
 @Builder
-public class JwtResponse {
+public class UserInfoResponseDto {
     private String nickname;
     private String loginType = "Bearer";
     private String username;

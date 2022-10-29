@@ -1,7 +1,7 @@
-package com.stock.yu.downbitbe.user.domain;
+package com.stock.yu.downbitbe.user.domain.userBlock;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
-import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

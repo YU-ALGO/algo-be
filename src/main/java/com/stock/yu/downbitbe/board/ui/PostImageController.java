@@ -2,7 +2,7 @@ package com.stock.yu.downbitbe.board.ui;
 
 import com.stock.yu.downbitbe.board.application.PostImageService;
 import com.stock.yu.downbitbe.security.config.Config;
-import com.stock.yu.downbitbe.user.domain.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;

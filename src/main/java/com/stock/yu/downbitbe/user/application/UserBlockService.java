@@ -1,9 +1,8 @@
 package com.stock.yu.downbitbe.user.application;
 
-import com.stock.yu.downbitbe.user.domain.UserBlock;
-import com.stock.yu.downbitbe.user.domain.UserBlockListDto;
-import com.stock.yu.downbitbe.user.domain.UserBlockRepository;
-import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.domain.userBlock.UserBlock;
+import com.stock.yu.downbitbe.user.domain.userBlock.UserBlockRepository;
+import com.stock.yu.downbitbe.user.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;

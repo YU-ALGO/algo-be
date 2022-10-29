@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.food.domain;
 
-import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.domain.user.User;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;

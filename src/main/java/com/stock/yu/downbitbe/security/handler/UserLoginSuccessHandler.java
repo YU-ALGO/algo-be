@@ -2,10 +2,10 @@ package com.stock.yu.downbitbe.security.handler;
 
 import com.stock.yu.downbitbe.security.config.Config;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
-import com.stock.yu.downbitbe.user.domain.LoginCookiesDTO;
-import com.stock.yu.downbitbe.user.domain.UserAuthDTO;
-import com.stock.yu.downbitbe.user.domain.LoginType;
-import com.stock.yu.downbitbe.user.domain.Token;
+import com.stock.yu.downbitbe.user.domain.user.LoginCookiesDTO;
+import com.stock.yu.downbitbe.user.domain.user.UserAuthDTO;
+import com.stock.yu.downbitbe.user.domain.user.LoginType;
+import com.stock.yu.downbitbe.user.domain.user.Token;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;

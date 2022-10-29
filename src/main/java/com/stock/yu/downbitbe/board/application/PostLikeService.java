@@ -5,7 +5,7 @@ import com.stock.yu.downbitbe.board.domain.post.Post;
 import com.stock.yu.downbitbe.board.domain.post.PostLike;
 import com.stock.yu.downbitbe.board.domain.post.PostLikeRepository;
 import com.stock.yu.downbitbe.board.domain.post.PostRepository;
-import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;

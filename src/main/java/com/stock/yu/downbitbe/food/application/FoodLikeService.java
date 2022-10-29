@@ -4,7 +4,7 @@ import com.stock.yu.downbitbe.food.domain.Food;
 import com.stock.yu.downbitbe.food.domain.FoodLike;
 import com.stock.yu.downbitbe.food.domain.FoodLikeRepository;
 import com.stock.yu.downbitbe.food.domain.FoodRepository;
-import com.stock.yu.downbitbe.user.domain.User;
+import com.stock.yu.downbitbe.user.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 

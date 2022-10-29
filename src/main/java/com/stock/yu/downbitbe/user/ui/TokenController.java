@@ -1,4 +1,4 @@
-package com.stock.yu.downbitbe.security.controller;
+package com.stock.yu.downbitbe.user.ui;
 
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;

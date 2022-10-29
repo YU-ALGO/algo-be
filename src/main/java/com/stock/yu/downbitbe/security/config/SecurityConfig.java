@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.security.config;
 
-import com.stock.yu.downbitbe.user.domain.CustomUserRepository;
+import com.stock.yu.downbitbe.user.domain.user.CustomUserRepository;
 import com.stock.yu.downbitbe.user.application.CustomOAuth2UserDetailsService;
 import com.stock.yu.downbitbe.user.application.CustomUserDetailsService;
 import com.stock.yu.downbitbe.security.filter.JwtAuthorizationFilter;

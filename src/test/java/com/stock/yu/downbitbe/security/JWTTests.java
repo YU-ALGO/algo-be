@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.security;
 
-import com.stock.yu.downbitbe.user.domain.Token;
+import com.stock.yu.downbitbe.user.domain.user.Token;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
