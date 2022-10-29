@@ -6,7 +6,6 @@ import lombok.Getter;
 
 import java.time.LocalDateTime;
 
-@Getter
 public class PostResponseDto {
     private final Long id;
     private final String title;

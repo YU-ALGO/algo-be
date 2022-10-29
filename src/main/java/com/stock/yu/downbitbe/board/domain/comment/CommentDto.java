@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 
 import java.time.LocalDateTime;
 
-@Getter
 public class CommentDto {
     private final Long id;
     private final String content;
@@ -15,8 +14,8 @@ public class CommentDto {
     private final Long parent;
     @JsonProperty("is_deleted")
     private final Boolean isDeleted;    // 닉네임 클릭하여 프로필 조회하는거 방지
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @JsonProperty("created_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private final LocalDateTime createdAt;
 
     public CommentDto(Comment comment){

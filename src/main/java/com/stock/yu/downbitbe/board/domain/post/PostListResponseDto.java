@@ -23,8 +23,8 @@ public class PostListResponseDto {
 
     @JsonProperty("view_count")
     private Long viewCount;
-    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     @JsonProperty("created_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private LocalDateTime createdAt;
 
     @QueryProjection

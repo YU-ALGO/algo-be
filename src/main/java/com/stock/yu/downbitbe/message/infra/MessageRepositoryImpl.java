@@ -18,8 +18,8 @@ import javax.persistence.EntityManager;
 import java.util.List;
 
 import static com.stock.yu.downbitbe.message.domain.QMessage.message;
-import static com.stock.yu.downbitbe.user.domain.QUser.user;
-import static com.stock.yu.downbitbe.user.domain.QUserBlock.userBlock;
+import static com.stock.yu.downbitbe.user.domain.user.QUser.user;
+import static com.stock.yu.downbitbe.user.domain.userBlock.QUserBlock.userBlock;
 import static org.springframework.util.StringUtils.hasText;
 
 
