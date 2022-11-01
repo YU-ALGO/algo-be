@@ -97,6 +97,13 @@ public class UserService {
         userAllergyInfoRepository.save(userAllergyInfo);
     }
 
+    @Transactional
+    public void leave(String username, String password) {
+        User user = userRepository.findByUsername(username);
+        if(passwordEncoder.encode(password).equals(user.getPassword()))
+            userRepository.delete(user);
+    }
+
     @Transactional(readOnly = true)
     public Boolean existsByNickname(String nickname) {
         return userRepository.existsByNickname(nickname);
