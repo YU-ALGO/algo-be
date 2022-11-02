@@ -9,9 +9,11 @@ import com.stock.yu.downbitbe.message.domain.DeleteCondition;
 import com.stock.yu.downbitbe.message.domain.MessageRepositoryCustom;
 import com.stock.yu.downbitbe.message.domain.ReceiveMessageListDto;
 import com.stock.yu.downbitbe.message.domain.SendMessageListDto;
+import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.EntityManager;
 
@@ -23,12 +25,10 @@ import static com.stock.yu.downbitbe.user.domain.userBlock.QUserBlock.userBlock;
 import static org.springframework.util.StringUtils.hasText;
 
 
+@Repository
+@RequiredArgsConstructor
 public class MessageRepositoryImpl implements MessageRepositoryCustom {
     private final JPAQueryFactory queryFactory;
-
-    public MessageRepositoryImpl(EntityManager em) {
-        this.queryFactory = new JPAQueryFactory(em);
-    }
 
     @Override
     public Integer countByIsRead(Long userId) {
