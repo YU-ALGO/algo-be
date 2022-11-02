@@ -14,20 +14,20 @@ import java.util.Date;
 
 @Log4j2
 public class JWTUtil {
-    private String secretKey = "downbit"; // ½Ç¹«¿¡¼­´Â À¯ÀúÀÇ ºñ¹Ğ¹øÈ£ µîÀ» ÀÌ¿ëÇØ¼­ ³Ö¾îÁÖ´Â°Ô ¸ÂÀ½
+    private String secretKey = "algo"; // ì‹¤ë¬´ì—ì„œëŠ” ìœ ì €ì˜ ë¹„ë°€ë²ˆí˜¸ ë“±ì„ ì´ìš©í•´ì„œ ë„£ì–´ì£¼ëŠ”ê²Œ ë§ìŒ
 
-    public static long accessExpire = 60 * 10 * 6; //60ºĞ
-    public static long refreshExpire = 60 * 60 * 24; //24½Ã°£
+    public static long accessExpire = 60 * 10 * 6; //60ë¶„
+    public static long refreshExpire = 60 * 60 * 24; //24ì‹œê°„
 
     /*
     *
     * refreshToken
-    * À¯È¿±â°£ : 24½Ã°£
+    * ìœ íš¨ê¸°ê°„ : 24ì‹œê°„
     * subject : userId
     * claims : [nickname]
     *
     * accessToken
-    * À¯È¿±â°£ : 10ºĞ
+    * ìœ íš¨ê¸°ê°„ : 10ë¶„
     * subject : userId
     * claims : [null]
     *
@@ -62,7 +62,7 @@ public class JWTUtil {
         String userId = Jwts.parser().setSigningKey(secretKey.getBytes(StandardCharsets.UTF_8))
                 .parseClaimsJws(refreshToken).getBody().getSubject();
 
-        //TODO : DBÀÇ accessToken °ª°ú ºñ±³ÇÏ´Â ÄÚµå Ãß°¡ ÇÊ¿ä
+        //TODO : DBì˜ accessToken ê°’ê³¼ ë¹„êµí•˜ëŠ” ì½”ë“œ ì¶”ê°€ í•„ìš”
 
         String accessToken = Jwts.builder()
                 .setIssuedAt(new Date())

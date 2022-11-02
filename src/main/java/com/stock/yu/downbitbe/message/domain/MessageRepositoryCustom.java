@@ -4,11 +4,9 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 
 public interface MessageRepositoryCustom {
-    Integer countNonReadMessageByUserId(Long userId);
+    Integer countByIsRead(Long receiverId);
 
-    Long updateDeleteCondition(Long messageId, DeleteCondition receiver);
+    Page<ReceiveMessageListDto> findAllReceiveMessagesBy(Long receiverId, Pageable pageable, Boolean notRead, String keyword);
 
-    Page<ReceiveMessageListDto> findAllByReceiverId(Long receiverId, Pageable pageable, Boolean notRead, String keyword);
-
-    Page<SendMessageListDto> findAllBySenderId(Long senderId, Pageable pageable, String keyword);
+    Page<SendMessageListDto> findAllSendMessagesBy(Long senderId, Pageable pageable, String keyword);
 }

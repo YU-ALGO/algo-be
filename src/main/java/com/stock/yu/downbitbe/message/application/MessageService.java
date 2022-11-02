@@ -18,12 +18,12 @@ public class MessageService {
 
     @Transactional(readOnly = true)
     public Page<ReceiveMessageListDto> findAllMessagesByReceiver(Pageable pageable, Long receiverId, Boolean notRead, String keyword) {
-        return messageRepository.findAllByReceiverId(receiverId, pageable, notRead, keyword);
+        return messageRepository.findAllReceiveMessagesBy(receiverId, pageable, notRead, keyword);
     }
 
     @Transactional(readOnly = true)
     public Page<SendMessageListDto> findAllMessagesBySender(Pageable pageable, Long senderId, String keyword) {
-        return messageRepository.findAllBySenderId(senderId, pageable, keyword);
+        return messageRepository.findAllSendMessagesBy(senderId, pageable, keyword);
     }
 
     @Transactional(readOnly = true)
@@ -39,7 +39,7 @@ public class MessageService {
 
     @Transactional(readOnly = true)
     public Integer getNonReadMessageCount(Long userId){
-        return messageRepository.countNonReadMessageByUserId(userId);
+        return messageRepository.countByIsRead(userId);
     }
 
     @Transactional
@@ -54,7 +54,7 @@ public class MessageService {
             if(message.getDeleted() == DeleteCondition.SENDER){
                 messageRepository.delete(message);
             } else if(message.getDeleted() == DeleteCondition.NONE){
-                Long result = messageRepository.updateDeleteCondition(messageId, DeleteCondition.RECEIVER);
+                int result = messageRepository.updateDeleteCondition(messageId, DeleteCondition.RECEIVER);
                 if(result == 0)
                     throw new RuntimeException("삭제에 실패했습니다.");
             }
@@ -62,7 +62,7 @@ public class MessageService {
             if(message.getDeleted() == DeleteCondition.RECEIVER){
                 messageRepository.delete(message);
             } else if(message.getDeleted() == DeleteCondition.NONE){
-                Long result = messageRepository.updateDeleteCondition(messageId, DeleteCondition.SENDER);
+                int result = messageRepository.updateDeleteCondition(messageId, DeleteCondition.SENDER);
                 if(result == 0)
                     throw new RuntimeException("삭제에 실패했습니다.");
             }

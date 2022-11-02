@@ -89,11 +89,11 @@ public class UserController {
         log.info("password : " + password);
         log.info("-----------");
 
-        // ÅäÅ« »ı¼º ¹× ÄíÅ° ¼³Á¤
+        // í† í° ìƒì„± ë° ì¿ í‚¤ ì„¤ì •
         Token token = jwtUtil.generateToken(email, nickname);
         LoginCookies loginCookies = jwtUtil.setLoginCookies(token, roles.contains(Grade.ADMIN));
 
-        // ResponseEntity¿¡¼­ header ¼³Á¤ ¹× ¸¸µç ÄíÅ° ³Ö°í ÀÀ´ä
+        // ResponseEntityì—ì„œ header ì„¤ì • ë° ë§Œë“  ì¿ í‚¤ ë„£ê³  ì‘ë‹µ
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,
                         loginCookies.getAccessCookie().toString(),
                         loginCookies.getRefreshCookie().toString(),
@@ -103,7 +103,7 @@ public class UserController {
                 .body(new UserInfoResponseDto(auth.getNickname(), email, auth.getLoginType().toString(), roles.contains(Grade.ADMIN)));
     }
 
-    //TODO È¸¿ø°¡ÀÔ ¿Ï¼ºÇÏ±â
+    //TODO íšŒì›ê°€ì… ì™„ì„±í•˜ê¸°
     @Transactional
     @PostMapping("signup")
     public ResponseEntity<String> signUp(@RequestBody SignupRequestDto request) {
@@ -160,14 +160,14 @@ public class UserController {
         if (isValidate)
             return ResponseEntity.ok().build();
         else
-            return ResponseEntity.badRequest().body("ÀÎÁõ ½Ã°£ ÃÊ°ú");
+            return ResponseEntity.badRequest().body("ì¸ì¦ ì‹œê°„ ì´ˆê³¼");
     }
 
     @PatchMapping("users/password")
     public ResponseEntity<?> changePassword(@RequestBody @PathVariable("newPassword") String newPassword, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
-        /* ·ÎÄÃ À¯Àú ¿©ºÎ È®ÀÎ */
+        /* ë¡œì»¬ ìœ ì € ì—¬ë¶€ í™•ì¸ */
         if(!auth.getLoginType().equals(LoginType.LOCAL))
-            return ResponseEntity.badRequest().body("¼Ò¼È È¸¿øÀº ºñ¹Ğ¹øÈ£¸¦ º¯°æÇÒ ¼ö ¾ø½À´Ï´Ù");
+            return ResponseEntity.badRequest().body("ì†Œì…œ íšŒì›ì€ ë¹„ë°€ë²ˆí˜¸ë¥¼ ë³€ê²½í•  ìˆ˜ ì—†ìŠµë‹ˆë‹¤");
 
         userService.passwordChange(auth, newPassword);
         return ResponseEntity.ok().build();
@@ -176,11 +176,11 @@ public class UserController {
     @PatchMapping("users/nickname")
     public ResponseEntity<?> changeNickname(@RequestBody String nickname, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         nickname = nickname.trim();
-        /* ±âÁ¸ ´Ğ³×ÀÓ°ú ÀÏÄ¡ ¿©ºÎ È®ÀÎ */
+        /* ê¸°ì¡´ ë‹‰ë„¤ì„ê³¼ ì¼ì¹˜ ì—¬ë¶€ í™•ì¸ */
         if(auth.getNickname().equals(nickname))
-            return ResponseEntity.badRequest().body("±âÁ¸ ´Ğ³×ÀÓ ÀÔ´Ï´Ù");
+            return ResponseEntity.badRequest().body("ê¸°ì¡´ ë‹‰ë„¤ì„ ì…ë‹ˆë‹¤");
         if(userService.existsByNickname(nickname))
-            return ResponseEntity.badRequest().body("ÀÌ¹Ì Á¸ÀçÇÏ´Â ´Ğ³×ÀÓ ÀÔ´Ï´Ù");
+            return ResponseEntity.badRequest().body("ì´ë¯¸ ì¡´ì¬í•˜ëŠ” ë‹‰ë„¤ì„ ì…ë‹ˆë‹¤");
 
         userService.nicknameChange(auth, nickname);
         return ResponseEntity.ok().build();

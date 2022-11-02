@@ -1,6 +1,6 @@
 package com.stock.yu.downbitbe.board.infra;
 
-import com.querydsl.core.BooleanBuilder;
+
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -53,7 +53,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .select(Projections.constructor(PostListResponseDto.class,
                         post.postId,
                         post.title,
-                        post.user.username.as("author"),
+                        post.user.nickname.as("author"),
                         post.likeCount,
                         post.commentCount,
                         post.viewCount,

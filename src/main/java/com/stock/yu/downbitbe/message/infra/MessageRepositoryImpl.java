@@ -31,7 +31,7 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
     }
 
     @Override
-    public Integer countNonReadMessageByUserId(Long userId) {
+    public Integer countByIsRead(Long userId) {
         return queryFactory
                 .selectFrom(message)
                 .where(message.readTime.isNull()
@@ -44,16 +44,7 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
     }
 
     @Override
-    public Long updateDeleteCondition(Long messageId, DeleteCondition condition) {
-        return queryFactory
-                .update(message)
-                .set(message.deleted, condition)
-                .where(message.messageId.eq(messageId))
-                .execute();
-    }
-
-    @Override
-    public Page<ReceiveMessageListDto> findAllByReceiverId(Long receiverId, Pageable pageable, Boolean notRead, String keyword) {
+    public Page<ReceiveMessageListDto> findAllReceiveMessagesBy(Long receiverId, Pageable pageable, Boolean notRead, String keyword) {
         List<ReceiveMessageListDto> results = queryFactory
                 .select(Projections.constructor(ReceiveMessageListDto.class,
                         message.messageId,
@@ -93,7 +84,7 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
     }
 
     @Override
-    public Page<SendMessageListDto> findAllBySenderId(Long senderId, Pageable pageable, String keyword) {
+    public Page<SendMessageListDto> findAllSendMessagesBy(Long senderId, Pageable pageable, String keyword) {
         List<SendMessageListDto> results = queryFactory
                 .select(Projections.constructor(SendMessageListDto.class,
                         message.messageId,

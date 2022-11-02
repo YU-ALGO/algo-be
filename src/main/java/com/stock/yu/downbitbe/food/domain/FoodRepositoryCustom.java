@@ -6,5 +6,6 @@ import org.springframework.data.domain.Pageable;
 import java.util.Map;
 
 public interface FoodRepositoryCustom {
-    Page<FoodListResponseDto> findAll(Map<String, Boolean> allergyFilter, Pageable pageable, String keyword);
+    Page<FoodListResponseDto> findAllFoodsBy(Map<String, Boolean> allergyFilter, Pageable pageable, String keyword);
+    //Page<FoodListResponseDto> findAll(Map<String, Boolean> allergyFilter, Pageable pageable, String keyword);
 }
