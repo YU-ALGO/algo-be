@@ -61,7 +61,6 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 ))
                 .from(post)
                 .innerJoin(post.board, board)
-                //.where(post.board.boardId.eq(boardId))
                 .where(post.board.boardId.eq(boardId),
                         isSearchable(keyword, searchType))
                 .orderBy(getOrderSpecifier(pageable.getSort()).toArray(OrderSpecifier[]::new))

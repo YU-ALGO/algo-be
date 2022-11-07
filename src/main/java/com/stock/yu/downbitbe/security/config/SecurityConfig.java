@@ -93,7 +93,7 @@ public class SecurityConfig {
                 .antMatchers("/api/v1/admin/**", "/api/v1/admin").hasRole("ADMIN")
                 .antMatchers("api/v1/").hasRole("ADMIN")
                 .antMatchers("/oauth2/authorization/**").permitAll()
-                .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/boards/*/posts/*/comments", "/api/v1/users/*").permitAll()
+                .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/boards/*/posts/*/comments", "/api/v1/users/*", "/api/v1/profiles/*").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/users/validate").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/users/mail").permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll();
@@ -129,7 +129,7 @@ public class SecurityConfig {
                     isLoginCookie.setHttpOnly(false);
                     isLoginCookie.setMaxAge(0);
                     isLoginCookie.setDomain(Config.DOMAIN);
-                    Cookie isAdminCookie = new Cookie("isLogin", null);
+                    Cookie isAdminCookie = new Cookie("isAdmin", null);
                     isAdminCookie.setPath("/");
                     isAdminCookie.setHttpOnly(false);
                     isAdminCookie.setMaxAge(0);

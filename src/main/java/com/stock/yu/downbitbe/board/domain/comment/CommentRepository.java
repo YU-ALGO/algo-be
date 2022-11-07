@@ -18,16 +18,18 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
 
     Boolean existsCommentByParent(Long parent);
 
+
+    // 삭제된 사용자입니다. 항상 1번 유저로 추가하기
     @Modifying(clearAutomatically = true)
-    @Query("update Comment set content = :content, isDeleted = true, user = -1 where commentId = :commentId")
+    @Query("update Comment set content = :content, isDeleted = true where commentId = :commentId")
     int deleteCommentView(@Param(value = "commentId") Long commentId, @Param(value = "content") String content);
 
     @Query("select count(c) from Comment c where c.parent = :parentId")
     Long countCommentByParent(@Param(value = "parentId") Long parentId);
 
-    @Modifying
+    @Modifying(clearAutomatically = true)
     @Query("delete from Comment c where c.parent = :id or c.commentId = :id")
-    Long deleteCommentsByCommentIdAndParent(@Param(value = "id")Long parent);
+    int deleteCommentsByCommentIdAndParent(@Param(value = "id")Long parent);
 
     List<Comment> findAllByUserNickname(String nickname);
 }

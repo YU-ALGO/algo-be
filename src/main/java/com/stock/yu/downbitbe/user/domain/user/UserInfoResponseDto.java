@@ -9,8 +9,8 @@ import lombok.Getter;
 @AllArgsConstructor
 public class UserInfoResponseDto {
     private String nickname;
-    private String loginType = "Bearer";
     private String username;
+    private String loginType = "Bearer";
     //@JsonProperty("is_admin")
     private Boolean isAdmin;
 }

@@ -7,6 +7,8 @@ import com.stock.yu.downbitbe.food.domain.FoodResponseDto;
 import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,6 +28,12 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/foods")
+@ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
+        @ApiResponse(responseCode = "404", description = "NOT FOUND"),
+        @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+})
 public class FoodController {
     private final FoodService foodService;
     private final UserService userService;

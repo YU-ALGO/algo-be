@@ -13,5 +13,4 @@ public interface MessageRepository extends JpaRepository<Message, Long>, Message
     @Modifying(clearAutomatically = true)
     @Query("update Message set deleted = :condition where messageId = :messageId")
     int updateDeleteCondition(@Param(value = "messageId") Long messageId, @Param(value = "condition") DeleteCondition condition);
-
 }

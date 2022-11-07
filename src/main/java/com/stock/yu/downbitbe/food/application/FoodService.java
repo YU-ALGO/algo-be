@@ -30,7 +30,9 @@ public class FoodService {
     @Transactional
     public Long createFood(FoodRequestDto foodCreateRequestDto){
         Food food = foodCreateRequestDto.toEntity();
-        return foodRepository.save(food).getFoodId();
+        Long foodId = foodRepository.save(food).getFoodId();
+
+        return foodId;
     }
 
     @Transactional

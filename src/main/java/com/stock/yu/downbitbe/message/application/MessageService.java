@@ -3,13 +3,16 @@ package com.stock.yu.downbitbe.message.application;
 import com.stock.yu.downbitbe.message.domain.*;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
 import java.util.Objects;
 
+@Slf4j
 @RequiredArgsConstructor
 @Service
 public class MessageService {
@@ -17,21 +20,22 @@ public class MessageService {
     private final MessageRepository messageRepository;
 
     @Transactional(readOnly = true)
-    public Page<ReceiveMessageListDto> findAllMessagesByReceiver(Pageable pageable, Long receiverId, Boolean notRead, String keyword) {
-        return messageRepository.findAllReceiveMessagesBy(receiverId, pageable, notRead, keyword);
+    public Page<ReceiveMessageListDto> findAllMessagesByReceiver(Pageable pageable, Long receiverId, Boolean notRead, String keyword, MessageSearchType searchType) {
+        return messageRepository.findAllReceiveMessagesBy(receiverId, pageable, notRead, keyword, searchType);
     }
 
     @Transactional(readOnly = true)
-    public Page<SendMessageListDto> findAllMessagesBySender(Pageable pageable, Long senderId, String keyword) {
-        return messageRepository.findAllSendMessagesBy(senderId, pageable, keyword);
+    public Page<SendMessageListDto> findAllMessagesBySender(Pageable pageable, Long senderId, String keyword, MessageSearchType searchType) {
+        return messageRepository.findAllSendMessagesBy(senderId, pageable, keyword, searchType);
     }
 
-    @Transactional(readOnly = true)
+    @Transactional
     public MessageDto findMessageByMessageId(Long messageId, Long userId){
         Message message = messageRepository.findById(messageId).orElseThrow(() -> new IllegalArgumentException("쪽지가 존재하지 않습니다."));
         if(Objects.equals(message.getReceiver().getUserId(), userId)){
             if(message.getReadTime() == null) {
                 messageRepository.save(message.updateRead());
+                log.info("message read = " + message.getReadTime());
             }
         }
         return new MessageDto(message);
@@ -68,5 +72,20 @@ public class MessageService {
             }
         }
         return message.getMessageId();
+    }
+
+    @Transactional
+    public Long deleteMessageListBySender(List<Long> messageIdList, Long userId){
+        Long ret = messageRepository.deleteMessagesBySenderId(userId, messageIdList);
+        ret += messageRepository.updateDeletedBySenderId(userId, messageIdList);
+        return ret;
+    }
+
+
+    @Transactional
+    public Long deleteMessageListByReceiver(List<Long> messageIdList, Long userId){
+        Long ret = messageRepository.deleteMessagesByReceiverId(userId, messageIdList);
+        ret += messageRepository.updateDeletedByReceiverId(userId, messageIdList);
+        return ret;
     }
 }

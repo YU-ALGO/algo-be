@@ -21,6 +21,10 @@ public class CommentDto {
     @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
     private final LocalDateTime createdAt;
 
+    @JsonProperty("modified_at")
+    @JsonFormat(pattern = "yyyy-MM-dd HH:mm:ss", timezone = "Asia/Seoul")
+    private final LocalDateTime modifiedAt;
+
     public CommentDto(Comment comment){
         this.id = comment.getCommentId();
         this.content = comment.getContent();
@@ -28,5 +32,6 @@ public class CommentDto {
         this.parent = comment.getParent();
         this.isDeleted = comment.getIsDeleted();
         this.createdAt = comment.getCreatedAt();
+        this.modifiedAt = comment.getModifiedAt();
     }
 }

@@ -5,26 +5,22 @@ import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.jpa.JPAExpressions;
 import com.querydsl.jpa.JPQLQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.stock.yu.downbitbe.message.domain.DeleteCondition;
-import com.stock.yu.downbitbe.message.domain.MessageRepositoryCustom;
-import com.stock.yu.downbitbe.message.domain.ReceiveMessageListDto;
-import com.stock.yu.downbitbe.message.domain.SendMessageListDto;
+import com.stock.yu.downbitbe.message.domain.*;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
 
 import java.util.List;
 
 import static com.stock.yu.downbitbe.message.domain.QMessage.message;
-import static com.stock.yu.downbitbe.user.domain.user.QUser.user;
 import static com.stock.yu.downbitbe.user.domain.userBlock.QUserBlock.userBlock;
 import static org.springframework.util.StringUtils.hasText;
 
-
+@Slf4j
 @Repository
 @RequiredArgsConstructor
 public class MessageRepositoryImpl implements MessageRepositoryCustom {
@@ -34,34 +30,37 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
     public Integer countByIsRead(Long userId) {
         return queryFactory
                 .selectFrom(message)
-                .where(message.readTime.isNull()
-                        .and(message.sender.notIn(
+                .where(message.readTime.isNull(),
+                        message.receiver.userId.eq(userId),
+                        (message.sender.notIn(
                                 new JPQLQuery[]{JPAExpressions
-                                        .selectFrom(userBlock.blockUserId)
-                                        .innerJoin(userBlock.userId, user)
-                                        .where(userBlock.userId.userId.eq(userId))})))
+                                        .select(userBlock.blockUserId)
+                                        .from(userBlock)
+                                        .where(userBlock.userId.userId.eq(userId),
+                                        message.createdAt.after(userBlock.createdAt))})))
                 .fetch().size();
     }
 
     @Override
-    public Page<ReceiveMessageListDto> findAllReceiveMessagesBy(Long receiverId, Pageable pageable, Boolean notRead, String keyword) {
+    public Page<ReceiveMessageListDto> findAllReceiveMessagesBy(Long receiverId, Pageable pageable, Boolean notRead, String keyword, MessageSearchType searchType) {
         List<ReceiveMessageListDto> results = queryFactory
                 .select(Projections.constructor(ReceiveMessageListDto.class,
                         message.messageId,
                         message.title,
-                        message.sender.username.as("sender"),
+                        message.sender.nickname.as("sender"),
                         message.isRead,
                         message.createdAt
                 ))
                 .from(message)
-                .innerJoin(message.sender, user)
-                .where(message.deleted.ne(DeleteCondition.RECEIVER),
+                .where(message.receiver.userId.eq(receiverId),
+                        message.deleted.ne(DeleteCondition.RECEIVER),
                         message.sender.notIn(
                                 new JPQLQuery[]{JPAExpressions
-                                        .selectFrom(userBlock.blockUserId)
-                                        .innerJoin(userBlock.userId, user)
-                                        .where(userBlock.userId.userId.eq(receiverId))}),
-                        isSearchable(keyword),
+                                        .select(userBlock.blockUserId)
+                                        .from(userBlock)
+                                        .where(userBlock.userId.userId.eq(receiverId),
+                                        message.createdAt.after(userBlock.createdAt))}),
+                        isSearchable(keyword, searchType),
                         isNotRead(notRead))
                 .orderBy(message.createdAt.desc())
                 .offset(pageable.getOffset())
@@ -70,56 +69,105 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
 
         int totalSize = queryFactory
                 .selectFrom(message)
-                .where(message.deleted.ne(DeleteCondition.RECEIVER),
+                .where(message.receiver.userId.eq(receiverId),
+                        message.deleted.ne(DeleteCondition.RECEIVER),
                         message.sender.notIn(
                                 new JPQLQuery[]{JPAExpressions
-                                        .selectFrom(userBlock.blockUserId)
-                                        .innerJoin(userBlock.userId, user)
-                                        .where(userBlock.userId.userId.eq(receiverId))}),
-                        isSearchable(keyword),
+                                        .select(userBlock.blockUserId)
+                                        .from(userBlock)
+                                        .where(userBlock.userId.userId.eq(receiverId),
+                                        message.createdAt.after(userBlock.createdAt))}),
+                        isSearchable(keyword, searchType),
                         isNotRead(notRead))
+                .fetch().size();
+        return new PageImpl<>(results, pageable, totalSize);
+    }
+
+    @Override
+    public Page<SendMessageListDto> findAllSendMessagesBy(Long senderId, Pageable pageable, String keyword, MessageSearchType searchType) {
+        List<SendMessageListDto> results = queryFactory
+                .select(Projections.constructor(SendMessageListDto.class,
+                        message.messageId,
+                        message.title,
+                        message.receiver.nickname.as("receiver"),
+                        message.readTime,
+                        message.createdAt
+                ))
+                .from(message)
+                .where(message.sender.userId.eq(senderId),
+                        message.deleted.ne(DeleteCondition.SENDER),
+                        isSearchable(keyword, searchType))
+                .orderBy(message.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        int totalSize = queryFactory
+                .selectFrom(message)
+                .where(message.sender.userId.eq(senderId),
+                        message.deleted.ne(DeleteCondition.SENDER),
+                        isSearchable(keyword, searchType))
                 .fetch().size();
 
         return new PageImpl<>(results, pageable, totalSize);
     }
 
     @Override
-    public Page<SendMessageListDto> findAllSendMessagesBy(Long senderId, Pageable pageable, String keyword) {
-        List<SendMessageListDto> results = queryFactory
-                .select(Projections.constructor(SendMessageListDto.class,
-                        message.messageId,
-                        message.title,
-                        message.receiver.username.as("receiver"),
-                        message.readTime,
-                        message.createdAt
-                ))
-                .from(message)
-                .innerJoin(message.receiver, user)
-                .where(message.deleted.ne(DeleteCondition.SENDER),
-                        isSearchable(keyword))
-                .orderBy(message.createdAt.desc())
-                .offset(pageable.getOffset())
-                .limit(pageable.getPageSize())
-                .fetch();
-
-        int totalSize = queryFactory
-                .selectFrom(message)
-                .where(message.deleted.ne(DeleteCondition.SENDER),
-                        isSearchable(keyword))
-                .fetch().size();
-
-        return new PageImpl<>(results, pageable, totalSize);
+    public Long deleteMessagesBySenderId(Long senderId, List<Long> messageIdList) {
+        return queryFactory
+                .delete(message)
+                .where(message.sender.userId.eq(senderId)
+                        .and(message.messageId.in(messageIdList))
+                        .and(message.deleted.eq(DeleteCondition.RECEIVER)))
+                .execute();
     }
 
-    BooleanExpression isSearchable(String keyword){
-        if(!hasText(keyword))
+    @Override
+    public Long deleteMessagesByReceiverId(Long receiverId, List<Long> messageIdList) {
+        return queryFactory
+                .delete(message)
+                .where(message.sender.userId.eq(receiverId)
+                        .and(message.messageId.in(messageIdList))
+                        .and(message.deleted.eq(DeleteCondition.SENDER)))
+                .execute();
+    }
+
+    @Override
+    public Long updateDeletedBySenderId(Long senderId, List<Long> messageIdList) {
+        return queryFactory
+                .update(message)
+                .set(message.deleted, DeleteCondition.SENDER)
+                .where(message.sender.userId.eq(senderId)
+                        .and(message.messageId.in(messageIdList))
+                        .and(message.deleted.eq(DeleteCondition.NONE)))
+                .execute();
+    }
+
+    @Override
+    public Long updateDeletedByReceiverId(Long receiverId, List<Long> messageIdList) {
+        return queryFactory
+                .update(message)
+                .set(message.deleted, DeleteCondition.RECEIVER)
+                .where(message.sender.userId.eq(receiverId)
+                        .and(message.messageId.in(messageIdList))
+                        .and(message.deleted.eq(DeleteCondition.NONE)))
+                .execute();
+    }
+
+    BooleanExpression isSearchable(String keyword, MessageSearchType searchType){
+        if(!hasText(keyword) || searchType == null)
             return null;
-        return message.title.contains(keyword);
+
+        if(searchType == MessageSearchType.TITLE)
+            return message.title.contains(keyword);
+        else if(searchType == MessageSearchType.RECEIVER)
+            return message.receiver.nickname.eq(keyword);
+        else return message.sender.nickname.eq(keyword);
     }
 
     BooleanExpression isNotRead(Boolean notRead){
-        if(notRead == null)
+        if(notRead == null || !notRead)
             return null;
-        return message.isRead.eq(notRead);
+        return message.isRead.ne(true);
     }
 }

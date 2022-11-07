@@ -53,7 +53,6 @@ public class Food {
         this.foodImageUrl = foodImageUrl;
     }
 
-
     public Food updateFood(Food food) {
         if(food.getFoodName() != null)
             this.foodName = food.getFoodName();

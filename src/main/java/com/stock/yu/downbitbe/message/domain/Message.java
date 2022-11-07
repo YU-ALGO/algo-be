@@ -7,6 +7,7 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
@@ -15,6 +16,7 @@ import java.time.LocalDateTime;
 @Entity
 @Table(name = "MESSAGE")
 @Getter
+@DynamicInsert
 @DynamicUpdate
 @NoArgsConstructor
 public class Message extends BaseTimeEntity {
@@ -32,11 +34,10 @@ public class Message extends BaseTimeEntity {
     @NotNull
     private String content;
 
-    @Column(name = "read_time", updatable = false)
+    @Column(name = "read_time")
     private LocalDateTime readTime;
 
-    @Column(name = "is_read")
-    @ColumnDefault("0")
+    @Column(name = "is_read", columnDefinition = "tinyint(1) default 0")
     @NotNull
     private Boolean isRead;
 
@@ -50,8 +51,7 @@ public class Message extends BaseTimeEntity {
     @NotNull
     private User receiver;
 
-    @Column
-    @ColumnDefault("NONE")
+    @Column(columnDefinition = "varchar(32) default 'NONE'")
     @Enumerated(EnumType.STRING)
     @NotNull
     private DeleteCondition deleted; // delete 는 mysql 예약어

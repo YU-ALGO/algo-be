@@ -1,13 +1,13 @@
 package com.stock.yu.downbitbe.message.ui;
 
+import com.stock.yu.downbitbe.board.domain.post.PostSearchType;
 import com.stock.yu.downbitbe.message.application.MessageService;
-import com.stock.yu.downbitbe.message.domain.MessageCreateRequestDto;
-import com.stock.yu.downbitbe.message.domain.MessageDto;
-import com.stock.yu.downbitbe.message.domain.ReceiveMessageListDto;
-import com.stock.yu.downbitbe.message.domain.SendMessageListDto;
+import com.stock.yu.downbitbe.message.domain.*;
 import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
+import io.swagger.v3.oas.annotations.responses.ApiResponse;
+import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -26,17 +26,31 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/messages")
+@ApiResponses({
+        @ApiResponse(responseCode = "200", description = "OK"),
+        @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
+        @ApiResponse(responseCode = "404", description = "NOT FOUND"),
+        @ApiResponse(responseCode = "500", description = "INTERNAL SERVER ERROR")
+})
 public class MessageController {
     private final MessageService messageService;
     private final UserService userService;
 
+    @GetMapping("/non_read_counts")
+    public ResponseEntity<Integer> getNonReadMessageCount(@CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
+        User user = userService.findByUsername(auth.getUsername());
+        int count = messageService.getNonReadMessageCount(user.getUserId());
+        return ResponseEntity.status(HttpStatus.OK).body(count);
+    }
+
     @GetMapping("/inboxes")
     public ResponseEntity<List<ReceiveMessageListDto>> getReceiveMessageList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                                                              @RequestParam(value = "keyword", required = false) String keyword,
+                                                                             @RequestParam(value = "searchType", required = false) MessageSearchType searchType,
                                                                              @RequestParam(value = "not_read", required = false) Boolean notRead,
                                                                              @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
-        Page<ReceiveMessageListDto> receiveMessageList = messageService.findAllMessagesByReceiver(pageable, user.getUserId(), notRead, keyword);
+        Page<ReceiveMessageListDto> receiveMessageList = messageService.findAllMessagesByReceiver(pageable, user.getUserId(), notRead, keyword, searchType);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("X-Page-Count", String.valueOf(receiveMessageList.getTotalPages()));
         return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(receiveMessageList.stream().collect(Collectors.toList()));
@@ -45,9 +59,10 @@ public class MessageController {
     @GetMapping("/outboxes")
     public ResponseEntity<List<SendMessageListDto>> getSendMessageList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                                                        @RequestParam(value = "keyword", required = false) String keyword,
-                                                                          @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
+                                                                       @RequestParam(value = "searchType", required = false) MessageSearchType searchType,
+                                                                       @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
-        Page<SendMessageListDto> sendMessageList = messageService.findAllMessagesBySender(pageable, user.getUserId(), keyword);
+        Page<SendMessageListDto> sendMessageList = messageService.findAllMessagesBySender(pageable, user.getUserId(), keyword, searchType);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("X-Page-Count", String.valueOf(sendMessageList.getTotalPages()));
         return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(sendMessageList.stream().collect(Collectors.toList()));
@@ -65,6 +80,8 @@ public class MessageController {
     public ResponseEntity<Long> createMessage(final @RequestBody @Valid MessageCreateRequestDto messageCreateRequestDto,
                                               @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User receiver = userService.findByNickname(messageCreateRequestDto.getReceiverName());
+        if(receiver == null)
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-1L);
         User sender = userService.findByUsername(auth.getUsername());
         Long ret = messageService.createMessage(messageCreateRequestDto, receiver, sender);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
@@ -81,14 +98,20 @@ public class MessageController {
 
 //TODO: messageList 삭제하는 거 수정하기
 
-//    @DeleteMapping("")
-//    public ResponseEntity<Long> deleteMessageList(@RequestBody List<Long> messageIdArray,
-//                                                  @CurrentSecurityContext(expression = "authentication.principal") UserAuthDTO auth){
-//        Long userId = userService.findByUsername(auth.getUsername()).getUserId();
-//        Long ret = 0L;
-//        for(Long messageId : messageIdArray){
-//            ret += messageService.deleteMessage(messageId, userId);
-//        }
-//        return ResponseEntity.status(HttpStatus.OK).body(ret);
-//    }
+    @DeleteMapping("/inboxes")
+    public ResponseEntity<Long> deleteSenderMessageList(@RequestBody List<Long> messageIdArray,
+                                                  @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
+        Long userId = userService.findByUsername(auth.getUsername()).getUserId();
+        Long ret = messageService.deleteMessageListBySender(messageIdArray, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(ret);
+    }
+
+    @DeleteMapping("/outboxes")
+    public ResponseEntity<Long> deleteReceiverMessageList(@RequestBody List<Long> messageIdArray,
+                                                  @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
+        Long userId = userService.findByUsername(auth.getUsername()).getUserId();
+        Long ret = messageService.deleteMessageListByReceiver(messageIdArray, userId);
+        return ResponseEntity.status(HttpStatus.OK).body(ret);
+    }
+
 }

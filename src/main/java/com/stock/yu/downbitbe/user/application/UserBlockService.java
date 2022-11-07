@@ -9,6 +9,8 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Objects;
+
 @RequiredArgsConstructor
 @Service
 public class UserBlockService {
@@ -16,7 +18,7 @@ public class UserBlockService {
 
     @Transactional(readOnly = true)
     public Page<UserBlock> findAllBlocksByUserId(Pageable pageable, Long userId){
-        return userBlockRepository.findAllByUserId(pageable, userId);
+        return userBlockRepository.findAllByUserId_UserId(pageable, userId);
     }
 
     public Long createUserBlock(User user, User blockUser) {
@@ -26,7 +28,7 @@ public class UserBlockService {
 
     public Long deleteUserBlock(User user, Long blockId) {
         UserBlock userBlock = userBlockRepository.findById(blockId).orElseThrow(() -> new IllegalArgumentException("차단 내용이 없습니다."));
-        if(userBlock.getUserId() != user)
+        if(!Objects.equals(userBlock.getUserId().getUserId(), user.getUserId()))
             throw new RuntimeException("사용자가 일치하지 않습니다.");
         userBlockRepository.delete(userBlock);
         return userBlock.getUserBlockId();
