@@ -93,7 +93,7 @@ public class SecurityConfig {
                 .antMatchers("/api/v1/admin/**", "/api/v1/admin").hasRole("ADMIN")
                 .antMatchers("api/v1/").hasRole("ADMIN")
                 .antMatchers("/oauth2/authorization/**").permitAll()
-                .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/boards/*/posts/*/comments", "/api/v1/users/*", "/api/v1/profiles/*").permitAll()
+                .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/boards/*/posts/*/comments", "/api/v1/users/*", "/api/v1/profiles/*", "/api/v1/posts/images/*").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/users/validate").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/users/mail").permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll();

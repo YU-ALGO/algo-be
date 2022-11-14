@@ -30,8 +30,9 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
     public Integer countByIsRead(Long userId) {
         return queryFactory
                 .selectFrom(message)
-                .where(message.readTime.isNull(),
-                        message.receiver.userId.eq(userId),
+                .where(message.receiver.userId.eq(userId),
+                        message.readTime.isNull(),
+                        message.deleted.ne(DeleteCondition.RECEIVER),
                         (message.sender.notIn(
                                 new JPQLQuery[]{JPAExpressions
                                         .select(userBlock.blockUserId)
@@ -114,19 +115,31 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
 
     @Override
     public Long deleteMessagesBySenderId(Long senderId, List<Long> messageIdList) {
-        return queryFactory
+        int totalSize = queryFactory
+                .selectFrom(message)
+                .where(message.sender.userId.eq(senderId)
+                        .and(message.messageId.in(messageIdList))
+                        .and(message.deleted.eq(DeleteCondition.RECEIVER)))
+                .fetch().size();
+
+        log.info("totalSize=", totalSize);
+        Long results =  queryFactory
                 .delete(message)
                 .where(message.sender.userId.eq(senderId)
                         .and(message.messageId.in(messageIdList))
                         .and(message.deleted.eq(DeleteCondition.RECEIVER)))
                 .execute();
+
+
+
+        return results;
     }
 
     @Override
     public Long deleteMessagesByReceiverId(Long receiverId, List<Long> messageIdList) {
         return queryFactory
                 .delete(message)
-                .where(message.sender.userId.eq(receiverId)
+                .where(message.receiver.userId.eq(receiverId)
                         .and(message.messageId.in(messageIdList))
                         .and(message.deleted.eq(DeleteCondition.SENDER)))
                 .execute();
@@ -134,6 +147,15 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
 
     @Override
     public Long updateDeletedBySenderId(Long senderId, List<Long> messageIdList) {
+        int totalSize = queryFactory
+                .selectFrom(message)
+                .where(message.sender.userId.eq(senderId)
+                        .and(message.messageId.in(messageIdList))
+                        .and(message.deleted.eq(DeleteCondition.NONE)))
+                .fetch().size();
+
+        log.info("totalSize="+totalSize);
+
         return queryFactory
                 .update(message)
                 .set(message.deleted, DeleteCondition.SENDER)
@@ -145,10 +167,21 @@ public class MessageRepositoryImpl implements MessageRepositoryCustom {
 
     @Override
     public Long updateDeletedByReceiverId(Long receiverId, List<Long> messageIdList) {
+        log.info("listSize="+messageIdList);
+        List<Message> totalSize = queryFactory
+                .selectFrom(message)
+                .where(message.receiver.userId.eq(receiverId))
+                        //.and(message.messageId.in(messageIdList)))
+                        //.and(message.deleted.eq(DeleteCondition.NONE)))
+                .fetch();
+
+        log.info("totalSize="+totalSize);
+
+
         return queryFactory
                 .update(message)
                 .set(message.deleted, DeleteCondition.RECEIVER)
-                .where(message.sender.userId.eq(receiverId)
+                .where(message.receiver.userId.eq(receiverId)
                         .and(message.messageId.in(messageIdList))
                         .and(message.deleted.eq(DeleteCondition.NONE)))
                 .execute();

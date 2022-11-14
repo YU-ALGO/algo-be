@@ -1,5 +1,8 @@
 package com.stock.yu.downbitbe.message.ui;
 
+import com.fasterxml.jackson.annotation.JsonFormat;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.stock.yu.downbitbe.board.domain.post.PostSearchType;
 import com.stock.yu.downbitbe.message.application.MessageService;
 import com.stock.yu.downbitbe.message.domain.*;
@@ -9,6 +12,7 @@ import com.stock.yu.downbitbe.user.application.UserService;
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
@@ -20,9 +24,13 @@ import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/v1/messages")
@@ -98,19 +106,19 @@ public class MessageController {
 
 //TODO: messageList 삭제하는 거 수정하기
 
-    @DeleteMapping("/inboxes")
-    public ResponseEntity<Long> deleteSenderMessageList(@RequestBody List<Long> messageIdArray,
-                                                  @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
+    @DeleteMapping("/outboxes")
+    public ResponseEntity<Long> deleteSenderMessageList(@RequestBody @Valid MessageDeleteRequestDto messageIdArray,
+                                                        @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         Long userId = userService.findByUsername(auth.getUsername()).getUserId();
-        Long ret = messageService.deleteMessageListBySender(messageIdArray, userId);
+        Long ret = messageService.deleteMessageListBySender(messageIdArray.getMessageIdArray(), userId);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
-    @DeleteMapping("/outboxes")
-    public ResponseEntity<Long> deleteReceiverMessageList(@RequestBody List<Long> messageIdArray,
+    @DeleteMapping("/inboxes")
+    public ResponseEntity<Long> deleteReceiverMessageList(@RequestBody MessageDeleteRequestDto messageIdArray,
                                                   @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         Long userId = userService.findByUsername(auth.getUsername()).getUserId();
-        Long ret = messageService.deleteMessageListByReceiver(messageIdArray, userId);
+        Long ret = messageService.deleteMessageListByReceiver(messageIdArray.getMessageIdArray(), userId);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
