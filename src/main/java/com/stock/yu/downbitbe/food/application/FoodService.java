@@ -16,8 +16,8 @@ public class FoodService {
     private final FoodLikeRepository foodLikeRepository;
 
     @Transactional(readOnly = true)
-    public Page<FoodListResponseDto> findAllFoods(Map<String, Boolean> allergyFilter, Pageable pageable, String keyword){
-        return foodRepository.findAllFoodsBy(allergyFilter, pageable, keyword);
+    public Page<FoodListResponseDto> findAllFoods(AllergyInfoDto allergyInfo, Pageable pageable, String keyword){
+        return foodRepository.findAllFoodsBy(allergyInfo.toTrueMap(), pageable, keyword);
     }
 
     @Transactional(readOnly = true)

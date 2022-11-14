@@ -1,7 +1,7 @@
 package com.stock.yu.downbitbe.user.application;
 
-import com.nimbusds.openid.connect.sdk.UserInfoResponse;
 import com.stock.yu.downbitbe.food.domain.AllergyInfo;
+import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
 import com.stock.yu.downbitbe.user.domain.user.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -16,7 +16,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class UserService {
     private final CustomUserRepository userRepository;
-    private final UserAllergyInfoRepository userAllergyInfoRepository;
+    private final MailCodeRepository mailCodeRepository;
+    private final UserAllergyInfoRepository allergyInfoRepository;
     private final PasswordEncoder passwordEncoder;
 
     @Transactional(readOnly = true)
@@ -40,7 +41,11 @@ public class UserService {
     }
 
     @Transactional
-    public void signUp(SignupRequestDto request) {
+    public void signUp(SignupRequestDto request, AllergyInfoDto allergyInfoDto) {
+        /* 인증 여부 체크 */
+        if (!mailCodeRepository.findIsValidateByUsername(request.getUsername()))
+            throw new RuntimeException("인증되지 않았습니다.");
+
         User newUser = User.builder()
                 .username(request.getUsername())
                 .password(passwordEncoder.encode(request.getPassword()))
@@ -49,10 +54,12 @@ public class UserService {
                 .build();
 
         newUser.addGrade(Grade.USER);
-
-
-
         userRepository.save(newUser);
+
+        UserAllergyInfo userAllergyInfo =
+                UserAllergyInfo.builder()
+                        .user(newUser).build();
+        allergyInfoRepository.save(userAllergyInfo.updateAllergyInfo(allergyInfoDto.toEntity()));
     }
 
     @Transactional
@@ -61,7 +68,7 @@ public class UserService {
         String newEncodingPassword = passwordEncoder.encode(password);
 
         /* 기존 비밀번호와 일치 여부 확인 */
-        if(user.getPassword().equals(newEncodingPassword))
+        if (user.getPassword().equals(newEncodingPassword))
             throw new RuntimeException("이전 비밀번호와 일치합니다.");
 
         user.updatePassword(newEncodingPassword);
@@ -79,11 +86,11 @@ public class UserService {
     }
 
     @Transactional
-    public void introduceChange(UserAuthDto userAuthDTO, String newIntroduce) {
+    public String introduceChange(UserAuthDto userAuthDTO, String newIntroduce) {
         User user = userRepository.findByUsername(userAuthDTO.getUsername());
 
         user.updateIntroduce(newIntroduce);
-        userRepository.save(user);
+        return userRepository.save(user).getIntroduce();
 
     }
 
@@ -91,16 +98,16 @@ public class UserService {
     public void allergyChange(UserAuthDto userAuthDTO, AllergyInfo newAllergyInfo) {
         User user = userRepository.findByUsername(userAuthDTO.getUsername());
 
-        UserAllergyInfo userAllergyInfo = userAllergyInfoRepository.findByUserId(user.getUserId());
+        UserAllergyInfo userAllergyInfo = allergyInfoRepository.findByUserId(user.getUserId());
         userAllergyInfo.updateAllergyInfo(newAllergyInfo);
 
-        userAllergyInfoRepository.save(userAllergyInfo);
+        allergyInfoRepository.save(userAllergyInfo);
     }
 
     @Transactional
     public void leave(String username, String password) {
         User user = userRepository.findByUsername(username);
-        if(passwordEncoder.encode(password).equals(user.getPassword()))
+        if (passwordEncoder.encode(password).equals(user.getPassword()))
             userRepository.delete(user);
     }
 

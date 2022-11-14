@@ -21,7 +21,7 @@ public class MailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
-    public void sendMail(User user) {
+    public void sendMail(String username, String nickname) {
         int code = MailUtil.createCode();
         SimpleMailMessage msg = new SimpleMailMessage();
 
@@ -30,25 +30,30 @@ public class MailService {
 
         StringBuilder content = new StringBuilder();
         content.append("ALGo 인증요청\n");
-        content.append(user.getNickname());
+        content.append(nickname);
         content.append("님의 인증요청 코드\n");
         content.append(code);
 
-        msg.setTo(user.getUsername());
+        msg.setTo(username);
         msg.setSubject(subject.toString());
         msg.setText(content.toString());
         javaMailSender.send(msg);
 
         MailCode mailCode = MailCode.builder()
-                .userId(user.getUserId())
+                .username(username)
                 //.user(user)
                 .code(code)
                 .build();
         mailCodeRepository.save(mailCode);
     }
 
-    public boolean validateCode(User user, int code) {
-        MailCode mailCode = mailCodeRepository.findByUser(user).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
-        return (mailCode.getCreatedAt().isAfter(LocalDateTime.now().minusMinutes(5)) && mailCode.getCode() == code);
+    public boolean validateCode(String username, int code) {
+        MailCode mailCode = mailCodeRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("인증 기록이 존재하지 않습니다."));
+        if(mailCode.getModifiedAt().isAfter(LocalDateTime.now().minusMinutes(5)) && mailCode.getCode() == code) {
+            mailCodeRepository.save(mailCode.updateIsValidate());
+            return true;
+        }
+        else
+            return false;
     }
 }

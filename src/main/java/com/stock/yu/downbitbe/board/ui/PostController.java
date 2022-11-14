@@ -110,7 +110,7 @@ public class PostController {
     public ResponseEntity<Long> deletePost(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
                            @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         User user = userService.findByUsername(auth.getUsername());
-        Long ret = postService.deletePost(postId, user);
+        Long ret = postService.deletePost(boardId, postId, user);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 }
