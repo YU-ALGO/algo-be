@@ -12,5 +12,4 @@ public interface FoodRepository extends JpaRepository<Food, Long>, FoodRepositor
     @Query("update Food set likeCount = likeCount + :symbol where foodId = :foodId")
     int updateLikeCount(@Param(value = "foodId") Long foodId, @Param(value = "symbol") Integer symbol);
 
-
 }

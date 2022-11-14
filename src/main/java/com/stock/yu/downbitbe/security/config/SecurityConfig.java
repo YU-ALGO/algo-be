@@ -176,7 +176,7 @@ public class SecurityConfig {
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
         //configuration.setAllowedOrigins(Collections.singletonList("http://42.82.185.184:3000")); // singletonList : 하나짜리 리스트
-        configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, Config.SERVER_BASE_URL));
+        configuration.setAllowedOrigins(Arrays.asList(Config.WEB_BASE_URL, Config.SERVER_BASE_URL, "http://algo.r-e.kr:3000"));
         configuration.setAllowedMethods(Collections.singletonList("*"));
         configuration.setAllowedHeaders(Collections.singletonList("*"));
         configuration.setExposedHeaders(Arrays.asList("X-Page-Count", "Access-Control-Allow-Origin","Access-Control-Allow-Credentials"));

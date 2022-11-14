@@ -1,16 +1,10 @@
 package com.stock.yu.downbitbe.user.ui;
 
 import com.stock.yu.downbitbe.food.domain.AllergyInfo;
+import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
 import com.stock.yu.downbitbe.user.domain.profile.UserProfileDto;
-import com.stock.yu.downbitbe.user.domain.user.LoginRequestDto;
-import com.stock.yu.downbitbe.user.domain.user.SignupRequestDto;
-import com.stock.yu.downbitbe.user.domain.user.UserInfoResponseDto;
+import com.stock.yu.downbitbe.user.domain.user.*;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
-import com.stock.yu.downbitbe.user.domain.user.LoginCookies;
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
-import com.stock.yu.downbitbe.user.domain.user.Grade;
-import com.stock.yu.downbitbe.user.domain.user.LoginType;
-import com.stock.yu.downbitbe.user.domain.user.Token;
 import com.stock.yu.downbitbe.user.application.MailService;
 import com.stock.yu.downbitbe.user.application.UserAllergyInfoService;
 import com.stock.yu.downbitbe.user.application.UserService;
@@ -26,6 +20,8 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -113,7 +109,7 @@ public class UserController {
         if (checkNicknameDuplication(request.getNickname()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("nickname is duplication.");
 
-        userService.signUp(request);
+        userService.signUp(request, request.getAllergyInfoDto());
 
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -148,15 +144,22 @@ public class UserController {
     }
 
     @PostMapping("users/mail")
-    public ResponseEntity<Boolean> sendMail(@CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
-        mailService.sendMail(userService.findByUsername(auth.getUsername()));
+    public ResponseEntity<Boolean> sendMail(@RequestBody() Map<String, String> requestMap, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+        String username = requestMap.get("username");
+
+        if(auth != null && auth.getUsername().equals(username))
+            mailService.sendMail(auth.getUsername(), auth.getNickname());
+        else
+            mailService.sendMail(username, "신규 사용자");
 
         return ResponseEntity.ok(true);
     }
 
-    @GetMapping("users/validate")
-    public ResponseEntity<?> validateCode(@RequestParam("code") int code, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
-        boolean isValidate = mailService.validateCode(userService.findByUsername(auth.getUsername()), code);
+    @PostMapping("users/validate")
+    public ResponseEntity<?> validateCode(@RequestBody MailValidateRequestDto requestValidate, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+        if (auth != null && !auth.getUsername().equals(requestValidate.getUsername()))
+            return ResponseEntity.badRequest().body("이미 가입된 사용자입니다.");
+        boolean isValidate = mailService.validateCode(requestValidate.getUsername(), requestValidate.getCode());
         if (isValidate)
             return ResponseEntity.ok().build();
         else
@@ -169,12 +172,14 @@ public class UserController {
         if(!auth.getLoginType().equals(LoginType.LOCAL))
             return ResponseEntity.badRequest().body("소셜 회원은 비밀번호를 변경할 수 없습니다");
 
+
+
         userService.passwordChange(auth, newPassword);
         return ResponseEntity.ok().build();
     }
 
     @PatchMapping("users/nickname")
-    public ResponseEntity<?> changeNickname(@RequestBody String nickname, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+    public ResponseEntity<String> changeNickname(@RequestBody String nickname, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         nickname = nickname.trim();
         /* 기존 닉네임과 일치 여부 확인 */
         if(auth.getNickname().equals(nickname))
@@ -187,7 +192,7 @@ public class UserController {
     }
 
     @PatchMapping("users/introduce")
-    public ResponseEntity<?> changeIntroduce(@RequestBody String introduce, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+    public ResponseEntity<Void> changeIntroduce(@RequestBody String introduce, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         introduce = introduce.trim();
         userService.introduceChange(auth, introduce);
 

@@ -5,6 +5,7 @@ import com.stock.yu.downbitbe.board.domain.comment.CommentDto;
 import com.stock.yu.downbitbe.board.domain.comment.CommentRepository;
 import com.stock.yu.downbitbe.board.domain.post.Post;
 import com.stock.yu.downbitbe.board.domain.post.PostRepository;
+import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
 import com.stock.yu.downbitbe.user.domain.profile.ProfileCommentDto;
 import com.stock.yu.downbitbe.user.domain.profile.ProfilePostDto;
 import com.stock.yu.downbitbe.user.domain.profile.UserProfileDto;
@@ -29,9 +30,9 @@ public class ProfileService {
     @Transactional(readOnly = true)
     public UserProfileDto getUserProfileByNickname(String nickname, boolean isAuthor) {
         User user = userRepository.findByNickname(nickname);
-        UserAllergyInfo allergyInfo = userAllergyInfoRepository.findByUserId(user.getUserId());
+        AllergyInfoDto allergyInfo = userAllergyInfoRepository.findAllergyDtoByUserId(user.getUserId());
 
-        return new UserProfileDto(user, allergyInfo.toMap(), isAuthor);
+        return new UserProfileDto(user, allergyInfo, isAuthor);
     }
 
     @Transactional(readOnly = true)

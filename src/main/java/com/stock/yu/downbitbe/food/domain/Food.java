@@ -18,17 +18,17 @@ public class Food {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long foodId;
 
-    @Column(name = "food_name", length = 30)
+    @Column(name = "food_name", length = 50)
     private String foodName;
 
     @Column
     private Long code;
 
     // TODO : 영양성분표
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String nutrition;
 
-    @Column
+    @Column(columnDefinition = "TEXT")
     private String rawMaterials;
 
     @Column

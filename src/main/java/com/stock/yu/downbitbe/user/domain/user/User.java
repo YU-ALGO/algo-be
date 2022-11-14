@@ -1,6 +1,7 @@
 package com.stock.yu.downbitbe.user.domain.user;
 
 import com.stock.yu.downbitbe.BaseTimeEntity;
+import com.stock.yu.downbitbe.food.domain.AllergyInfo;
 import com.sun.istack.NotNull;
 import lombok.*;
 import org.hibernate.annotations.DynamicUpdate;
@@ -90,4 +91,5 @@ public class User extends BaseTimeEntity {
             this.introduce = introduce;
         return this;
     }
+
 }

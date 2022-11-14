@@ -1,6 +1,7 @@
 package com.stock.yu.downbitbe.food.ui;
 
 import com.stock.yu.downbitbe.food.application.FoodService;
+import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
 import com.stock.yu.downbitbe.food.domain.FoodListResponseDto;
 import com.stock.yu.downbitbe.food.domain.FoodRequestDto;
 import com.stock.yu.downbitbe.food.domain.FoodResponseDto;
@@ -40,7 +41,7 @@ public class FoodController {
 
     @GetMapping("")
     public ResponseEntity<List<FoodListResponseDto>> getFoodList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                 @RequestParam(value = "keyword", required = false) String keyword, Map<String, Boolean> allergyFilter){
+                                                                 @RequestParam(value = "keyword", required = false) String keyword, AllergyInfoDto allergyFilter){
         Page<FoodListResponseDto> foodListResponse = foodService.findAllFoods(allergyFilter, pageable, keyword);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("X-Page-Count", String.valueOf(foodListResponse.getTotalPages()));

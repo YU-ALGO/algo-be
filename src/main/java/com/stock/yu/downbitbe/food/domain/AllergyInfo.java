@@ -1,9 +1,6 @@
 package com.stock.yu.downbitbe.food.domain;
 
-import lombok.Data;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.ToString;
+import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
 import org.hibernate.annotations.DynamicInsert;
 
@@ -14,6 +11,8 @@ import javax.validation.constraints.NotNull;
 @Embeddable
 @Getter
 @ToString
+@Builder
+@AllArgsConstructor
 @NoArgsConstructor
 public class AllergyInfo {
     @Column(name = "SQUID", columnDefinition = "tinyint(1) default 0")

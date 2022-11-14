@@ -4,10 +4,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 import java.util.Optional;
 
-public interface MailCodeRepository extends JpaRepository<MailCode, Long> {
+public interface MailCodeRepository extends JpaRepository<MailCode, Long>, MailCodeRepositoryCustom {
 
-    Optional<MailCode> findByUser(User user);
-
-
+    Optional<MailCode> findByUsername(String username);
 
 }

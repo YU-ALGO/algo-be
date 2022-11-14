@@ -53,7 +53,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .select(Projections.constructor(PostListResponseDto.class,
                         post.postId,
                         post.title,
-                        post.user.username.as("author"),
+                        post.user.nickname.as("author"),
                         post.likeCount,
                         post.commentCount,
                         post.viewCount,

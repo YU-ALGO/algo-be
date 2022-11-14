@@ -1,6 +1,7 @@
 package com.stock.yu.downbitbe.user.domain.user;
 
 import com.stock.yu.downbitbe.food.domain.AllergyInfo;
+import lombok.*;
 
 import javax.persistence.*;
 import java.lang.reflect.Field;
@@ -9,6 +10,10 @@ import java.util.TreeMap;
 
 @Entity
 @Table(name = "USER_ALLERGY_INFO")
+@Getter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class UserAllergyInfo {
     @Id
     @Column(name = "user_id")
@@ -52,7 +57,9 @@ public class UserAllergyInfo {
         return allergyInfoMap;
     }
 
-    public void updateAllergyInfo(AllergyInfo allergyInfo) {
-        this.allergyInfo = allergyInfo;
+    public UserAllergyInfo updateAllergyInfo(AllergyInfo allergyInfo) {
+        if(allergyInfo != null)
+            this.allergyInfo = allergyInfo;
+        return this;
     }
 }
