@@ -2,6 +2,7 @@ package com.stock.yu.downbitbe.board.ui;
 
 import com.stock.yu.downbitbe.board.application.PostService;
 import com.stock.yu.downbitbe.board.domain.post.*;
+import com.stock.yu.downbitbe.security.config.Config;
 import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
@@ -13,17 +14,15 @@ import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpRequest;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.net.http.HttpResponse;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -52,11 +51,39 @@ public class PostController {
     @PreAuthorize("isAuthenticated()")
     @GetMapping("/{board_id}/posts/{post_id}")
     public ResponseEntity<PostResponseDto> getPost(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
+                                                   @CookieValue("viewList") String viewList,
                                                    @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         User user = userService.findByUsername(auth.getUsername());
+
         PostResponseDto responseDto = postService.findPostByPostId(boardId, postId, user.getUserId());
-        int ret = postService.updateView(postId, user);
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+
+        Set<Long> viewSet = new HashSet<>();
+
+        if(!(viewList.equals("")||viewList.equals("[]"))) {
+            log.info("viewList : ");
+
+            for (String s : viewList.replaceAll("[\\[\\]]", "").split(",")) {
+                log.info(s);
+                viewSet.add(Long.parseLong(s));
+            }
+        }
+
+        long viewCount = 0;
+        if (!viewSet.contains(postId))
+            viewCount = postService.updateView(postId, user);
+        else
+            viewCount = responseDto.getViewCount();
+        viewSet.add(postId);
+
+        ResponseCookie viewListCookie = ResponseCookie.from("viewList",viewSet.toString())
+                .httpOnly(true)
+                .path("/")
+                .domain(Config.DOMAIN)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, viewListCookie.toString())
+                .body(responseDto);
     }
 
     @PostMapping("/{board_id}/posts")

@@ -4,6 +4,8 @@ import com.stock.yu.downbitbe.food.application.FoodService;
 import com.stock.yu.downbitbe.food.domain.FoodListResponseDto;
 import com.stock.yu.downbitbe.food.domain.FoodRequestDto;
 import com.stock.yu.downbitbe.food.domain.FoodResponseDto;
+import com.stock.yu.downbitbe.security.config.Config;
+import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
@@ -16,6 +18,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
@@ -23,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @RequiredArgsConstructor
@@ -48,10 +52,22 @@ public class FoodController {
     }
 
     @GetMapping("/{food_id}")
-    public ResponseEntity<FoodResponseDto> getFood(@PathVariable("food_id") Long foodId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
+    public ResponseEntity<FoodResponseDto> getFood(@PathVariable("food_id") Long foodId,
+                                                   @CookieValue("foodList") Set<Long> viewList,
+                                                   @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         FoodResponseDto responseDto = foodService.findFoodByFoodId(foodId, user.getUserId());
-        return ResponseEntity.status(HttpStatus.OK).body(responseDto);
+
+        viewList.add(foodId);
+        ResponseCookie foodListCookie = ResponseCookie.from("foodList",viewList.toString())
+                .httpOnly(true)
+                .path("/food")
+                .domain(Config.DOMAIN)
+                .build();
+
+        return ResponseEntity.status(HttpStatus.OK)
+                .header(HttpHeaders.SET_COOKIE, foodListCookie.toString())
+                .body(responseDto);
     }
 
     @PostMapping("")
