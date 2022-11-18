@@ -19,11 +19,11 @@ public class FoodRequestDto {
     private Long code;
     @NotBlank
     private String nutrition;
-    @NotBlank
     @JsonProperty("raw_materials")
-    private String rawMaterials;
     @NotBlank
+    private String rawMaterials;
     @JsonProperty("product_kind")
+    @NotBlank
     private String productKind;
     @JsonProperty("food_image_url")
     private String foodImageUrl;

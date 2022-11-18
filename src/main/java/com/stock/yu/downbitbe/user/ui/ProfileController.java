@@ -59,6 +59,6 @@ public class ProfileController {
     //@PreAuthorize("isAuthenticated()")
 //    @GetMapping("/{nickname}/foods")//TODO
 //    public ResponseEntity<List<FoodResponseDto>> getUserFoodLikeList(@PathVariable String nickname) {
-//        return ResponseEntity.ok(profileService.(nickname));
+//        return ResponseEntity.ok(profileService.;
 //    }
 }
