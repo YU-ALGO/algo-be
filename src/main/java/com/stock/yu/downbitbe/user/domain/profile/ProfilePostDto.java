@@ -20,7 +20,7 @@ public class ProfilePostDto {
     private final LocalDateTime createdAt;
 
     public ProfilePostDto(Post post, Long boardId, Long postId) {
-        this.title = post.getContent();
+        this.title = post.getTitle();
         this.postId = postId;
         this.boardId = boardId;
         this.createdAt = post.getCreatedAt();

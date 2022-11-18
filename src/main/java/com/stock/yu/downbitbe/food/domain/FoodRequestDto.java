@@ -19,8 +19,15 @@ public class FoodRequestDto {
     private Long code;
     @NotBlank
     private String nutrition;
+    @NotBlank
+    @JsonProperty("raw_materials")
+    private String rawMaterials;
+    @NotBlank
+    @JsonProperty("product_kind")
+    private String productKind;
     @JsonProperty("food_image_url")
     private String foodImageUrl;
+    private AllergyInfoDto allergy;
 
 
     public Food toEntity() {
@@ -28,6 +35,8 @@ public class FoodRequestDto {
                 .foodName(foodName)
                 .code(code)
                 .nutrition(nutrition)
+                .rawMaterials(rawMaterials)
+                .productKind(productKind)
                 .foodImageUrl(foodImageUrl)
                 .build();
     }

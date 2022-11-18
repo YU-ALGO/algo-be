@@ -8,6 +8,7 @@ import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import com.stock.yu.downbitbe.user.application.MailService;
 import com.stock.yu.downbitbe.user.application.UserAllergyInfoService;
 import com.stock.yu.downbitbe.user.application.UserService;
+import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
@@ -94,6 +95,7 @@ public class UserController {
                         loginCookies.getAccessCookie().toString(),
                         loginCookies.getRefreshCookie().toString(),
                         loginCookies.getViewListCookie().toString(),
+                        loginCookies.getFoodListCookie().toString(),
                         loginCookies.getIsLoginCookie().toString(),
                         loginCookies.getIsAdminCookie().toString())
                 .body(new UserInfoResponseDto(auth.getNickname(), email, auth.getLoginType().toString(), roles.contains(Grade.ADMIN)));
@@ -167,7 +169,7 @@ public class UserController {
     }
 
     @PatchMapping("users/password")
-    public ResponseEntity<?> changePassword(@RequestBody @PathVariable("newPassword") String newPassword, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+    public ResponseEntity<?> changePassword(@PathVariable("newPassword") String newPassword, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         /* 로컬 유저 여부 확인 */
         if(!auth.getLoginType().equals(LoginType.LOCAL))
             return ResponseEntity.badRequest().body("소셜 회원은 비밀번호를 변경할 수 없습니다");
@@ -179,7 +181,9 @@ public class UserController {
     }
 
     @PatchMapping("users/nickname")
-    public ResponseEntity<String> changeNickname(@RequestBody String nickname, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+    public ResponseEntity<String> changeNickname(@RequestBody Map<String, String> map, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+        String nickname = map.get("nickname");
+
         nickname = nickname.trim();
         /* 기존 닉네임과 일치 여부 확인 */
         if(auth.getNickname().equals(nickname))
@@ -192,14 +196,15 @@ public class UserController {
     }
 
     @PatchMapping("users/introduce")
-    public ResponseEntity<Void> changeIntroduce(@RequestBody String introduce, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+    public ResponseEntity<Void> changeIntroduce(@RequestBody Map<String, String> map, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+        String introduce = map.get("introduce");
         introduce = introduce.trim();
         userService.introduceChange(auth, introduce);
 
         return ResponseEntity.ok().build();
     }
 
-    @PatchMapping("users/allergy")
+    @PatchMapping("users/allergies")
     public ResponseEntity<?> changeAllergy(@RequestBody AllergyInfo allergyInfo, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
 
         userService.allergyChange(auth, allergyInfo);
@@ -207,6 +212,10 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("users/allergies")
+    public ResponseEntity<Map<String, Boolean>> getUserAllergyInfo(@Parameter(hidden = true) @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+        return ResponseEntity.ok(userAllergyInfoService.findUserAllergyInfoByUser(auth));
+    }
 
 //    @PatchMapping("/users/")
 //    public ResponseEntity<Long> updateProfile(UserProfileDto userProfileDto , @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {

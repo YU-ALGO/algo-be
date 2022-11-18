@@ -62,7 +62,7 @@ public class PostController {
         if(!(viewList.equals("")||viewList.equals("[]"))) {
             log.info("viewList : ");
 
-            for (String s : viewList.replaceAll("[\\[\\]]", "").split(",")) {
+            for (String s : viewList.replaceAll("[\\[\\]]", "").split("/")) {
                 log.info(s);
                 viewSet.add(Long.parseLong(s));
             }
@@ -75,7 +75,9 @@ public class PostController {
             viewCount = responseDto.getViewCount();
         viewSet.add(postId);
 
-        ResponseCookie viewListCookie = ResponseCookie.from("viewList",viewSet.toString())
+        log.info("viewSet : "+viewSet.toString().replaceAll(",","/"));
+
+        ResponseCookie viewListCookie = ResponseCookie.from("viewList",viewSet.toString().replaceAll(" ", "").replaceAll(",","/"))
                 .httpOnly(true)
                 .path("/")
                 .domain(Config.DOMAIN)
@@ -86,8 +88,8 @@ public class PostController {
                 .body(responseDto);
     }
 
-    @PostMapping("/{board_id}/posts")
     @PreAuthorize("isAuthenticated()")
+    @PostMapping("/{board_id}/posts")
     public ResponseEntity<Long> createPost(final @RequestBody @Valid PostCreateRequestDto postCreateRequestDto, @PathVariable("board_id") Long boardId,
                                            @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         User user = userService.findByUsername(auth.getUsername());

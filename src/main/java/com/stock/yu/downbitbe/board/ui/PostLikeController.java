@@ -9,6 +9,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
@@ -25,6 +26,7 @@ public class PostLikeController {
     private final PostLikeService postLikeService;
     private final UserService userService;
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("{board_id}/posts/{post_id}/likes")
     public ResponseEntity<Long> createPostLike(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
                                             @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
@@ -34,6 +36,7 @@ public class PostLikeController {
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("{board_id}/posts/{post_id}/likes")
     public ResponseEntity<Long> deletePostLike(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
                                             @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){

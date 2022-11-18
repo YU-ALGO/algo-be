@@ -48,8 +48,9 @@ public class UserAllergyInfoRepositoryImpl implements UserAllergyInfoRepositoryC
         //JPAQuery<AllergyInfoDto> query = queryFactory.select(Projections.constructor(AllergyInfoDto.class, classes, list));
 
         AllergyInfoDto allergyInfoDto = queryFactory
-                .select(Projections.constructor(AllergyInfoDto.class, allergyInfo))
+                .select(Projections.constructor(AllergyInfoDto.class, userAllergyInfo.allergyInfo))
                .from(userAllergyInfo)
+                .innerJoin(userAllergyInfo.user, user)
                .where(userAllergyInfo.userId.eq(userId))
                .fetchFirst();
 

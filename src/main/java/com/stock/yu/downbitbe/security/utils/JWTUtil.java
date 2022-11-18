@@ -122,6 +122,13 @@ public class JWTUtil {
                 .domain(Config.DOMAIN)
                 .build();
 
+        ResponseCookie foodCookie = ResponseCookie.from("foodList", "")
+                .httpOnly(true)
+                .path("/")
+                .maxAge(JWTUtil.refreshExpire)
+                .domain(Config.DOMAIN)
+                .build();
+
         ResponseCookie isLoginCookie = ResponseCookie.from("isLogin", "true")
                 .path("/")
                 .maxAge(JWTUtil.accessExpire)
@@ -134,14 +141,13 @@ public class JWTUtil {
                 .domain(Config.DOMAIN)
                 .build();
 
-        LoginCookies loginCookies = LoginCookies.builder()
+        return LoginCookies.builder()
                 .accessCookie(accessCookie)
                 .refreshCookie(refreshCookie)
                 .viewListCookie(viewCookie)
+                .foodListCookie(foodCookie)
                 .isLoginCookie(isLoginCookie)
                 .isAdminCookie(isAdminCookie)
                 .build();
-
-        return loginCookies;
     }
 }

@@ -8,6 +8,7 @@ import com.stock.yu.downbitbe.user.application.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.CookieValue;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -22,6 +23,7 @@ public class AdminController {
     private final JWTUtil jwtUtil;
     private final UserService userService;
 
+    @PreAuthorize("hasRole('ADMIN')")
     @GetMapping("/admin")
     public ResponseEntity<?> isAdmin(@CookieValue("accessToken")String accessToken) {
         try {
