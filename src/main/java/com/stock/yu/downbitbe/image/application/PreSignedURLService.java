@@ -39,7 +39,8 @@ public class PreSignedURLService {
 
     @Async
     public String postImage(String extension, String username) {
-        String fileName = "post_image/" + username + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")) + extension;
+        int index = username.lastIndexOf('@');
+        String fileName = "post_image/" + username.substring(0, index).toLowerCase() + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")) + extension;
         String url = generateUrl(fileName, HttpMethod.PUT);
         log.info("URL = " + url);
         return url;

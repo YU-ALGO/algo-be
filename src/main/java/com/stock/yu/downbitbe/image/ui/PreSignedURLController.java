@@ -11,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
@@ -27,6 +28,7 @@ import org.springframework.web.bind.annotation.*;
 public class PreSignedURLController {
     private final PreSignedURLService preSignedURLService;
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("")
     public ResponseEntity<String> getImageURL(@RequestBody ImageRequestDto imageRequestDto,
                                               @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){

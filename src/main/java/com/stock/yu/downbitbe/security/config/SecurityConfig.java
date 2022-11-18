@@ -93,7 +93,7 @@ public class SecurityConfig {
                 .antMatchers("/api/v1/admin/**", "/api/v1/admin").hasRole("ADMIN")
                 .antMatchers("api/v1/").hasRole("ADMIN")
                 .antMatchers("/oauth2/authorization/**").permitAll()
-                .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/boards/*/posts/*/comments", "/api/v1/users/*", "/api/v1/profiles/*", "/api/v1/posts/images/*").permitAll()
+                .antMatchers("/api/v1/signup", "/api/v1/login", "/images/**", "/api/v1/users/**", "/api/v1/boards", "/api/v1/boards/*/posts", "/api/v1/boards/*/posts/*/comments", "/api/v1/users/*", "/api/v1/profiles/*", "/api/v1/posts/images/*", "/api/v1/foods").permitAll()
                 .antMatchers(HttpMethod.GET, "/api/v1/users/validate").permitAll()
                 .antMatchers(HttpMethod.POST, "/api/v1/users/mail").permitAll()
                 .antMatchers(HttpMethod.OPTIONS).permitAll();
@@ -124,6 +124,11 @@ public class SecurityConfig {
                     viewListCookie.setHttpOnly(true);
                     viewListCookie.setMaxAge(0);
                     viewListCookie.setDomain(Config.DOMAIN);
+                    Cookie foodListCookie = new Cookie("foodList", null);
+                    foodListCookie.setPath("/");
+                    foodListCookie.setHttpOnly(true);
+                    foodListCookie.setMaxAge(0);
+                    foodListCookie.setDomain(Config.DOMAIN);
                     Cookie isLoginCookie = new Cookie("isLogin", null);
                     isLoginCookie.setPath("/");
                     isLoginCookie.setHttpOnly(false);
@@ -139,12 +144,13 @@ public class SecurityConfig {
                     response.addCookie(refreshToken);
                     response.addCookie(accessToken);
                     response.addCookie(viewListCookie);
+                    response.addCookie(foodListCookie);
                     response.addCookie(isLoginCookie);
                     response.addCookie(isAdminCookie);
 
                     SecurityContextHolder.clearContext();
                 })
-                .deleteCookies("accessToken", "refreshToken", "viewList", "isLogin", "isAdmin") // 토큰 삭제가 안됨 ㅠ
+                .deleteCookies("accessToken", "refreshToken", "viewList", "foodList", "isLogin", "isAdmin") // 토큰 삭제가 안됨 ㅠ
                 .invalidateHttpSession(true)
                 .logoutSuccessHandler(((request, response, authentication) -> response.setStatus(HttpServletResponse.SC_OK)))
         );
@@ -190,11 +196,6 @@ public class SecurityConfig {
     public JWTUtil jwtUtil() {
         return new JWTUtil();
     }
-
-//    @Bean
-//    public JavaMailSender emailSender(){
-//        return new JavaMailSenderImpl();
-//    }
 
     @Bean
     AccessDecisionVoter hierarchyVoter() {

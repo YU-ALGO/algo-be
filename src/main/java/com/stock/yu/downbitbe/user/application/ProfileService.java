@@ -1,7 +1,6 @@
 package com.stock.yu.downbitbe.user.application;
 
 import com.stock.yu.downbitbe.board.domain.comment.Comment;
-import com.stock.yu.downbitbe.board.domain.comment.CommentDto;
 import com.stock.yu.downbitbe.board.domain.comment.CommentRepository;
 import com.stock.yu.downbitbe.board.domain.post.Post;
 import com.stock.yu.downbitbe.board.domain.post.PostRepository;
@@ -14,7 +13,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -52,4 +50,11 @@ public class ProfileService {
                         new ProfilePostDto(post, post.getBoard().getBoardId(), post.getPostId())).
                 collect(Collectors.toList());
     }
+
+    @Transactional(readOnly = true)
+    public AllergyInfoDto getUserAllergyByNickname(String nickname) {
+        User user = userRepository.findByNickname(nickname);
+        return userAllergyInfoRepository.findAllergyDtoByUserId(user.getUserId());
+    }
+
 }

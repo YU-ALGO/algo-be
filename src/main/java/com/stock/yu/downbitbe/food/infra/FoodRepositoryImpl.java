@@ -11,6 +11,7 @@ import com.stock.yu.downbitbe.food.domain.FoodListResponseDto;
 import com.stock.yu.downbitbe.food.domain.FoodRepositoryCustom;
 import com.stock.yu.downbitbe.food.domain.QAllergyInfo;
 import com.stock.yu.downbitbe.food.domain.QFoodAllergyInfo;
+import com.stock.yu.downbitbe.user.domain.profile.UserFoodLikeResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;

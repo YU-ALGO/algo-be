@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
@@ -39,25 +40,25 @@ public class BoardController {
         return ResponseEntity.status(HttpStatus.OK).body(boardName);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
-    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> createBoard(@RequestBody Map<String, String> boardCreateDto, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         Long createBoardId = boardService.createBoard(boardCreateDto.get("name"));
         if(createBoardId == null){
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-1L); // 에러코드 다시 살펴보기
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-1L); //TODO 에러코드 다시 살펴보기
         }
-        return ResponseEntity.status(HttpStatus.OK).body(createBoardId);    // 추후 수정
+        return ResponseEntity.status(HttpStatus.OK).body(createBoardId);    //TODO 추후 수정
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{board_id}")
-    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> updateBoard(@RequestBody Map<String, String> boardUpdateDto, @PathVariable("board_id") Long boardId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         Long updateBoardId = boardService.updateBoard(boardUpdateDto.get("name"), boardId);
         return ResponseEntity.status(HttpStatus.OK).body(updateBoardId);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{board_id}")
-    //@PreAuthorize("hasRole('ADMIN')")
     public ResponseEntity<Long> deleteBoard(@PathVariable("board_id") Long boardId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         Long deleteBoardId = boardService.deleteBoard(boardId);
         return ResponseEntity.status(HttpStatus.OK).body(deleteBoardId);

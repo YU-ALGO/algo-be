@@ -2,6 +2,8 @@ package com.stock.yu.downbitbe.food.ui;
 
 
 import com.stock.yu.downbitbe.food.application.FoodLikeService;
+import com.stock.yu.downbitbe.food.domain.FoodLikeRepository;
+import com.stock.yu.downbitbe.user.domain.profile.UserFoodLikeResponseDto;
 import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.application.UserService;
@@ -10,8 +12,12 @@ import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RequiredArgsConstructor
 @RestController
@@ -26,6 +32,7 @@ public class FoodLikeController {
     private final FoodLikeService foodLikeService;
     private final UserService userService;
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("{food_id}/likes")
     public ResponseEntity<Long> createFoodLike(@PathVariable("food_id") Long foodId,
                                                @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
@@ -35,6 +42,7 @@ public class FoodLikeController {
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("{food_id}/likes")
     public ResponseEntity<Long> deleteFoodLike(@PathVariable("food_id") Long foodId,
                                                @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
@@ -43,4 +51,5 @@ public class FoodLikeController {
         foodLikeService.updateLike(foodId, user, -1);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
+
 }

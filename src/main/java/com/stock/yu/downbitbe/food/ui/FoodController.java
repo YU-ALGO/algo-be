@@ -1,10 +1,8 @@
 package com.stock.yu.downbitbe.food.ui;
 
 import com.stock.yu.downbitbe.food.application.FoodService;
-import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
-import com.stock.yu.downbitbe.food.domain.FoodListResponseDto;
-import com.stock.yu.downbitbe.food.domain.FoodRequestDto;
-import com.stock.yu.downbitbe.food.domain.FoodResponseDto;
+import com.stock.yu.downbitbe.food.domain.*;
+import com.stock.yu.downbitbe.food.utils.AllergyUtils;
 import com.stock.yu.downbitbe.security.config.Config;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
@@ -21,10 +19,12 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -45,7 +45,7 @@ public class FoodController {
 
     @GetMapping("")
     public ResponseEntity<List<FoodListResponseDto>> getFoodList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                 @RequestParam(value = "keyword", required = false) String keyword, AllergyInfoDto allergyFilter){
+                                                             @RequestParam(value = "keyword", required = false) String keyword, AllergyInfoDto allergyFilter){
         Page<FoodListResponseDto> foodListResponse = foodService.findAllFoods(allergyFilter, pageable, keyword);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("X-Page-Count", String.valueOf(foodListResponse.getTotalPages()));
@@ -54,15 +54,15 @@ public class FoodController {
 
     @GetMapping("/{food_id}")
     public ResponseEntity<FoodResponseDto> getFood(@PathVariable("food_id") Long foodId,
-                                                   @CookieValue("foodList") Set<Long> viewList,
+                                                   @CookieValue("foodList") String viewCookie,
                                                    @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
         FoodResponseDto responseDto = foodService.findFoodByFoodId(foodId, user.getUserId());
-
+        List<Long> viewList = new ArrayList<>();
         viewList.add(foodId);
         ResponseCookie foodListCookie = ResponseCookie.from("foodList",viewList.toString())
                 .httpOnly(true)
-                .path("/food")
+                .path("/")
                 .domain(Config.DOMAIN)
                 .build();
 
@@ -71,18 +71,21 @@ public class FoodController {
                 .body(responseDto);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
     public ResponseEntity<Long> createFood(final @RequestBody @Valid FoodRequestDto foodRequestDto){
         Long ret = foodService.createFood(foodRequestDto);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{food_id}")
     public ResponseEntity<Long> updateFood(final @RequestBody @Valid FoodRequestDto foodRequestDto, @PathVariable("food_id") Long foodId){
         Long ret = foodService.updateFood(foodRequestDto, foodId);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
+    @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{food_id}")
     public ResponseEntity<Long> deleteFood(@PathVariable("food_id") Long foodId){
         Long ret = foodService.deleteFood(foodId);

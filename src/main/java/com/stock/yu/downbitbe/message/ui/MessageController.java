@@ -20,6 +20,7 @@ import org.springframework.data.web.PageableDefault;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
@@ -44,6 +45,7 @@ public class MessageController {
     private final MessageService messageService;
     private final UserService userService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/non_read_counts")
     public ResponseEntity<Integer> getNonReadMessageCount(@CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
@@ -51,6 +53,7 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.OK).body(count);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/inboxes")
     public ResponseEntity<List<ReceiveMessageListDto>> getReceiveMessageList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                                                              @RequestParam(value = "keyword", required = false) String keyword,
@@ -64,6 +67,7 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(receiveMessageList.stream().collect(Collectors.toList()));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/outboxes")
     public ResponseEntity<List<SendMessageListDto>> getSendMessageList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
                                                                        @RequestParam(value = "keyword", required = false) String keyword,
@@ -76,6 +80,7 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(sendMessageList.stream().collect(Collectors.toList()));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("{message_id}")
     public ResponseEntity<MessageDto> getMessage(@PathVariable("message_id") Long messageId,
                                                  @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
@@ -84,6 +89,7 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.OK).body(messageDto);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("")
     public ResponseEntity<Long> createMessage(final @RequestBody @Valid MessageCreateRequestDto messageCreateRequestDto,
                                               @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
@@ -95,6 +101,7 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("{message_id}")
     public ResponseEntity<Long> deleteMessage(@PathVariable("message_id") Long messageId,
                                               @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
@@ -103,9 +110,7 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
-
-//TODO: messageList 삭제하는 거 수정하기
-
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/outboxes")
     public ResponseEntity<Long> deleteSenderMessageList(@RequestBody @Valid MessageDeleteRequestDto messageIdArray,
                                                         @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
@@ -114,6 +119,7 @@ public class MessageController {
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/inboxes")
     public ResponseEntity<Long> deleteReceiverMessageList(@RequestBody MessageDeleteRequestDto messageIdArray,
                                                   @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
