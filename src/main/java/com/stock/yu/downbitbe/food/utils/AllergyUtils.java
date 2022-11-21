@@ -33,6 +33,8 @@ public class AllergyUtils {
 
         public static String mapToString(Map<String, Boolean> allergyInfo) {
                 StringBuilder stringBuilder = new StringBuilder();
+                if(allergyInfo.isEmpty())
+                        stringBuilder.append("없음");
                 allergyInfo.keySet().forEach((key) -> {
                         stringBuilder.append(allergyDict.get(key));
                         stringBuilder.append(" ");

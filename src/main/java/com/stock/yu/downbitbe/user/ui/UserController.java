@@ -2,6 +2,7 @@ package com.stock.yu.downbitbe.user.ui;
 
 import com.stock.yu.downbitbe.food.domain.AllergyInfo;
 import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
+import com.stock.yu.downbitbe.user.application.TokenService;
 import com.stock.yu.downbitbe.user.domain.profile.UserProfileDto;
 import com.stock.yu.downbitbe.user.domain.user.*;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
@@ -36,6 +37,7 @@ public class UserController {
     private final MailService mailService;
     private final UserService userService;
     private final UserAllergyInfoService userAllergyInfoService;
+    private final TokenService tokenService;
 
     private final JWTUtil jwtUtil;
 
@@ -89,6 +91,8 @@ public class UserController {
         // 토큰 생성 및 쿠키 설정
         Token token = jwtUtil.generateToken(email, nickname);
         LoginCookies loginCookies = jwtUtil.setLoginCookies(token, roles.contains(Grade.ADMIN));
+
+        tokenService.insertRefreshToken(userId, token.getCode().toString());
 
         // ResponseEntity에서 header 설정 및 만든 쿠키 넣고 응답
         return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE,

@@ -4,12 +4,16 @@ import lombok.Builder;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
+import org.hibernate.annotations.DynamicUpdate;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotNull;
+import com.sun.istack.NotNull;
 
 @Entity
 @Table(name = "FOOD")
+@DynamicInsert
+@DynamicUpdate
 @Getter
 @NoArgsConstructor
 public class Food {
@@ -69,3 +73,5 @@ public class Food {
         return this;
     }
 }
+
+

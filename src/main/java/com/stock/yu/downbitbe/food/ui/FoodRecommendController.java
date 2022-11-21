@@ -47,6 +47,8 @@ public class FoodRecommendController {
         List<Long> recommendList = foodRecommendService.getRecommendedFoodList(likeList, foodList, allergyInfoDto);
         log.info("recommendList : " + recommendList);
 
-        return ResponseEntity.ok().build();
+        //TODO 식품 반환 추가 필요
+
+        return ResponseEntity.ok(recommendList);
     }
 }

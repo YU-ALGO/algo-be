@@ -1,7 +1,9 @@
 package com.stock.yu.downbitbe.security.filter;
 
+import com.stock.yu.downbitbe.security.config.Config;
 import com.stock.yu.downbitbe.user.application.CustomUserDetailsService;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
+import com.stock.yu.downbitbe.user.application.TokenService;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -24,11 +26,14 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     //private final CustomUserRepository userRepository;
     private final CustomUserDetailsService userDetailsService;
     private final JWTUtil jwtUtil;
+    private final TokenService tokenService;
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, JWTUtil jwtUtil) {
+
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, JWTUtil jwtUtil, TokenService tokenService) {
         super(authenticationManager);
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
+        this.tokenService = tokenService;
     }
 
     @Override
@@ -49,6 +54,38 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
         String token = cookieMap.getOrDefault("accessToken", null);
         if(token == null) {
             log.info("accessToken is null");
+
+            String refresh = cookieMap.getOrDefault("refreshToken", null);
+            if(refresh != null) {
+                String accessToken;
+                try {
+                    accessToken = jwtUtil.regenerateToken(refresh);
+                } catch (Exception e) {
+                    throw new RuntimeException(e);
+                }
+                Cookie accessCookie = new Cookie("accessToken", accessToken);
+                accessCookie.setPath("/");
+                accessCookie.setHttpOnly(true);
+                accessCookie.setMaxAge((int) JWTUtil.accessExpire);
+                accessCookie.setDomain(Config.DOMAIN);
+                response.addCookie(accessCookie);
+
+                Cookie viewListCookie = new Cookie("viewList", "");
+                viewListCookie.setPath("/");
+                viewListCookie.setHttpOnly(true);
+                viewListCookie.setMaxAge((int) JWTUtil.accessExpire);
+                viewListCookie.setDomain(Config.DOMAIN);
+                response.addCookie(viewListCookie);
+
+                Cookie foodListCookie = new Cookie("foodList", "");
+                foodListCookie.setPath("/");
+                foodListCookie.setHttpOnly(true);
+                foodListCookie.setMaxAge((int) JWTUtil.accessExpire);
+                foodListCookie.setDomain(Config.DOMAIN);
+                response.addCookie(foodListCookie);
+
+            }
+
             chain.doFilter(request, response);
             return;
         }

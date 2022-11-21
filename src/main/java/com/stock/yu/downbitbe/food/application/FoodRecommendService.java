@@ -1,6 +1,7 @@
 package com.stock.yu.downbitbe.food.application;
 
 import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
+import com.stock.yu.downbitbe.food.domain.FoodRecommendIdListDto;
 import com.stock.yu.downbitbe.security.config.Config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -12,8 +13,6 @@ import org.springframework.web.client.RestTemplate;
 
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -54,10 +53,9 @@ public class FoodRecommendService {
         log.info("likeList : " + likeList.toString());
         log.info("recently : " + viewList.toString());
 
-        ResponseEntity<ArrayList> list = restTemplate.exchange(uriBuilder.toString(), HttpMethod.GET, entity, ArrayList.class);
-        //ResponseEntity<ArrayList> list = restTemplate.exchange(uriBuilder.toString(), HttpMethod.GET, ArrayList.class);
-       log.info("getList : " + list);
-       return list.getBody();
+        ResponseEntity<FoodRecommendIdListDto> responseEntity = restTemplate.exchange(uriBuilder.toString(), HttpMethod.GET, entity, FoodRecommendIdListDto.class);
+
+       return responseEntity.getBody().getRecommendList();
     }
 
 }

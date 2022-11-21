@@ -1,10 +1,15 @@
 package com.stock.yu.downbitbe.user.ui;
 
+import com.stock.yu.downbitbe.security.config.Config;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.ResponseCookie;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
+import javax.servlet.http.Cookie;
 
 @Log4j2
 @RestController
@@ -30,11 +35,14 @@ public class TokenController {
             return ResponseEntity.badRequest().build();
 
         String newToken = jwtUtil.regenerateToken(refreshToken);
+        ResponseCookie accessCookie = ResponseCookie.from("accessToken",newToken)
+                .httpOnly(true)
+                .path("/")
+                .maxAge(JWTUtil.accessExpire)
+                .domain(Config.DOMAIN)
+                .build();
 
-
-
-
-        return ResponseEntity.ok().build();
+        return ResponseEntity.ok().header(HttpHeaders.SET_COOKIE, accessCookie.toString()).build();
     }
 
 

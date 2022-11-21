@@ -3,7 +3,7 @@ package com.stock.yu.downbitbe.user.utils;
 
 import java.util.Random;
 
-public class MailUtil {
+public class RandomCodeUtil {
 
     public static int createCode() {
         Random random = new Random();

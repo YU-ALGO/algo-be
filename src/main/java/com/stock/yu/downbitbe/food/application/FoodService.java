@@ -7,9 +7,8 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-
-import java.util.Map;
 
 @Log4j2
 @RequiredArgsConstructor
@@ -25,7 +24,7 @@ public class FoodService {
     }
 
     @Transactional(readOnly = true)
-    public FoodResponseDto findFoodByFoodId(Long foodId, Long userId){
+    public FoodResponseDto findFoodLikeByFoodId(Long foodId, Long userId){
         Food food = foodRepository.findById(foodId).orElseThrow(() -> new IllegalArgumentException("식품이 존재하지 않습니다."));
         Boolean isLike = foodLikeRepository.existsByFoodFoodIdAndUserUserId(foodId, userId);
 
@@ -35,15 +34,23 @@ public class FoodService {
         return new FoodResponseDto(food, isLike, AllergyUtils.mapToString(result.toTrueMap()));
     }
 
-    @Transactional
+    @Transactional(readOnly = true)
+    public Food findFoodByFoodId(Long foodId) {
+        return foodRepository.findById(foodId).get();
+    }
+
     public Long createFood(FoodRequestDto foodCreateRequestDto){
         Food food = foodCreateRequestDto.toEntity();
-        Long foodId = foodRepository.save(food).getFoodId();
-        return foodAllergyRepository.save(FoodAllergyInfo.builder()
-                .foodId(foodId)
-                .food(food)
-                .allergyInfo(foodCreateRequestDto.getAllergy().toEntity())
-                .build()).getFoodId();
+        return foodRepository.save(food).getFoodId();
+    }
+
+    public Long createFoodAllergy(Food food, AllergyInfo allergyInfo){
+        FoodAllergyInfo foodAllergyInfo =
+                FoodAllergyInfo.builder()
+                        .food(food)
+                        .allergyInfo(allergyInfo)
+                        .build();
+        return foodAllergyRepository.save(foodAllergyInfo).getFoodId();
     }
 
     @Transactional
