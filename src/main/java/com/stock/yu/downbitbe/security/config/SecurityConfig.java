@@ -1,5 +1,6 @@
 package com.stock.yu.downbitbe.security.config;
 
+import com.stock.yu.downbitbe.user.application.TokenService;
 import com.stock.yu.downbitbe.user.domain.user.CustomUserRepository;
 import com.stock.yu.downbitbe.user.application.CustomOAuth2UserDetailsService;
 import com.stock.yu.downbitbe.user.application.CustomUserDetailsService;
@@ -43,12 +44,14 @@ import java.util.Collections;
 @EnableGlobalMethodSecurity(prePostEnabled = true) //권한 관리의 다른 방법
 public class SecurityConfig {
 
-
     @Autowired
     private CustomUserRepository userRepository;
 
     @Autowired
     private CustomUserDetailsService customUserDetailsService;
+
+    @Autowired
+    private TokenService tokenService;
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -84,7 +87,7 @@ public class SecurityConfig {
                 //.addFilter(new JwtAuthorizationFilter(authenticationManager, , jwtUtil()));
         //           .addFilterBefore(new JwtAuthorizationFilter(authenticationManager, userRepository), UsernamePasswordAuthenticationFilter.class);
 
-        http.addFilterBefore(new JwtAuthorizationFilter(authenticationManager, customUserDetailsService, jwtUtil()), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthorizationFilter(authenticationManager, customUserDetailsService, jwtUtil(), tokenService), UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeRequests()
                 .antMatchers("/sample/all", "/login", "/logout", "/api/v1/token/validate", "/api/v1/boards/").permitAll()
@@ -194,7 +197,7 @@ public class SecurityConfig {
 
     @Bean
     public JWTUtil jwtUtil() {
-        return new JWTUtil();
+        return new JWTUtil(tokenService);
     }
 
     @Bean
