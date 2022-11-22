@@ -6,10 +6,14 @@ import com.stock.yu.downbitbe.board.domain.post.*;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.joda.time.LocalDate;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.time.LocalDateTime;
+import java.util.List;
 
 @RequiredArgsConstructor
 @Service
@@ -72,5 +76,12 @@ public class PostService {
         }
         postRepository.delete(post);
         return post.getPostId();
+    }
+
+    @Transactional(readOnly = true)
+    public List<PostListResponseDto> findTopPosts(int size) {
+        LocalDateTime now = LocalDateTime.now();
+        LocalDateTime start = now.minusDays(1);
+        return postRepository.findTopPosts(size, start, now);
     }
 }

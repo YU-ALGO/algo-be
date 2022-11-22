@@ -26,6 +26,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Log4j2
@@ -44,7 +45,7 @@ public class FoodController {
 
     @GetMapping("")
     public ResponseEntity<List<FoodListResponseDto>> getFoodList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-                                                             @RequestParam(value = "keyword", required = false) String keyword, AllergyInfoDto allergyFilter){
+                                                                 @RequestParam(value = "keyword", required = false) String keyword, AllergyInfoDto allergyFilter) {
         Page<FoodListResponseDto> foodListResponse = foodService.findAllFoods(allergyFilter, pageable, keyword);
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("X-Page-Count", String.valueOf(foodListResponse.getTotalPages()));
@@ -54,12 +55,12 @@ public class FoodController {
     @GetMapping("/{food_id}")
     public ResponseEntity<FoodResponseDto> getFood(@PathVariable("food_id") Long foodId,
                                                    @CookieValue("foodList") String viewCookie,
-                                                   @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
+                                                   @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         User user = userService.findByUsername(auth.getUsername());
         FoodResponseDto responseDto = foodService.findFoodLikeByFoodId(foodId, user.getUserId());
         List<Long> viewList = new ArrayList<>();
 
-        if(!(viewCookie.equals("")||viewCookie.equals("[]"))) {
+        if (!(viewCookie.equals("") || viewCookie.equals("[]"))) {
             for (String s : viewCookie.replaceAll("[\\[\\]]", "").split("/")) {
                 log.info(s);
                 viewList.add(Long.parseLong(s));
@@ -67,7 +68,7 @@ public class FoodController {
         }
 
         viewList.add(foodId);
-        ResponseCookie foodListCookie = ResponseCookie.from("foodList",viewList.toString().replaceAll(" ", "").replaceAll(",","/"))
+        ResponseCookie foodListCookie = ResponseCookie.from("foodList", viewList.toString().replaceAll(" ", "").replaceAll(",", "/"))
                 .httpOnly(true)
                 .path("/")
                 .domain(Config.DOMAIN)
@@ -79,9 +80,28 @@ public class FoodController {
     }
 
     @PreAuthorize("hasRole('ADMIN')")
+    @GetMapping("/{food_id}/allergies")
+    public ResponseEntity<Map<String, Boolean>> getFoodAllergyInfo(@PathVariable("food_id") Long foodId) {
+        return ResponseEntity.status(HttpStatus.OK).body(foodService.getFoodAllergies(foodId));
+    }
+
+    @GetMapping("/viewLists")
+    public ResponseEntity<List<FoodListResponseDto>> getUserViewFood(@CookieValue(value = "foodList", required = false) String foodCookie) {
+        List<Long> foodList = new ArrayList<>();
+        if (foodCookie != null && !foodCookie.isBlank()) {
+            for (String s : foodCookie.replaceAll("[\\[\\]]", "").split("/")) {
+                foodList.add(Long.parseLong(s));
+            }
+        }
+
+        List<FoodListResponseDto> viewListDto = foodService.getViewFoodList(foodList);
+        return ResponseEntity.status(HttpStatus.OK).body(viewListDto);
+    }
+
+    @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
     @Transactional
-    public ResponseEntity<Long> createFood(final @RequestBody @Valid FoodRequestDto foodRequestDto){
+    public ResponseEntity<Long> createFood(final @RequestBody @Valid FoodRequestDto foodRequestDto) {
         Long foodId = foodService.createFood(foodRequestDto);
         Food food = foodService.findFoodByFoodId(foodId);
         foodService.createFoodAllergy(food, foodRequestDto.getAllergy().toEntity());
@@ -90,17 +110,17 @@ public class FoodController {
 
     @PreAuthorize("hasRole('ADMIN')")
     @PatchMapping("/{food_id}")
-    public ResponseEntity<Long> updateFood(final @RequestBody @Valid FoodRequestDto foodRequestDto, @PathVariable("food_id") Long foodId){
+    @Transactional
+    public ResponseEntity<Long> updateFood(final @RequestBody @Valid FoodRequestDto foodRequestDto, @PathVariable("food_id") Long foodId) {
         Long ret = foodService.updateFood(foodRequestDto, foodId);
+        foodService.updateFoodAllergy(foodId, foodRequestDto.getAllergy().toEntity());
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
     @PreAuthorize("hasRole('ADMIN')")
     @DeleteMapping("/{food_id}")
-    public ResponseEntity<Long> deleteFood(@PathVariable("food_id") Long foodId){
+    public ResponseEntity<Long> deleteFood(@PathVariable("food_id") Long foodId) {
         Long ret = foodService.deleteFood(foodId);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
-
-
 }

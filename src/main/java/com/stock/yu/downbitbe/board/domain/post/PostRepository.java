@@ -28,5 +28,5 @@ public interface PostRepository extends JpaRepository<Post, Long>, PostRepositor
     @Query("update Post set likeCount = likeCount + :symbol where postId = :postId")
     int updateLikeCount(@Param(value = "postId") Long postId, @Param(value = "symbol") Integer symbol);
 
-    List<Post> findAllByUserNickname(String nickname);
+    //Page<Post> findAllByUserNickname(String nickname, Pageable pageable);
 }

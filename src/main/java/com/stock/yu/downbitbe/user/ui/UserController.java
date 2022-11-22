@@ -150,8 +150,10 @@ public class UserController {
     }
 
     @PostMapping("users/mail")
-    public ResponseEntity<Boolean> sendMail(@RequestBody() Map<String, String> requestMap, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+    public ResponseEntity<Boolean> sendMail(@RequestBody() Map<String, String> requestMap) {
         String username = requestMap.get("username");
+
+        User auth = userService.findByUsername(username);
 
         if(auth != null && auth.getUsername().equals(username))
             mailService.sendMail(auth.getUsername(), auth.getNickname());

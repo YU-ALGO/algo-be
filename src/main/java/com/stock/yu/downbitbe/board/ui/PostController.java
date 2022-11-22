@@ -16,7 +16,9 @@ import org.springframework.data.domain.Sort;
 import org.springframework.data.web.PageableDefault;
 import org.springframework.http.*;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
@@ -46,6 +48,12 @@ public class PostController {
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("X-Page-Count", String.valueOf(postListResponse.getTotalPages()));
         return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(postListResponse.stream().collect(Collectors.toList()));
+    }
+
+    @GetMapping("/posts/top")
+    public ResponseEntity<List<PostListResponseDto>> getTopPostList(@RequestParam(value = "size") int size){
+        List<PostListResponseDto> responseDtoList = postService.findTopPosts(size);
+        return ResponseEntity.status(HttpStatus.OK).body(responseDtoList);
     }
 
     @PreAuthorize("isAuthenticated()")
@@ -91,26 +99,39 @@ public class PostController {
     @PreAuthorize("isAuthenticated()")
     @PostMapping("/{board_id}/posts")
     public ResponseEntity<Long> createPost(final @RequestBody @Valid PostCreateRequestDto postCreateRequestDto, @PathVariable("board_id") Long boardId,
-                                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+                                           @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+        if(boardId == 1 && !authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        log.info("title" + postCreateRequestDto.getTitle());
+        log.info("content" + postCreateRequestDto.getContent());
+        UserAuthDto auth = (UserAuthDto) authentication.getPrincipal();
         User user = userService.findByUsername(auth.getUsername());
-
         Long ret = postService.createPost(postCreateRequestDto, boardId, user);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
-    @PreAuthorize("isAuthenticated() and (#auth.username == @postRepository.findPostByPostId(#postId).user.username)")
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{board_id}/posts/{post_id}")
     public ResponseEntity<Long> updatePost(final @RequestBody @Valid PostUpdateRequestDto postUpdateRequestDto, @PathVariable("board_id") Long boardId,
-                                           @PathVariable("post_id") Long postId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+                                           @PathVariable("post_id") Long postId, @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+        if(boardId == 1 && !authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        UserAuthDto auth = (UserAuthDto) authentication.getPrincipal();
         User user = userService.findByUsername(auth.getUsername());
         Long ret = postService.updatePost(postUpdateRequestDto, boardId, postId, user);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
 
-    @PreAuthorize("isAuthenticated() and (#auth.username == @postRepository.findPostByPostId(#postId).user.username)")
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{board_id}/posts/{post_id}")
     public ResponseEntity<Long> deletePost(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId,
-                           @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+                                           @CurrentSecurityContext(expression = "authentication") Authentication authentication) {
+        if(boardId == 1 && !authentication.getAuthorities().contains(new SimpleGrantedAuthority("ROLE_ADMIN"))){
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        }
+        UserAuthDto auth = (UserAuthDto) authentication.getPrincipal();
         User user = userService.findByUsername(auth.getUsername());
         Long ret = postService.deletePost(boardId, postId, user);
         return ResponseEntity.status(HttpStatus.OK).body(ret);

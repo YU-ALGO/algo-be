@@ -15,4 +15,6 @@ import lombok.RequiredArgsConstructor;
 public class UserFoodLikeResponseDto {
     private Long id;
     private String foodName;
+    @JsonProperty("food_image_url")
+    private String foodImageUrl;
 }

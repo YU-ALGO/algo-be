@@ -28,6 +28,11 @@ public class BoardService {
         return board.getBoardName();
     }
 
+    @Transactional(readOnly = true)
+    public Boolean findBoardByBoardName(String boardName){
+        return boardRepository.existsByBoardName(boardName);
+    }
+
     @Transactional
     public Long createBoard(String name) {   //TODO : security admin 확인 필요
         return boardRepository.save(new Board(name)).getBoardId();

@@ -33,4 +33,8 @@ public class UserBlockService {
         userBlockRepository.delete(userBlock);
         return userBlock.getUserBlockId();
     }
+
+    public Boolean existsByBlockUserIdAndUserBlockId(User blockUser, User userBlock) {
+        return userBlockRepository.existsByBlockUserIdAndUserBlockId(blockUser.getUserId(), userBlock.getUserId());
+    }
 }

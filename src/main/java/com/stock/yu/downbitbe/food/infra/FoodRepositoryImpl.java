@@ -7,10 +7,7 @@ import com.querydsl.core.types.dsl.BooleanPath;
 import com.querydsl.core.types.dsl.PathBuilder;
 import com.querydsl.jpa.impl.JPAQuery;
 import com.querydsl.jpa.impl.JPAQueryFactory;
-import com.stock.yu.downbitbe.food.domain.FoodListResponseDto;
-import com.stock.yu.downbitbe.food.domain.FoodRepositoryCustom;
-import com.stock.yu.downbitbe.food.domain.QAllergyInfo;
-import com.stock.yu.downbitbe.food.domain.QFoodAllergyInfo;
+import com.stock.yu.downbitbe.food.domain.*;
 import com.stock.yu.downbitbe.user.domain.profile.UserFoodLikeResponseDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -26,7 +23,10 @@ import java.util.Map;
 
 import static com.stock.yu.downbitbe.food.domain.QFood.food;
 import static com.stock.yu.downbitbe.food.domain.QFoodAllergyInfo.foodAllergyInfo;
+import static com.stock.yu.downbitbe.food.domain.QFoodLike.foodLike;
 import static com.stock.yu.downbitbe.message.domain.QMessage.message;
+import static com.stock.yu.downbitbe.user.domain.user.QUser.user;
+import static com.stock.yu.downbitbe.user.domain.user.QUserAllergyInfo.userAllergyInfo;
 import static org.springframework.util.StringUtils.hasText;
 
 @Repository
@@ -67,13 +67,49 @@ public class FoodRepositoryImpl implements FoodRepositoryCustom {
         return new PageImpl<>(results, pageable, totalSize);
     }
 
+    @Override
+    public List<FoodListResponseDto> findRecommendFoodsByFoodId(List<Long> recommendList) {
 
+        return queryFactory
+                .select(Projections.constructor(FoodListResponseDto.class,
+                        food.foodId,
+                        food.foodImageUrl,
+                        food.foodName,
+                        food.likeCount
+                ))
+                .from(food)
+                .where(food.foodId.in(recommendList))
+                .fetch();
+    }
+
+    @Override
+    public List<FoodListResponseDto> findViewFoodsByFoodId(List<Long> viewList) {
+        return queryFactory
+                .select(Projections.constructor(FoodListResponseDto.class,
+                        food.foodId,
+                        food.foodImageUrl,
+                        food.foodName,
+                        food.likeCount
+                ))
+                .from(food)
+                .where(food.foodId.in(viewList))
+                .fetch();
+    }
+
+    @Override
+    public AllergyInfoDto findAllergyDtoByFoodId(Long foodId) {
+        AllergyInfoDto allergyInfoDto = queryFactory
+                .select(Projections.constructor(AllergyInfoDto.class, foodAllergyInfo.allergyInfo))
+                .from(foodAllergyInfo)
+                .where(foodAllergyInfo.foodId.eq(foodId))
+                .fetchFirst();
+
+        return allergyInfoDto;
+    }
 
     BooleanExpression isSearchable(String keyword){
         if(!hasText(keyword))
             return null;
         return food.foodName.contains(keyword);
     }
-
-
 }

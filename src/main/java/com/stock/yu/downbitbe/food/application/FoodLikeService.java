@@ -44,11 +44,6 @@ public class FoodLikeService {
     }
 
     @Transactional(readOnly = true)
-    public List<UserFoodLikeResponseDto> getUserFoodLikeListByNickname(String nickname) {
-        return foodLikeRepository.getUserFoodLikeListByNickname(nickname);
-    }
-
-    @Transactional(readOnly = true)
     public List<Long> getFoodIdListByUsername(String username) {
         return foodLikeRepository.getFoodIdListByUsername(username);
     }

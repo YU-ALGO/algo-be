@@ -43,7 +43,10 @@ public class BoardController {
     @PreAuthorize("hasRole('ADMIN')")
     @PostMapping("")
     public ResponseEntity<Long> createBoard(@RequestBody Map<String, String> boardCreateDto, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
-        Long createBoardId = boardService.createBoard(boardCreateDto.get("name"));
+        String boardName = boardCreateDto.get("name");
+        if(boardName.isBlank() || boardService.findBoardByBoardName(boardName))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        Long createBoardId = boardService.createBoard(boardName);
         if(createBoardId == null){
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-1L); //TODO 에러코드 다시 살펴보기
         }

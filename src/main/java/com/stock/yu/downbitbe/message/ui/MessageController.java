@@ -25,10 +25,7 @@ import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Slf4j
@@ -94,8 +91,13 @@ public class MessageController {
     public ResponseEntity<Long> createMessage(final @RequestBody @Valid MessageCreateRequestDto messageCreateRequestDto,
                                               @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User receiver = userService.findByNickname(messageCreateRequestDto.getReceiverName());
+        log.info("박세붕id=" + receiver.getUsername() + " " + auth.getUsername());
         if(receiver == null)
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-1L);
+        else if(Objects.equals(receiver.getUsername(), auth.getUsername())) {
+            log.info("박세붕park=");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(-2L);
+        }
         User sender = userService.findByUsername(auth.getUsername());
         Long ret = messageService.createMessage(messageCreateRequestDto, receiver, sender);
         return ResponseEntity.status(HttpStatus.OK).body(ret);

@@ -10,6 +10,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.List;
+import java.util.Map;
+
 @Log4j2
 @RequiredArgsConstructor
 @Service
@@ -63,6 +66,25 @@ public class FoodService {
     public Long deleteFood(Long foodId){
         Food food = foodRepository.findById(foodId).orElseThrow(() -> new IllegalArgumentException("식품이 존재하지 않습니다."));
         foodRepository.delete(food);
+        FoodAllergyInfo foodAllergyInfo = foodAllergyRepository.findById(foodId).orElseThrow(() -> new IllegalArgumentException("식품 알레르기 테이블이 존재하지 않습니다."));
+        foodAllergyRepository.delete(foodAllergyInfo);
         return food.getFoodId();
+    }
+
+    @Transactional
+    public Long updateFoodAllergy(Long foodId, AllergyInfo allergyInfo){
+        FoodAllergyInfo foodAllergyInfo = foodAllergyRepository.findById(foodId).orElseThrow(() -> new IllegalArgumentException("식품 알레르기 테이블이 존재하지 않습니다."));
+        return foodAllergyRepository.save(foodAllergyInfo.updateFoodAllergy(allergyInfo)).getFoodId();
+    }
+
+    @Transactional(readOnly = true)
+    public List<FoodListResponseDto> getViewFoodList(List<Long> foodList) {
+        return foodRepository.findViewFoodsByFoodId(foodList);
+    }
+
+    @Transactional(readOnly = true)
+    public Map<String, Boolean> getFoodAllergies(Long foodId){
+        AllergyInfoDto foodAllergyInfo = foodRepository.findAllergyDtoByFoodId(foodId);
+        return foodAllergyInfo.toMap();
     }
 }

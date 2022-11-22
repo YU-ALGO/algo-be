@@ -15,8 +15,10 @@ public class SignupRequestDto {
     @Email
     private String username;
     @NotBlank
-    //@Pattern(regexp = )
+    @Pattern(regexp = "^(?=.*[A-Za-z])(?=.*\\d)(?=.*[~!@#$%^&*()+|=])[A-Za-z\\d~!@#$%^&*()+|=]{8,}$")
     private String password;
+    @NotBlank
+    @Pattern(regexp = "^[ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z]{2,15}$")
     private String nickname;
     private AllergyInfoDto allergyInfoDto;
 }

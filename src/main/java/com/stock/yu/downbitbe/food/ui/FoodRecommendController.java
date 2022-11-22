@@ -3,6 +3,7 @@ package com.stock.yu.downbitbe.food.ui;
 import com.stock.yu.downbitbe.food.application.FoodLikeService;
 import com.stock.yu.downbitbe.food.application.FoodRecommendService;
 import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
+import com.stock.yu.downbitbe.food.domain.FoodListResponseDto;
 import com.stock.yu.downbitbe.user.application.ProfileService;
 import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import lombok.RequiredArgsConstructor;
@@ -47,8 +48,9 @@ public class FoodRecommendController {
         List<Long> recommendList = foodRecommendService.getRecommendedFoodList(likeList, foodList, allergyInfoDto);
         log.info("recommendList : " + recommendList);
 
-        //TODO 식품 반환 추가 필요
 
-        return ResponseEntity.ok(recommendList);
+        List<FoodListResponseDto> recommendListDto = foodRecommendService.getRecommendedFoodListDto(recommendList);
+
+        return ResponseEntity.ok(recommendListDto);
     }
 }
