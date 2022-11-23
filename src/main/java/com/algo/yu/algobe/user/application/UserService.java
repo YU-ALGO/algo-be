@@ -1,8 +1,7 @@
 package com.algo.yu.algobe.user.application;
 
-import com.algo.yu.algobe.user.domain.user.*;
-import com.algo.yu.algobe.food.domain.AllergyInfo;
 import com.algo.yu.algobe.food.domain.AllergyInfoDto;
+import com.algo.yu.algobe.user.domain.user.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -63,20 +62,17 @@ public class UserService {
     }
 
     @Transactional
-    public void passwordChange(UserAuthDto userAuthDTO, PasswordChangeRequestDto passwordChangeRequestDto) {
-        User user = userRepository.findByUsername(userAuthDTO.getUsername());
-        String encodingPassword = passwordEncoder.encode(passwordChangeRequestDto.getPassword());
-        String newEncodingPassword = passwordEncoder.encode(passwordChangeRequestDto.getNewPassword());
+    public void passwordChange(User user, PasswordChangeRequestDto passwordChangeRequestDto) {
 
 
-        if (!user.getPassword().equals(encodingPassword))
+        if (!passwordChangeRequestDto.getIsReset() && !passwordEncoder.matches(passwordChangeRequestDto.getPassword(), user.getPassword()))
             throw new RuntimeException("비밀번호가 틀렸습니다.");
 
         /* 기존 비밀번호와 일치 여부 확인 */
-        if (user.getPassword().equals(newEncodingPassword))
+        if (passwordEncoder.matches(passwordChangeRequestDto.getNewPassword(), user.getPassword()))
             throw new RuntimeException("이전 비밀번호와 일치합니다.");
 
-        user.updatePassword(newEncodingPassword);
+        user.updatePassword(passwordEncoder.encode(passwordChangeRequestDto.getNewPassword()));
         userRepository.save(user);
 
     }
@@ -100,17 +96,15 @@ public class UserService {
     }
 
     @Transactional
-    public void allergyChange(UserAuthDto userAuthDTO, AllergyInfo newAllergyInfo) {
+    public Long allergyChange(UserAuthDto userAuthDTO, AllergyInfoDto newAllergyInfo) {
         User user = userRepository.findByUsername(userAuthDTO.getUsername());
 
         UserAllergyInfo userAllergyInfo = allergyInfoRepository.findByUserId(user.getUserId());
-        userAllergyInfo.updateAllergyInfo(newAllergyInfo);
-
-        allergyInfoRepository.save(userAllergyInfo);
+        return allergyInfoRepository.save(userAllergyInfo.updateAllergyInfo(newAllergyInfo.toEntity())).getUserId();
     }
 
     @Transactional
-    public String profileImageChange(UserAuthDto userAuthDTO, String profileImg){
+    public String profileImageChange(UserAuthDto userAuthDTO, String profileImg) {
         User user = userRepository.findByUsername(userAuthDTO.getUsername());
         user.updateProfileImage(profileImg);
         return userRepository.save(user).getProfileImg();

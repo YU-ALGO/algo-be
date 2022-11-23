@@ -2,6 +2,7 @@ package com.algo.yu.algobe.security.handler;
 
 import com.algo.yu.algobe.security.utils.JWTUtil;
 import com.algo.yu.algobe.security.config.Config;
+import com.algo.yu.algobe.user.application.TokenService;
 import com.algo.yu.algobe.user.application.UserAllergyInfoService;
 import com.algo.yu.algobe.user.domain.user.LoginCookies;
 import com.algo.yu.algobe.user.domain.user.LoginType;
@@ -31,6 +32,7 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
     private final PasswordEncoder passwordEncoder;
     private final JWTUtil jwtUtil;
     private final UserAllergyInfoService allergyInfoService;
+    private final TokenService tokenService;
 
 
     @Override
@@ -54,6 +56,7 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
         try {
             token = jwtUtil.generateToken(userAuth.getUsername(), userAuth.getNickname());
             loginCookies = jwtUtil.setLoginCookies(token, false);
+            tokenService.insertRefreshToken(userAuth.getUsername(), token.getCode().toString());
         } catch (Exception e) {
             throw new RuntimeException(e);
         }

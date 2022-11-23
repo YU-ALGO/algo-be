@@ -1,5 +1,6 @@
 package com.algo.yu.algobe.user.ui;
 
+import com.algo.yu.algobe.food.domain.AllergyInfoDto;
 import com.algo.yu.algobe.security.utils.JWTUtil;
 import com.algo.yu.algobe.user.application.UserAllergyInfoService;
 import com.algo.yu.algobe.user.application.UserService;
@@ -14,6 +15,7 @@ import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.*;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.annotation.CurrentSecurityContext;
@@ -46,8 +48,6 @@ public class UserController {
         log.info("---------start login-------");
         String email = user.getUsername();
         String password = user.getPassword();
-        log.info("username : " + user.getUsername());
-        log.info("password : " + user.getPassword());
 
         UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(email, password);
         log.info("token" + authenticationToken);
@@ -86,7 +86,6 @@ public class UserController {
         log.info("-----------");
         log.info("email : " + email);
         log.info("user_id : " + userId);
-        log.info("password : " + password);
         log.info("-----------");
 
         // 토큰 생성 및 쿠키 설정
@@ -130,6 +129,7 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PostMapping("leave")
     public ResponseEntity<String> leave(@CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth, @RequestBody String password) {
         userService.leave(auth.getUsername(), password);
@@ -189,7 +189,7 @@ public class UserController {
     @PatchMapping("users/password")
     public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequestDto passwordChangeRequestDto, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         /* 비밀번호 변경(로그인 상태) */
-        if(!passwordChangeRequestDto.getIsReset() && auth.getUsername().equals(passwordChangeRequestDto.getUsername()))
+        if(!passwordChangeRequestDto.getIsReset() && !passwordChangeRequestDto.getUsername().equals(auth.getUsername()))
             return ResponseEntity.badRequest().body("요청 아이디 미일치");
 
         User user = userService.findByUsername(passwordChangeRequestDto.getUsername());
@@ -202,14 +202,15 @@ public class UserController {
         if (passwordChangeRequestDto.getIsReset()) {
             if (auth != null)
                 return ResponseEntity.badRequest().body("로그아웃하고 비밀번호 찾기를 시도해주세요");
-            if (!mailService.isValidateUser(auth.getUsername()))
+            if (!mailService.isValidateUser(passwordChangeRequestDto.getUsername()))
                 return ResponseEntity.badRequest().body("인증 시간 초과");
         }
 
-        userService.passwordChange(auth, passwordChangeRequestDto);
+        userService.passwordChange(user, passwordChangeRequestDto);
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("users/nickname")
     public ResponseEntity<String> changeNickname(@RequestBody Map<String, String> map, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         String nickname = map.get("nickname");
@@ -225,6 +226,7 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("users/introduce")
     public ResponseEntity<Void> changeIntroduce(@RequestBody Map<String, String> map, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         String introduce = map.get("introduce");
@@ -234,14 +236,14 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("users/allergies")
-    public ResponseEntity<?> changeAllergy(@RequestBody AllergyInfo allergyInfo, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
-
-        userService.allergyChange(auth, allergyInfo);
-
+    public ResponseEntity<?> changeAllergy(@RequestBody AllergyInfoDto allergyInfoDto, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+        userService.allergyChange(auth, allergyInfoDto);
         return ResponseEntity.ok().build();
     }
 
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("users/profile_images")
     public ResponseEntity<?> updateProfileImage(@RequestBody Map<String, String> profileImageUrl,
                                                                             @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
@@ -249,6 +251,8 @@ public class UserController {
         userService.profileImageChange(auth, imageUrl);
         return ResponseEntity.ok().build();
     }
+
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("users/allergies")
     public ResponseEntity<Map<String, Boolean>> getUserAllergyInfo(@Parameter(hidden = true) @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         return ResponseEntity.ok(userAllergyInfoService.findUserAllergyInfoByUser(auth));

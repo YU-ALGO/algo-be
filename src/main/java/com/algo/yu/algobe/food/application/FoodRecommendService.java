@@ -62,7 +62,7 @@ public class FoodRecommendService {
     }
 
     public List<FoodListResponseDto> getRecommendedFoodListDto(List<Long> recommendedFoodList){
-        return foodRepository.findRecommendFoodsByFoodId(recommendedFoodList);
+        return foodRepository.findViewFoodsByFoodId(recommendedFoodList);
     }
 
 }

@@ -2,6 +2,7 @@ package com.algo.yu.algobe.food.application;
 
 import com.algo.yu.algobe.food.domain.*;
 import com.algo.yu.algobe.food.utils.AllergyUtils;
+import com.algo.yu.algobe.user.domain.user.UserAuthDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -21,8 +22,14 @@ public class FoodService {
     private final FoodAllergyInfoRepository foodAllergyRepository;
 
     @Transactional(readOnly = true)
-    public Page<FoodListResponseDto> findAllFoods(AllergyInfoDto allergyInfo, Pageable pageable, String keyword){
-        return foodRepository.findAllFoodsBy(allergyInfo.toTrueMap(), pageable, keyword);
+    public Page<FoodListResponseDto> findAllFoods(AllergyInfoDto allergyInfo, Pageable pageable, String keyword, String username){
+        Page<FoodListResponseDto> responseFoodList =  foodRepository.findAllFoodsBy(allergyInfo.toTrueMap(), pageable, keyword);
+
+        for (FoodListResponseDto dto : responseFoodList) {
+            dto.setIsLike(foodLikeRepository.existsByFood_FoodIdAndUser_Username(dto.getId(), username));
+        }
+
+        return responseFoodList;
     }
 
     @Transactional(readOnly = true)
@@ -77,8 +84,13 @@ public class FoodService {
     }
 
     @Transactional(readOnly = true)
-    public List<FoodListResponseDto> getViewFoodList(List<Long> foodList) {
-        return foodRepository.findViewFoodsByFoodId(foodList);
+    public List<FoodListResponseDto> getViewFoodList(List<Long> foodList, String username) {
+        List<FoodListResponseDto> responseFoodList = foodRepository.findViewFoodsByFoodId(foodList);
+        for (FoodListResponseDto dto : responseFoodList) {
+            dto.setIsLike(foodLikeRepository.existsByFood_FoodIdAndUser_Username(dto.getId(), username));
+        }
+
+        return responseFoodList;
     }
 
     @Transactional(readOnly = true)

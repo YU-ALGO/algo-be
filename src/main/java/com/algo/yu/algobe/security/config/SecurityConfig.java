@@ -93,7 +93,7 @@ public class SecurityConfig {
                 //.addFilter(new JwtAuthorizationFilter(authenticationManager, , jwtUtil()));
         //           .addFilterBefore(new JwtAuthorizationFilter(authenticationManager, userRepository), UsernamePasswordAuthenticationFilter.class);
 
-        http.addFilterBefore(new JwtAuthorizationFilter(authenticationManager, customUserDetailsService, jwtUtil(), tokenService), UsernamePasswordAuthenticationFilter.class);
+        http.addFilterBefore(new JwtAuthorizationFilter(authenticationManager, customUserDetailsService, jwtUtil()), UsernamePasswordAuthenticationFilter.class);
 
         http.authorizeRequests()
                 .antMatchers("/sample/all", "/login", "/logout", "/api/v1/token/validate", "/api/v1/boards/").permitAll()
@@ -184,7 +184,7 @@ public class SecurityConfig {
 
     @Bean
     public UserLoginSuccessHandler successHandler() {
-        return new UserLoginSuccessHandler(passwordEncoder(), jwtUtil(), allergyInfoService);
+        return new UserLoginSuccessHandler(passwordEncoder(), jwtUtil(), allergyInfoService, tokenService);
     }
 
     @Bean

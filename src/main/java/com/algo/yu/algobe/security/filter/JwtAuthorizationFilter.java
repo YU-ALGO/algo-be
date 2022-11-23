@@ -26,14 +26,12 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
     //private final CustomUserRepository userRepository;
     private final CustomUserDetailsService userDetailsService;
     private final JWTUtil jwtUtil;
-    private final TokenService tokenService;
 
 
-    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, JWTUtil jwtUtil, TokenService tokenService) {
+    public JwtAuthorizationFilter(AuthenticationManager authenticationManager, CustomUserDetailsService userDetailsService, JWTUtil jwtUtil) {
         super(authenticationManager);
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
-        this.tokenService = tokenService;
     }
 
     @Override

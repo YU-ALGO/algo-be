@@ -46,4 +46,9 @@ public class FoodLikeService {
         return foodLikeRepository.getFoodIdListByUsername(username);
     }
 
+    @Transactional(readOnly = true)
+    public Boolean existsByFoodIdAndUsername(Long foodId, String username) {
+        return foodLikeRepository.existsByFood_FoodIdAndUser_Username(foodId, username);
+    }
+
 }

@@ -6,7 +6,6 @@ import com.algo.yu.algobe.security.config.Config;
 import com.algo.yu.algobe.user.application.UserService;
 import com.algo.yu.algobe.user.domain.user.User;
 import com.algo.yu.algobe.user.domain.user.UserAuthDto;
-
 import io.swagger.v3.oas.annotations.responses.ApiResponse;
 import io.swagger.v3.oas.annotations.responses.ApiResponses;
 import lombok.RequiredArgsConstructor;
@@ -44,15 +43,18 @@ public class FoodController {
     private final FoodService foodService;
     private final UserService userService;
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("")
     public ResponseEntity<List<FoodListResponseDto>> getFoodList(@PageableDefault(sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable,
-                                                                 @RequestParam(value = "keyword", required = false) String keyword, AllergyInfoDto allergyFilter) {
-        Page<FoodListResponseDto> foodListResponse = foodService.findAllFoods(allergyFilter, pageable, keyword);
+                                                                 @RequestParam(value = "keyword", required = false) String keyword, AllergyInfoDto allergyFilter,
+                                                                 @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+        Page<FoodListResponseDto> foodListResponse = foodService.findAllFoods(allergyFilter, pageable, keyword, auth.getUsername());
         HttpHeaders responseHeaders = new HttpHeaders();
         responseHeaders.set("X-Page-Count", String.valueOf(foodListResponse.getTotalPages()));
         return ResponseEntity.status(HttpStatus.OK).headers(responseHeaders).body(foodListResponse.stream().collect(Collectors.toList()));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/{food_id}")
     public ResponseEntity<FoodResponseDto> getFood(@PathVariable("food_id") Long foodId,
                                                    @CookieValue("foodList") String viewCookie,
@@ -86,8 +88,10 @@ public class FoodController {
         return ResponseEntity.status(HttpStatus.OK).body(foodService.getFoodAllergies(foodId));
     }
 
+    @PreAuthorize("isAuthenticated()")
     @GetMapping("/viewLists")
-    public ResponseEntity<List<FoodListResponseDto>> getUserViewFood(@CookieValue(value = "foodList", required = false) String foodCookie) {
+    public ResponseEntity<List<FoodListResponseDto>> getUserViewFood(@CookieValue(value = "foodList", required = false) String foodCookie,
+                                                                     @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         List<Long> foodList = new ArrayList<>();
         if (foodCookie != null && !foodCookie.isBlank()) {
             for (String s : foodCookie.replaceAll("[\\[\\]]", "").split("/")) {
@@ -95,7 +99,7 @@ public class FoodController {
             }
         }
 
-        List<FoodListResponseDto> viewListDto = foodService.getViewFoodList(foodList);
+        List<FoodListResponseDto> viewListDto = foodService.getViewFoodList(foodList, auth.getUsername());
         return ResponseEntity.status(HttpStatus.OK).body(viewListDto);
     }
 

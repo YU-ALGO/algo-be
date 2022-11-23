@@ -49,8 +49,12 @@ public class FoodRecommendController {
         log.info("recommendList : " + recommendList);
 
 
-        List<FoodListResponseDto> recommendListDto = foodRecommendService.getRecommendedFoodListDto(recommendList);
+        List<FoodListResponseDto> recommendDtoList = foodRecommendService.getRecommendedFoodListDto(recommendList);
 
-        return ResponseEntity.ok(recommendListDto);
+        for (FoodListResponseDto dto : recommendDtoList) {
+            dto.setIsLike(foodLikeService.existsByFoodIdAndUsername(dto.getId(), auth.getUsername()));
+        }
+
+        return ResponseEntity.ok(recommendDtoList);
     }
 }

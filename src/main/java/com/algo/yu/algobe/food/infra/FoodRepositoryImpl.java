@@ -16,6 +16,8 @@ import java.util.List;
 import java.util.Map;
 
 import static org.springframework.util.StringUtils.hasText;
+import static com.algo.yu.algobe.food.domain.QFood.food;
+import static com.algo.yu.algobe.food.domain.QFoodAllergyInfo.foodAllergyInfo;
 
 @Repository
 @RequiredArgsConstructor
@@ -27,13 +29,13 @@ public class FoodRepositoryImpl implements FoodRepositoryCustom {
 
         JPAQuery<FoodListResponseDto> query = queryFactory
                 .select(Projections.constructor(FoodListResponseDto.class,
-                        QFood.food.foodId,
-                        QFood.food.foodImageUrl,
-                        QFood.food.foodName,
-                        QFood.food.likeCount
+                        food.foodId,
+                        food.foodImageUrl,
+                        food.foodName,
+                        food.likeCount
                 ))
-                .from(QFoodAllergyInfo.foodAllergyInfo)
-                .innerJoin(QFoodAllergyInfo.foodAllergyInfo.food, QFood.food)
+                .from(foodAllergyInfo)
+                .innerJoin(foodAllergyInfo.food, food)
                 .where(isSearchable(keyword));
 
         allergyFilter.forEach((key, value) -> {
@@ -56,40 +58,25 @@ public class FoodRepositoryImpl implements FoodRepositoryCustom {
     }
 
     @Override
-    public List<FoodListResponseDto> findRecommendFoodsByFoodId(List<Long> recommendList) {
-
-        return queryFactory
-                .select(Projections.constructor(FoodListResponseDto.class,
-                        QFood.food.foodId,
-                        QFood.food.foodImageUrl,
-                        QFood.food.foodName,
-                        QFood.food.likeCount
-                ))
-                .from(QFood.food)
-                .where(QFood.food.foodId.in(recommendList))
-                .fetch();
-    }
-
-    @Override
     public List<FoodListResponseDto> findViewFoodsByFoodId(List<Long> viewList) {
         return queryFactory
                 .select(Projections.constructor(FoodListResponseDto.class,
-                        QFood.food.foodId,
-                        QFood.food.foodImageUrl,
-                        QFood.food.foodName,
-                        QFood.food.likeCount
+                        food.foodId,
+                        food.foodImageUrl,
+                        food.foodName,
+                        food.likeCount
                 ))
-                .from(QFood.food)
-                .where(QFood.food.foodId.in(viewList))
+                .from(food)
+                .where(food.foodId.in(viewList))
                 .fetch();
     }
 
     @Override
     public AllergyInfoDto findAllergyDtoByFoodId(Long foodId) {
         AllergyInfoDto allergyInfoDto = queryFactory
-                .select(Projections.constructor(AllergyInfoDto.class, QFoodAllergyInfo.foodAllergyInfo.allergyInfo))
-                .from(QFoodAllergyInfo.foodAllergyInfo)
-                .where(QFoodAllergyInfo.foodAllergyInfo.foodId.eq(foodId))
+                .select(Projections.constructor(AllergyInfoDto.class, foodAllergyInfo.allergyInfo))
+                .from(foodAllergyInfo)
+                .where(foodAllergyInfo.foodId.eq(foodId))
                 .fetchFirst();
 
         return allergyInfoDto;
@@ -98,6 +85,6 @@ public class FoodRepositoryImpl implements FoodRepositoryCustom {
     BooleanExpression isSearchable(String keyword){
         if(!hasText(keyword))
             return null;
-        return QFood.food.foodName.contains(keyword);
+        return food.foodName.contains(keyword);
     }
 }
