@@ -30,29 +30,27 @@ public class PreSignedURLService {
     }
 
     @Async
-    public String getImageByName(String fileName){
-        String filePath = "post_image/" + fileName;
+    public String getImageByName(String fileName, String path){
+        String filePath = path + fileName;
         if (!amazonS3.doesObjectExist(bucketName, filePath))
             return "File does not exist";
         return generateUrl(filePath, HttpMethod.GET);
     }
 
     @Async
-    public String postImage(String extension, String username) {
+    public String postImage(String extension, String username, String path) {
         int index = username.lastIndexOf('@');
-        String fileName = "post_image/" + username.substring(0, index).toLowerCase() + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")) + extension;
+        String fileName = path + username.substring(0, index).toLowerCase() + LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyyMMddHHmmssSSS")) + extension;
         String url = generateUrl(fileName, HttpMethod.PUT);
         log.info("URL = " + url);
         return url;
     }
 
     @Async
-    public String deleteImage(String fileName, String username) {
-        String filePath = "post_image/" + fileName;
+    public String deleteImage(String fileName, String username, String path) {
+        String filePath = path + fileName;
         if (!amazonS3.doesObjectExist(bucketName, filePath))
             return "File does not exist";
         return generateUrl(fileName, HttpMethod.DELETE);
     }
-
-
 }

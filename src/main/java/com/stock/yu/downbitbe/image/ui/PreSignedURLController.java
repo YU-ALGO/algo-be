@@ -18,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 @Slf4j
 @RequiredArgsConstructor
 @RestController
-@RequestMapping("/api/v1/posts/images")
+@RequestMapping("/api/v1")
 @ApiResponses({
         @ApiResponse(responseCode = "200", description = "OK"),
         @ApiResponse(responseCode = "400", description = "BAD REQUEST"),
@@ -29,18 +29,36 @@ public class PreSignedURLController {
     private final PreSignedURLService preSignedURLService;
 
     @PreAuthorize("isAuthenticated()")
-    @PostMapping("")
-    public ResponseEntity<String> getImageURL(@RequestBody ImageRequestDto imageRequestDto,
+    @PostMapping("/posts/images")
+    public ResponseEntity<String> getPostImageURL(@RequestBody ImageRequestDto imageRequestDto,
                                               @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
+        String filePath = "post_image/";
         if(imageRequestDto.getImageRequestType() == ImageRequestType.GET)
-            return ResponseEntity.status(HttpStatus.OK).body(preSignedURLService.getImageByName(imageRequestDto.getFileName()));
+            return ResponseEntity.status(HttpStatus.OK).body(preSignedURLService.getImageByName(imageRequestDto.getFileName(), filePath));
         else if(imageRequestDto.getImageRequestType() == ImageRequestType.POST) {
             int index = imageRequestDto.getFileName().lastIndexOf('.');
             String extension = imageRequestDto.getFileName().substring(index).toLowerCase();
-            return ResponseEntity.status(HttpStatus.OK).body(preSignedURLService.postImage(extension, auth.getUsername()));
+            return ResponseEntity.status(HttpStatus.OK).body(preSignedURLService.postImage(extension, auth.getUsername(), filePath));
         }
         else if(imageRequestDto.getImageRequestType() == ImageRequestType.DELETE)
-            return ResponseEntity.status(HttpStatus.OK).body(preSignedURLService.deleteImage(imageRequestDto.getFileName(), auth.getUsername()));
+            return ResponseEntity.status(HttpStatus.OK).body(preSignedURLService.deleteImage(imageRequestDto.getFileName(), auth.getUsername(), filePath));
+        else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 접근입니다.");
+    }
+
+    @PreAuthorize("isAuthenticated()")
+    @PostMapping("/profiles/images")
+    public ResponseEntity<String> getProfileImageURL(@RequestBody ImageRequestDto imageRequestDto,
+                                                  @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
+        String filePath = "profile_image/";
+        if(imageRequestDto.getImageRequestType() == ImageRequestType.GET)
+            return ResponseEntity.status(HttpStatus.OK).body(preSignedURLService.getImageByName(imageRequestDto.getFileName(), filePath));
+        else if(imageRequestDto.getImageRequestType() == ImageRequestType.POST) {
+            int index = imageRequestDto.getFileName().lastIndexOf('.');
+            String extension = imageRequestDto.getFileName().substring(index).toLowerCase();
+            return ResponseEntity.status(HttpStatus.OK).body(preSignedURLService.postImage(extension, auth.getUsername(), filePath));
+        }
+        else if(imageRequestDto.getImageRequestType() == ImageRequestType.DELETE)
+            return ResponseEntity.status(HttpStatus.OK).body(preSignedURLService.deleteImage(imageRequestDto.getFileName(), auth.getUsername(), filePath));
         else return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("잘못된 접근입니다.");
     }
 }

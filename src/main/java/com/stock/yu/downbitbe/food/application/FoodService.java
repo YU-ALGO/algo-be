@@ -64,10 +64,10 @@ public class FoodService {
 
     @Transactional
     public Long deleteFood(Long foodId){
-        Food food = foodRepository.findById(foodId).orElseThrow(() -> new IllegalArgumentException("식품이 존재하지 않습니다."));
-        foodRepository.delete(food);
         FoodAllergyInfo foodAllergyInfo = foodAllergyRepository.findById(foodId).orElseThrow(() -> new IllegalArgumentException("식품 알레르기 테이블이 존재하지 않습니다."));
         foodAllergyRepository.delete(foodAllergyInfo);
+        Food food = foodRepository.findById(foodId).orElseThrow(() -> new IllegalArgumentException("식품이 존재하지 않습니다."));
+        foodRepository.delete(food);
         return food.getFoodId();
     }
 
