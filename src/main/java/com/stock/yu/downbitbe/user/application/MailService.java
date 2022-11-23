@@ -8,6 +8,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mail.SimpleMailMessage;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
 
@@ -20,6 +21,7 @@ public class MailService {
     @Autowired
     private JavaMailSender javaMailSender;
 
+    @Transactional
     public void sendMail(String username, String nickname) {
         int code = RandomCodeUtil.createCode();
         SimpleMailMessage msg = new SimpleMailMessage();
@@ -40,12 +42,13 @@ public class MailService {
 
         MailCode mailCode = MailCode.builder()
                 .username(username)
-                //.user(user)
                 .code(code)
+                .isValidate(false)
                 .build();
         mailCodeRepository.save(mailCode);
     }
 
+    @Transactional
     public boolean validateCode(String username, int code) {
         MailCode mailCode = mailCodeRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("인증 기록이 존재하지 않습니다."));
         if(mailCode.getModifiedAt().isAfter(LocalDateTime.now().minusMinutes(5)) && mailCode.getCode() == code) {
@@ -54,5 +57,11 @@ public class MailService {
         }
         else
             return false;
+    }
+
+    @Transactional(readOnly = true)
+    public boolean isValidateUser(String username) {
+        MailCode mailCode = mailCodeRepository.findByUsername(username).orElseThrow(() -> new IllegalArgumentException("없는 회원이거나 인증 기록이 존재하지 않습니다."));
+        return mailCode.getModifiedAt().isAfter(LocalDateTime.now().minusMinutes(5));
     }
 }

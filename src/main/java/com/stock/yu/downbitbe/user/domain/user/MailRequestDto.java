@@ -6,9 +6,8 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public class MailValidateRequestDto {
-    String username;
-    int code;
+public class MailRequestDto {
+    private String username;
     @JsonProperty("is_signup")
-    Boolean isSignup;
+    private Boolean isSignup;
 }

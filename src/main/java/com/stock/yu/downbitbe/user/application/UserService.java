@@ -63,9 +63,14 @@ public class UserService {
     }
 
     @Transactional
-    public void passwordChange(UserAuthDto userAuthDTO, String password) {
+    public void passwordChange(UserAuthDto userAuthDTO, PasswordChangeRequestDto passwordChangeRequestDto) {
         User user = userRepository.findByUsername(userAuthDTO.getUsername());
-        String newEncodingPassword = passwordEncoder.encode(password);
+        String encodingPassword = passwordEncoder.encode(passwordChangeRequestDto.getPassword());
+        String newEncodingPassword = passwordEncoder.encode(passwordChangeRequestDto.getNewPassword());
+
+
+        if (!user.getPassword().equals(encodingPassword))
+            throw new RuntimeException("비밀번호가 틀렸습니다.");
 
         /* 기존 비밀번호와 일치 여부 확인 */
         if (user.getPassword().equals(newEncodingPassword))

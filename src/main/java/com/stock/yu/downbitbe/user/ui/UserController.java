@@ -9,6 +9,7 @@ import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import com.stock.yu.downbitbe.user.application.MailService;
 import com.stock.yu.downbitbe.user.application.UserAllergyInfoService;
 import com.stock.yu.downbitbe.user.application.UserService;
+import com.stock.yu.downbitbe.user.utils.RandomCodeUtil;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -22,6 +23,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
+import javax.validation.Valid;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -119,7 +121,7 @@ public class UserController {
     //TODO 회원가입 완성하기
     @Transactional
     @PostMapping("signup")
-    public ResponseEntity<String> signUp(@RequestBody SignupRequestDto request) {
+    public ResponseEntity<String> signUp(@RequestBody @Valid SignupRequestDto request) {
 
         if (checkUserIdDuplication(request.getUsername()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user_id is duplication.");
@@ -161,23 +163,25 @@ public class UserController {
     }
 
     @PostMapping("users/mail")
-    public ResponseEntity<Boolean> sendMail(@RequestBody() Map<String, String> requestMap) {
-        String username = requestMap.get("username");
+    public ResponseEntity<Boolean> sendMail(@RequestBody @Valid MailRequestDto mailRequestDto) {
 
-        User auth = userService.findByUsername(username);
+        User auth = userService.findByUsername(mailRequestDto.getUsername());
 
-        if(auth != null && auth.getUsername().equals(username))
+        if(mailRequestDto.getIsSignup() && auth == null)
+            mailService.sendMail(mailRequestDto.getUsername(), "신규 사용자");
+        else if(!mailRequestDto.getIsSignup() && mailRequestDto.getUsername().equals(auth.getUsername()))
             mailService.sendMail(auth.getUsername(), auth.getNickname());
-        else
-            mailService.sendMail(username, "신규 사용자");
 
         return ResponseEntity.ok(true);
     }
 
     @PostMapping("users/validate")
-    public ResponseEntity<?> validateCode(@RequestBody MailValidateRequestDto requestValidate, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
-        if (auth != null && !auth.getUsername().equals(requestValidate.getUsername()))
+    public ResponseEntity<?> validateCode(@RequestBody MailValidateRequestDto requestValidate) {
+        if (requestValidate.getIsSignup() && userService.existsByUsername(requestValidate.getUsername()))
             return ResponseEntity.badRequest().body("이미 가입된 사용자입니다.");
+        if (!requestValidate.getIsSignup()) {
+            userService.findByUsername(requestValidate.getUsername());
+        }
         boolean isValidate = mailService.validateCode(requestValidate.getUsername(), requestValidate.getCode());
         if (isValidate)
             return ResponseEntity.ok().build();
@@ -186,13 +190,26 @@ public class UserController {
     }
 
     @PatchMapping("users/password")
-    public ResponseEntity<?> changePassword(@PathVariable("newPassword") String newPassword, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+    public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequestDto passwordChangeRequestDto, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+        /* 비밀번호 변경(로그인 상태) */
+        if(!passwordChangeRequestDto.getIsReset() && auth.getUsername().equals(passwordChangeRequestDto.getUsername()))
+            return ResponseEntity.badRequest().body("요청 아이디 미일치");
+
+        User user = userService.findByUsername(passwordChangeRequestDto.getUsername());
+        if (user == null)
+            return ResponseEntity.badRequest().body("없는 유저입니다");
         /* 로컬 유저 여부 확인 */
-        if (!auth.getLoginType().equals(LoginType.LOCAL))
+        if (!user.getLoginType().equals(LoginType.LOCAL))
             return ResponseEntity.badRequest().body("소셜 회원은 비밀번호를 변경할 수 없습니다");
+        /* 비밀번호 찾기시 */
+        if (passwordChangeRequestDto.getIsReset()) {
+            if (auth != null)
+                return ResponseEntity.badRequest().body("로그아웃하고 비밀번호 찾기를 시도해주세요");
+            if (!mailService.isValidateUser(auth.getUsername()))
+                return ResponseEntity.badRequest().body("인증 시간 초과");
+        }
 
-
-        userService.passwordChange(auth, newPassword);
+        userService.passwordChange(auth, passwordChangeRequestDto);
         return ResponseEntity.ok().build();
     }
 
