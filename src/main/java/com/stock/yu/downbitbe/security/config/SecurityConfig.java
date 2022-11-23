@@ -1,12 +1,11 @@
 package com.stock.yu.downbitbe.security.config;
 
-import com.stock.yu.downbitbe.user.application.TokenService;
+import com.stock.yu.downbitbe.user.application.*;
 import com.stock.yu.downbitbe.user.domain.user.CustomUserRepository;
-import com.stock.yu.downbitbe.user.application.CustomOAuth2UserDetailsService;
-import com.stock.yu.downbitbe.user.application.CustomUserDetailsService;
 import com.stock.yu.downbitbe.security.filter.JwtAuthorizationFilter;
 import com.stock.yu.downbitbe.security.handler.UserLoginSuccessHandler;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
+import com.stock.yu.downbitbe.user.domain.user.UserAllergyInfoRepository;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
@@ -52,6 +51,10 @@ public class SecurityConfig {
 
     @Autowired
     private TokenService tokenService;
+
+    @Autowired
+    private UserAllergyInfoService allergyInfoService;
+
 
     @Bean
     public PasswordEncoder passwordEncoder() {
@@ -178,7 +181,7 @@ public class SecurityConfig {
 
     @Bean
     public UserLoginSuccessHandler successHandler() {
-        return new UserLoginSuccessHandler(passwordEncoder(), jwtUtil());
+        return new UserLoginSuccessHandler(passwordEncoder(), jwtUtil(), allergyInfoService);
     }
 
     @Bean

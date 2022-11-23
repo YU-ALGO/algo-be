@@ -1,10 +1,7 @@
 package com.stock.yu.downbitbe.user.application;
 
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
-import com.stock.yu.downbitbe.user.domain.user.Grade;
-import com.stock.yu.downbitbe.user.domain.user.LoginType;
-import com.stock.yu.downbitbe.user.domain.user.User;
-import com.stock.yu.downbitbe.user.domain.user.CustomUserRepository;
+import com.stock.yu.downbitbe.user.domain.user.*;
+import com.stock.yu.downbitbe.user.utils.RandomCodeUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -22,7 +19,6 @@ import java.util.stream.Collectors;
 
 @Log4j2
 @RequiredArgsConstructor
-@Transactional
 @Service
 public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
 
@@ -30,6 +26,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
     private final PasswordEncoder passwordEncoder;
 
     @Override
+    @Transactional
     public OAuth2User loadUser(OAuth2UserRequest userRequest) throws OAuth2AuthenticationException {
         log.info("----------------");
         log.info("userRequest: " + userRequest); // org.springframework.security.oauth2.client.userinfo.OAuth2UserRequest 객체
@@ -49,6 +46,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         String email = null;
         String nickname = null;
         LoginType type = null;
+        String profileImgUrl = null;
 
         Map<String, Object> attributes = oAuth2User.getAttributes();
 
@@ -57,6 +55,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
             case "Google":
                 email = oAuth2User.getAttribute("email");
                 type = LoginType.GOOGLE;
+                profileImgUrl = oAuth2User.getAttribute("picture");
                 break;
             case "Naver": {
                 Map<String, Object> response = (Map<String, Object>) oAuth2User.getAttributes().get("response");
@@ -64,6 +63,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
                 email = (String) response.get("email");
                 nickname = (String) response.get("nickname");
                 type = LoginType.NAVER;
+                profileImgUrl = (String) response.get("profile_image");
                 break;
             }
             case "Kakao": {
@@ -72,13 +72,23 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
                 email = (String) response.get("email");
                 nickname = (String) ((Map<String, Object>) response.get("profile")).get("nickname");
                 type = LoginType.KAKAO;
+                profileImgUrl = (String) response.get("profile_image");
                 break;
             }
         }
         log.info("EMAIL: " + email);
-        User user = saveSocialMember(email, nickname, type);
 
-        //return oAuth2User;
+        while (existsByNickname(nickname))
+            nickname = clientName + RandomCodeUtil.createCode();
+
+
+        User user = saveSocialMember(email+clientName, nickname, type, profileImgUrl);
+
+
+        //User newUser = repository.findByUsername(user.getUsername());
+        //log.info("newUser : " + newUser);
+        //saveUserAllergyInfo(newUser);
+
 
         UserAuthDto userAuth = new UserAuthDto(
                 user.getUsername(),
@@ -94,7 +104,8 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
     }
 
     // for google login
-    private User saveSocialMember(String email, LoginType type) {
+    @Transactional
+    public User saveSocialMember(String email, LoginType type, String profileImage) {
 
         Optional<User> result = repository.findByUsernameAndLoginType(email, type);
 
@@ -102,24 +113,29 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
             return result.get();
         }
 
+        String nickname = "google" + RandomCodeUtil.createCode();
+        while (existsByNickname(nickname))
+            nickname = "google" + RandomCodeUtil.createCode();
+
         User user = User.builder()
                 .username(email)
-                .nickname(email)    //TODO 임시 닉네임 : email
+                .nickname(nickname)    //TODO 임시 닉네임 : email
                 .password( passwordEncoder.encode("1111")) //TODO 임시 비밀번호 : 1111
                 .loginType(type)
+                .profileImg(profileImage)
                 .build();
 
         user.addGrade(Grade.USER);
-        repository.save(user);
 
         return user;
     }
 
     // for kakao, naver login
-    private User saveSocialMember(String email, String nickname, LoginType type) {
+    @Transactional
+    public User saveSocialMember(String email, String nickname, LoginType type, String profileImage) {
 
         if (type.equals(LoginType.GOOGLE))
-            return saveSocialMember(email, type);
+            return saveSocialMember(email, type, profileImage);
 
         Optional<User> result = repository.findByUsernameAndLoginType(email, type);
 
@@ -132,10 +148,11 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
                 .nickname(nickname)
                 .password( passwordEncoder.encode("1111")) //TODO 임시 비밀번호 : 1111
                 .loginType(type)
+                .profileImg(profileImage)
                 .build();
 
         user.addGrade(Grade.USER);
-        repository.save(user);
+        repository.saveAndFlush(user);
 
         return user;
     }
@@ -154,5 +171,9 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
             throw new IllegalStateException("회원 시스템에 등록된 계정입니다");
     }
 
+    @Transactional(readOnly = true)
+    public Boolean existsByNickname(String nickname) {
+        return repository.existsByNickname(nickname);
+    }
 
 }

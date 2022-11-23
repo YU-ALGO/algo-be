@@ -2,10 +2,10 @@ package com.stock.yu.downbitbe.security.handler;
 
 import com.stock.yu.downbitbe.security.config.Config;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
-import com.stock.yu.downbitbe.user.domain.user.LoginCookies;
-import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
-import com.stock.yu.downbitbe.user.domain.user.LoginType;
-import com.stock.yu.downbitbe.user.domain.user.Token;
+import com.stock.yu.downbitbe.user.application.UserAllergyInfoService;
+import com.stock.yu.downbitbe.user.application.UserService;
+import com.stock.yu.downbitbe.user.domain.user.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.Authentication;
@@ -13,6 +13,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.DefaultRedirectStrategy;
 import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
+import org.springframework.stereotype.Component;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
@@ -20,17 +21,15 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Log4j2
+@RequiredArgsConstructor
 public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private RedirectStrategy redirectStrategy = new DefaultRedirectStrategy();
 
     private final PasswordEncoder passwordEncoder;
     private final JWTUtil jwtUtil;
+    private final UserAllergyInfoService allergyInfoService;
 
-    public UserLoginSuccessHandler(PasswordEncoder passwordEncoder, JWTUtil jwtUtil) {
-        this.passwordEncoder = passwordEncoder;
-        this.jwtUtil = jwtUtil;
-    }
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request, HttpServletResponse response, Authentication authentication) throws IOException, ServletException {
@@ -42,9 +41,11 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
         log.info("Need Modify Member? " + isSocial);
         boolean isDefaultPassword = passwordEncoder.matches("1111", userAuth.getPassword());
 
-//        if(isSocial && isDefaultPassword) { // 소셜 로그인이면서 기본 비밀번호 사용시 연결되는 리다이렉트 링크임 -> 이름변경/비밀번호 변경 링크로 연결
-//            redirectStrategy.sendRedirect(request, response, "/member/modify?from=social"); //TODO : Need Fix ( from=social -> 아직 파악 못한 내용)
-//        }
+        if(isSocial) { // 소셜 로그인이면서 기본 비밀번호 사용시 연결되는 리다이렉트 링크임 -> 이름변경/비밀번호 변경 링크로 연결
+            if(!allergyInfoService.existsUserByUserId(userAuth.getUsername())) {
+                allergyInfoService.saveAllergyInfo(userAuth.getUsername());
+            }
+        }
 
         Token token = null;
         LoginCookies loginCookies = null;
@@ -59,6 +60,7 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
         response.addHeader(HttpHeaders.SET_COOKIE, loginCookies.getIsAdminCookie().toString());
         response.addHeader(HttpHeaders.SET_COOKIE, loginCookies.getAccessCookie().toString());
         response.addHeader(HttpHeaders.SET_COOKIE, loginCookies.getViewListCookie().toString());
+        response.addHeader(HttpHeaders.SET_COOKIE, loginCookies.getFoodListCookie().toString());
         response.addHeader(HttpHeaders.SET_COOKIE, loginCookies.getRefreshCookie().toString());
 
         //TODO : 아래로 수정할 것 - 홈으로 갔을 때 특정 헤더를 붙이면 프론트에서

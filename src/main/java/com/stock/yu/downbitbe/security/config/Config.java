@@ -7,7 +7,7 @@ public class Config {
 
     public static String SERVER_DOMAIN = "be.algo.r-e.kr";
     public static String DOMAIN = "algo.r-e.kr";
-    public static String WEB_BASE_URL = "http://web."+DOMAIN+":"+WEB_PORT;
+    public static String WEB_BASE_URL = "http://"+DOMAIN+":"+WEB_PORT;
     //public static String WEB_BASE_URL = "http://be."+DOMAIN+":"+WEB_PORT;
     public static String SERVER_BASE_URL = "http://"+SERVER_DOMAIN+":"+SERVER_PORT;
 

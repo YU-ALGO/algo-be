@@ -84,10 +84,13 @@ public class JwtAuthorizationFilter extends BasicAuthenticationFilter {
                 foodListCookie.setDomain(Config.DOMAIN);
                 response.addCookie(foodListCookie);
 
-            }
 
-            chain.doFilter(request, response);
-            return;
+                token = accessToken;
+            }
+            else {
+                chain.doFilter(request, response);
+                return;
+            }
         }
 
         try {

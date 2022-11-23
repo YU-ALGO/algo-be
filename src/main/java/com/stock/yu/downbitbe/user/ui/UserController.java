@@ -1,14 +1,12 @@
 package com.stock.yu.downbitbe.user.ui;
 
 import com.stock.yu.downbitbe.food.domain.AllergyInfo;
-import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
-import com.stock.yu.downbitbe.user.application.TokenService;
-import com.stock.yu.downbitbe.user.domain.profile.UserProfileDto;
-import com.stock.yu.downbitbe.user.domain.user.*;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import com.stock.yu.downbitbe.user.application.MailService;
+import com.stock.yu.downbitbe.user.application.TokenService;
 import com.stock.yu.downbitbe.user.application.UserAllergyInfoService;
 import com.stock.yu.downbitbe.user.application.UserService;
+import com.stock.yu.downbitbe.user.domain.user.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -23,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -60,6 +57,8 @@ public class UserController {
             log.info("authentication" + authentication);
             auth = (UserAuthDto) authentication.getPrincipal();
             SecurityContextHolder.getContext().setAuthentication(authentication);
+            if (!auth.getLoginType().equals(LoginType.LOCAL))
+                throw new DisabledException("소셜로그인을 이용해주세요");
         } catch (DisabledException | LockedException | BadCredentialsException e) {
             String status;
             if (e.getClass().equals(BadCredentialsException.class)) {
@@ -80,7 +79,7 @@ public class UserController {
 
         String userId = (String) authenticationToken.getPrincipal();
         String nickname = auth.getNickname();
-        Set<Grade> roles = auth.getAuthorities().stream().map(item -> Grade.valueOf(item.getAuthority().replace("ROLE_",""))).collect(Collectors.toSet());
+        Set<Grade> roles = auth.getAuthorities().stream().map(item -> Grade.valueOf(item.getAuthority().replace("ROLE_", ""))).collect(Collectors.toSet());
 
         log.info("-----------");
         log.info("email : " + email);
@@ -105,12 +104,21 @@ public class UserController {
                 .body(new UserInfoResponseDto(auth.getNickname(), email, auth.getLoginType().toString(), roles.contains(Grade.ADMIN)));
     }
 
+    @GetMapping("social")
+    public ResponseEntity<SocialUserResponseDto> getSocialUserInfo(@CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+        return ResponseEntity.ok(SocialUserResponseDto.builder()
+                .nickname(auth.getNickname())
+                .username(auth.getUsername())
+                .build());
+    }
+
+
     //TODO 회원가입 완성하기
     @Transactional
     @PostMapping("signup")
     public ResponseEntity<String> signUp(@RequestBody SignupRequestDto request) {
 
-        if(checkUserIdDuplication(request.getUsername()).getBody().equals("true"))
+        if (checkUserIdDuplication(request.getUsername()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("user_id is duplication.");
         if (checkNicknameDuplication(request.getNickname()).getBody().equals("true"))
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("nickname is duplication.");
@@ -153,7 +161,7 @@ public class UserController {
     public ResponseEntity<Boolean> sendMail(@RequestBody() Map<String, String> requestMap, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         String username = requestMap.get("username");
 
-        if(auth != null && auth.getUsername().equals(username))
+        if (auth != null && auth.getUsername().equals(username))
             mailService.sendMail(auth.getUsername(), auth.getNickname());
         else
             mailService.sendMail(username, "신규 사용자");
@@ -175,9 +183,8 @@ public class UserController {
     @PatchMapping("users/password")
     public ResponseEntity<?> changePassword(@PathVariable("newPassword") String newPassword, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         /* 로컬 유저 여부 확인 */
-        if(!auth.getLoginType().equals(LoginType.LOCAL))
+        if (!auth.getLoginType().equals(LoginType.LOCAL))
             return ResponseEntity.badRequest().body("소셜 회원은 비밀번호를 변경할 수 없습니다");
-
 
 
         userService.passwordChange(auth, newPassword);
@@ -190,9 +197,9 @@ public class UserController {
 
         nickname = nickname.trim();
         /* 기존 닉네임과 일치 여부 확인 */
-        if(auth.getNickname().equals(nickname))
+        if (auth.getNickname().equals(nickname))
             return ResponseEntity.badRequest().body("기존 닉네임 입니다");
-        if(userService.existsByNickname(nickname))
+        if (userService.existsByNickname(nickname))
             return ResponseEntity.badRequest().body("이미 존재하는 닉네임 입니다");
 
         userService.nicknameChange(auth, nickname);
