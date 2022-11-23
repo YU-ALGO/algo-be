@@ -8,6 +8,7 @@ import com.stock.yu.downbitbe.user.domain.profile.ProfileCommentDto;
 import com.stock.yu.downbitbe.user.domain.profile.ProfilePostDto;
 import com.stock.yu.downbitbe.user.domain.profile.UserFoodLikeResponseDto;
 import com.stock.yu.downbitbe.user.domain.profile.UserProfileDto;
+import com.stock.yu.downbitbe.user.domain.user.User;
 import com.stock.yu.downbitbe.user.domain.user.UserAuthDto;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.Parameter;
@@ -27,6 +28,7 @@ import org.springframework.security.core.annotation.CurrentSecurityContext;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Log4j2

@@ -105,6 +105,13 @@ public class UserService {
     }
 
     @Transactional
+    public String profileImageChange(UserAuthDto userAuthDTO, String profileImg){
+        User user = userRepository.findByUsername(userAuthDTO.getUsername());
+        user.updateProfileImage(profileImg);
+        return userRepository.save(user).getProfileImg();
+    }
+
+    @Transactional
     public void leave(String username, String password) {
         User user = userRepository.findByUsername(username);
         if (passwordEncoder.encode(password).equals(user.getPassword()))
