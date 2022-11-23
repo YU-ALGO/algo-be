@@ -24,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
+import static com.algo.yu.algobe.board.domain.board.QBoard.board;
 import static com.algo.yu.algobe.board.domain.post.QPost.post;
 import static org.springframework.util.StringUtils.hasText;
 
@@ -53,13 +54,14 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         post.postId,
                         post.title,
                         post.user.nickname.as("author"),
+                        post.board.boardId,
                         post.likeCount,
                         post.commentCount,
                         post.viewCount,
                         post.createdAt
                 ))
                 .from(post)
-                .innerJoin(post.board, QBoard.board)
+                .innerJoin(post.board, board)
                 .where(post.board.boardId.eq(boardId),
                         isSearchable(keyword, searchType))
                 .orderBy(getOrderSpecifier(pageable.getSort()).toArray(OrderSpecifier[]::new))
@@ -83,14 +85,16 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         post.postId,
                         post.title,
                         post.user.nickname.as("author"),
+                        post.board.boardId,
                         post.likeCount,
                         post.commentCount,
                         post.viewCount,
                         post.createdAt
                 ))
                 .from(post)
-                .innerJoin(post.board, QBoard.board)
-                .where(post.createdAt.between(start, now))
+                .innerJoin(post.board, board)
+                .where(post.createdAt.between(start, now)
+                        .and(post.board.boardId.ne(1L)))
                 .orderBy(post.likeCount.desc(), post.viewCount.desc())
                 .limit(size)
                 .fetch();
@@ -108,7 +112,7 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                         post.createdAt
                 ))
                 .from(post)
-                .innerJoin(post.board, QBoard.board)
+                .innerJoin(post.board, board)
                 .where(post.user.nickname.eq(nickname))
                 .orderBy(post.createdAt.desc())
                 .offset(pageable.getOffset())

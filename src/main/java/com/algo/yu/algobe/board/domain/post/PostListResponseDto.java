@@ -15,6 +15,8 @@ public class PostListResponseDto {
     private Long id;
     private String title;
     private String author;
+
+    private Long boardId;
     @JsonProperty("like_count")
     private Integer likeCount;
 
@@ -28,10 +30,11 @@ public class PostListResponseDto {
     private LocalDateTime createdAt;
 
     @QueryProjection
-    public PostListResponseDto(Long postId, String title, String author, Integer likeCount, Integer commentCount, Long viewCount, LocalDateTime createdAt) {
+    public PostListResponseDto(Long postId, String title, String author, Long boardId, Integer likeCount, Integer commentCount, Long viewCount, LocalDateTime createdAt) {
         this.id = postId;
         this.title = title;
         this.author = author;
+        this.boardId = boardId;
         this.likeCount = likeCount;
         this.commentCount = commentCount;
         this.viewCount = viewCount;
