@@ -1,6 +1,5 @@
 package com.stock.yu.downbitbe.board.infra;
 
-import com.querydsl.core.BooleanBuilder;
 import com.querydsl.core.types.Order;
 import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
@@ -11,6 +10,7 @@ import com.stock.yu.downbitbe.board.domain.post.Post;
 import com.stock.yu.downbitbe.board.domain.post.PostListResponseDto;
 import com.stock.yu.downbitbe.board.domain.post.PostRepositoryCustom;
 import com.stock.yu.downbitbe.board.domain.post.PostSearchType;
+import com.stock.yu.downbitbe.user.domain.profile.ProfilePostDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.data.domain.Page;
@@ -19,8 +19,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.EntityManager;
-
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -72,6 +71,53 @@ public class PostRepositoryImpl implements PostRepositoryCustom {
                 .selectFrom(post)
                 .where(post.board.boardId.eq(boardId),
                         isSearchable(keyword, searchType))
+                .fetch().size();
+
+        return new PageImpl<>(results, pageable, totalSize);
+    }
+
+    @Override
+    public List<PostListResponseDto> findTopPosts(int size, LocalDateTime start, LocalDateTime now) {
+        List<PostListResponseDto> results = queryFactory
+                .select(Projections.constructor(PostListResponseDto.class,
+                        post.postId,
+                        post.title,
+                        post.user.nickname.as("author"),
+                        post.likeCount,
+                        post.commentCount,
+                        post.viewCount,
+                        post.createdAt
+                ))
+                .from(post)
+                .innerJoin(post.board, board)
+                .where(post.createdAt.between(start, now))
+                .orderBy(post.likeCount.desc(), post.viewCount.desc())
+                .limit(size)
+                .fetch();
+
+        return results;
+    }
+
+    @Override
+    public Page<ProfilePostDto> findAllByUserNickname(String nickname, Pageable pageable) {
+        List<ProfilePostDto> results = queryFactory
+                .select(Projections.constructor(ProfilePostDto.class,
+                        post.board.boardId,
+                        post.postId,
+                        post.title,
+                        post.createdAt
+                ))
+                .from(post)
+                .innerJoin(post.board, board)
+                .where(post.user.nickname.eq(nickname))
+                .orderBy(post.createdAt.desc())
+                .offset(pageable.getOffset())
+                .limit(pageable.getPageSize())
+                .fetch();
+
+        int totalSize = queryFactory
+                .selectFrom(post)
+                .where(post.user.nickname.eq(nickname))
                 .fetch().size();
 
         return new PageImpl<>(results, pageable, totalSize);

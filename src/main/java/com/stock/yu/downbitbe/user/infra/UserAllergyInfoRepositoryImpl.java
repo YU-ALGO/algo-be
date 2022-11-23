@@ -34,19 +34,6 @@ public class UserAllergyInfoRepositoryImpl implements UserAllergyInfoRepositoryC
 
     @Override
     public AllergyInfoDto findAllergyDtoByUserId(Long userId) {
-/*        //JPAQuery<AllergyInfoDto> query = (JPAQuery<AllergyInfoDto>) queryFactory.query();
-        List<Expression<?>> list = new ArrayList<>();
-        Class<Boolean>[] classes = new Class[AllergyInfoDto.class.getDeclaredFields().length];
-        Arrays.fill(classes, Boolean.class);
-        PathBuilder<QAllergyInfo> entityPath = new
-                PathBuilder<>(QAllergyInfo.class, "userAllergyInfo.allergyInfo");
-        for (Field field : AllergyInfoDto.class.getDeclaredFields()) {
-            //query.select(entityPath.getBoolean(field.getName()));
-            list.add(entityPath.getBoolean(field.getName()));
-        }*/
-
-        //JPAQuery<AllergyInfoDto> query = queryFactory.select(Projections.constructor(AllergyInfoDto.class, classes, list));
-
         AllergyInfoDto allergyInfoDto = queryFactory
                 .select(Projections.constructor(AllergyInfoDto.class, userAllergyInfo.allergyInfo))
                .from(userAllergyInfo)

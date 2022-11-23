@@ -61,7 +61,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(true);
     }
 
-    @PreAuthorize("isAuthenticated() and (#auth.username == @commentRepository.findCommentByCommentId(#commentId).user.username)")
+    @PreAuthorize("isAuthenticated()")
     @PatchMapping("/{board_id}/posts/{post_id}/comments/{comment_id}")
     public ResponseEntity<?> updateComment(final @RequestBody @Valid CommentUpdateRequestDto commentUpdateRequestDto, @PathVariable("board_id") Long boardId,
                                            @PathVariable("post_id") Long postId, @PathVariable("comment_id") Long commentId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
@@ -73,7 +73,7 @@ public class CommentController {
         return ResponseEntity.status(HttpStatus.OK).body(true);
     }
 
-    @PreAuthorize("isAuthenticated() and (#auth.username == @commentRepository.findCommentByCommentId(#commentId).user.username)")
+    @PreAuthorize("isAuthenticated()")
     @DeleteMapping("/{board_id}/posts/{post_id}/comments/{comment_id}")
     public ResponseEntity<?> deleteComment(@PathVariable("board_id") Long boardId, @PathVariable("post_id") Long postId, @PathVariable("comment_id") Long commentId, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());

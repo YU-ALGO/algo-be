@@ -1,12 +1,14 @@
 package com.stock.yu.downbitbe.user.ui;
 
 import com.stock.yu.downbitbe.food.domain.AllergyInfo;
+import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
+import com.stock.yu.downbitbe.user.application.TokenService;
+import com.stock.yu.downbitbe.user.domain.profile.UserProfileDto;
+import com.stock.yu.downbitbe.user.domain.user.*;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
 import com.stock.yu.downbitbe.user.application.MailService;
-import com.stock.yu.downbitbe.user.application.TokenService;
 import com.stock.yu.downbitbe.user.application.UserAllergyInfoService;
 import com.stock.yu.downbitbe.user.application.UserService;
-import com.stock.yu.downbitbe.user.domain.user.*;
 import io.swagger.v3.oas.annotations.Parameter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -21,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -158,10 +161,12 @@ public class UserController {
     }
 
     @PostMapping("users/mail")
-    public ResponseEntity<Boolean> sendMail(@RequestBody() Map<String, String> requestMap, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+    public ResponseEntity<Boolean> sendMail(@RequestBody() Map<String, String> requestMap) {
         String username = requestMap.get("username");
 
-        if (auth != null && auth.getUsername().equals(username))
+        User auth = userService.findByUsername(username);
+
+        if(auth != null && auth.getUsername().equals(username))
             mailService.sendMail(auth.getUsername(), auth.getNickname());
         else
             mailService.sendMail(username, "신규 사용자");

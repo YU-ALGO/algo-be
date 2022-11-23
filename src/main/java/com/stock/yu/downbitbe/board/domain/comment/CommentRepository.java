@@ -1,5 +1,6 @@
 package com.stock.yu.downbitbe.board.domain.comment;
 
+import com.stock.yu.downbitbe.user.domain.profile.ProfileCommentDto;
 import com.stock.yu.downbitbe.user.domain.user.User;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -10,7 +11,7 @@ import org.springframework.data.repository.query.Param;
 
 import java.util.List;
 
-public interface CommentRepository extends JpaRepository<Comment, Long> {
+public interface CommentRepository extends JpaRepository<Comment, Long>, CommentRepositoryCustom{
     @Query("select m from Comment m where m.post.postId = :postId order by COALESCE(m.parent, m.commentId), m.commentId")
     Page<Comment> findAllByPostPostId(@Param(value = "postId") Long postId, Pageable pageable);
 
@@ -30,6 +31,4 @@ public interface CommentRepository extends JpaRepository<Comment, Long> {
     @Modifying(clearAutomatically = true)
     @Query("delete from Comment c where c.parent = :id or c.commentId = :id")
     int deleteCommentsByCommentIdAndParent(@Param(value = "id")Long parent);
-
-    List<Comment> findAllByUserNickname(String nickname);
 }

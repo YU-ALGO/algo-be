@@ -1,7 +1,9 @@
 package com.stock.yu.downbitbe.food.application;
 
 import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
+import com.stock.yu.downbitbe.food.domain.FoodListResponseDto;
 import com.stock.yu.downbitbe.food.domain.FoodRecommendIdListDto;
+import com.stock.yu.downbitbe.food.domain.FoodRepository;
 import com.stock.yu.downbitbe.security.config.Config;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -20,6 +22,7 @@ import java.util.Map;
 @Service
 @RequiredArgsConstructor
 public class FoodRecommendService {
+    private final FoodRepository foodRepository;
 
     public List<Long> getRecommendedFoodList(List<Long> likeList, List<Long> viewList, AllergyInfoDto allergyInfoDto) {
         HttpComponentsClientHttpRequestFactory clientHttpRequestFactory = new HttpComponentsClientHttpRequestFactory();
@@ -56,6 +59,10 @@ public class FoodRecommendService {
         ResponseEntity<FoodRecommendIdListDto> responseEntity = restTemplate.exchange(uriBuilder.toString(), HttpMethod.GET, entity, FoodRecommendIdListDto.class);
 
        return responseEntity.getBody().getRecommendList();
+    }
+
+    public List<FoodListResponseDto> getRecommendedFoodListDto(List<Long> recommendedFoodList){
+        return foodRepository.findRecommendFoodsByFoodId(recommendedFoodList);
     }
 
 }

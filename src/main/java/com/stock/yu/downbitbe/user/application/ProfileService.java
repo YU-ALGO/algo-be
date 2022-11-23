@@ -5,11 +5,15 @@ import com.stock.yu.downbitbe.board.domain.comment.CommentRepository;
 import com.stock.yu.downbitbe.board.domain.post.Post;
 import com.stock.yu.downbitbe.board.domain.post.PostRepository;
 import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
+import com.stock.yu.downbitbe.food.domain.FoodLikeRepository;
 import com.stock.yu.downbitbe.user.domain.profile.ProfileCommentDto;
 import com.stock.yu.downbitbe.user.domain.profile.ProfilePostDto;
+import com.stock.yu.downbitbe.user.domain.profile.UserFoodLikeResponseDto;
 import com.stock.yu.downbitbe.user.domain.profile.UserProfileDto;
 import com.stock.yu.downbitbe.user.domain.user.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -24,7 +28,7 @@ public class ProfileService {
     private final UserAllergyInfoRepository userAllergyInfoRepository;
     private final CommentRepository commentRepository;
     private final PostRepository postRepository;
-
+    private final FoodLikeRepository foodLikeRepository;
     @Transactional(readOnly = true)
     public UserProfileDto getUserProfileByNickname(String nickname, boolean isAuthor) {
         User user = userRepository.findByNickname(nickname);
@@ -34,27 +38,24 @@ public class ProfileService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProfileCommentDto> getUserCommentsByNickname(String nickname) {
-        List<Comment> commentList = commentRepository.findAllByUserNickname(nickname);
-
-        return commentList.stream().map(comment ->
-                new ProfileCommentDto(comment, comment.getPost().getBoard().getBoardId(), comment.getPost().getPostId())).
-                collect(Collectors.toList());
+    public Page<ProfileCommentDto> getUserCommentsByNickname(String nickname, Pageable pageable) {
+        return commentRepository.findAllByUserNickname(nickname, pageable);
     }
 
     @Transactional(readOnly = true)
-    public List<ProfilePostDto> getUserPostsByNickname(String nickname) {
-        List<Post> commentList = postRepository.findAllByUserNickname(nickname);
-
-        return commentList.stream().map(post ->
-                        new ProfilePostDto(post, post.getBoard().getBoardId(), post.getPostId())).
-                collect(Collectors.toList());
+    public Page<ProfilePostDto> getUserPostsByNickname(String nickname, Pageable pageable) {
+        return postRepository.findAllByUserNickname(nickname, pageable);
     }
 
     @Transactional(readOnly = true)
     public AllergyInfoDto getUserAllergyByNickname(String nickname) {
         User user = userRepository.findByNickname(nickname);
         return userAllergyInfoRepository.findAllergyDtoByUserId(user.getUserId());
+    }
+
+    @Transactional(readOnly = true)
+    public Page<UserFoodLikeResponseDto> getUserFoodLikeListByNickname(String nickname, Pageable pageable) {
+        return foodLikeRepository.getUserFoodLikeListByNickname(nickname, pageable);
     }
 
 }

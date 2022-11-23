@@ -49,7 +49,12 @@ public class UserBlockController {
     @PostMapping("")
     public ResponseEntity<Long> createUserBlock(@RequestBody Map<String, String> UserBlockCreateRequestDto, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth){
         User user = userService.findByUsername(auth.getUsername());
-        User userBlock = userService.findByNickname(UserBlockCreateRequestDto.get("blockUserName"));
+        String blockNickname = UserBlockCreateRequestDto.get("blockUserName");
+        if(user.getNickname().equals(blockNickname))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        User userBlock = userService.findByNickname(blockNickname);
+        if(userBlockService.existsByBlockUserIdAndUserBlockId(user, userBlock))
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         Long ret = userBlockService.createUserBlock(user, userBlock);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
