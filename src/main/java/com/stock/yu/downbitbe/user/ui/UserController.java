@@ -3,6 +3,7 @@ package com.stock.yu.downbitbe.user.ui;
 import com.stock.yu.downbitbe.food.domain.AllergyInfo;
 import com.stock.yu.downbitbe.food.domain.AllergyInfoDto;
 import com.stock.yu.downbitbe.user.application.TokenService;
+import com.stock.yu.downbitbe.user.domain.profile.UserFoodLikeResponseDto;
 import com.stock.yu.downbitbe.user.domain.profile.UserProfileDto;
 import com.stock.yu.downbitbe.user.domain.user.*;
 import com.stock.yu.downbitbe.security.utils.JWTUtil;
@@ -24,6 +25,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.validation.Valid;
+import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.Set;
@@ -245,6 +247,13 @@ public class UserController {
         return ResponseEntity.ok().build();
     }
 
+    @PatchMapping("users/profile_images")
+    public ResponseEntity<?> updateProfileImage(@RequestBody Map<String, String> profileImageUrl,
+                                                                            @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
+        String imageUrl = profileImageUrl.get("profileImageUrl");
+        userService.profileImageChange(auth, imageUrl);
+        return ResponseEntity.ok().build();
+    }
     @GetMapping("users/allergies")
     public ResponseEntity<Map<String, Boolean>> getUserAllergyInfo(@Parameter(hidden = true) @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         return ResponseEntity.ok(userAllergyInfoService.findUserAllergyInfoByUser(auth));

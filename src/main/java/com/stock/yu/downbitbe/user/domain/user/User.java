@@ -94,4 +94,10 @@ public class User extends BaseTimeEntity {
         return this;
     }
 
+    public User updateProfileImage(String profileImageUrl){
+       if(profileImageUrl != null)
+           this.profileImg = profileImageUrl;
+       return this;
+    }
+
 }
