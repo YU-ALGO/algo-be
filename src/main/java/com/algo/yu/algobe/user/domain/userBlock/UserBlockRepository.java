@@ -6,5 +6,6 @@ import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface UserBlockRepository extends JpaRepository<UserBlock, Long> {
     Page<UserBlock> findAllByUserId_UserId(Pageable pageable, Long userId);
-    Boolean existsByBlockUserIdAndUserBlockId(Long blockUserId, Long userBlockId);
+    Boolean existsByBlockUserId_UserIdAndUserId_UserId(Long blockUserId, Long userBlockId);
+
 }

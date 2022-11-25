@@ -81,6 +81,8 @@ public class UserService {
     public void nicknameChange(UserAuthDto userAuthDTO, String newNickname) {
         User user = userRepository.findByUsername(userAuthDTO.getUsername());
 
+        if (newNickname == null || newNickname.isBlank())
+            throw new RuntimeException("비밀번호가 비어있습니다");
         user.updateNickname(newNickname);
         userRepository.save(user);
 

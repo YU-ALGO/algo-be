@@ -35,6 +35,6 @@ public class UserBlockService {
     }
 
     public Boolean existsByBlockUserIdAndUserBlockId(User blockUser, User userBlock) {
-        return userBlockRepository.existsByBlockUserIdAndUserBlockId(blockUser.getUserId(), userBlock.getUserId());
+        return userBlockRepository.existsByBlockUserId_UserIdAndUserId_UserId(blockUser.getUserId(), userBlock.getUserId());
     }
 }

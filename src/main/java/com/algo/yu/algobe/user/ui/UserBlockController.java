@@ -51,10 +51,10 @@ public class UserBlockController {
         User user = userService.findByUsername(auth.getUsername());
         String blockNickname = UserBlockCreateRequestDto.get("blockUserName");
         if(user.getNickname().equals(blockNickname))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            throw new RuntimeException("자기 자신을 차단할 수 없습니다.");
         User userBlock = userService.findByNickname(blockNickname);
         if(userBlockService.existsByBlockUserIdAndUserBlockId(user, userBlock))
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            throw new RuntimeException("이미 차단된 사용자입니다.");
         Long ret = userBlockService.createUserBlock(user, userBlock);
         return ResponseEntity.status(HttpStatus.OK).body(ret);
     }
