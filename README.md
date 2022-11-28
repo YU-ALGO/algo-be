@@ -15,11 +15,3 @@ querydsl
 ```
 MySQL Server 8.0 이상의 서버, Spring Boot 2.7.1, IntelliJ IDEA 2020.3.2 이상
 ```
-
-### 모듈 설치
-
-아래의 명령어로 필요한 모듈들을 설치합니다.
-
-```
-npm install
-```
