@@ -190,20 +190,20 @@ public class UserController {
     public ResponseEntity<?> changePassword(@RequestBody PasswordChangeRequestDto passwordChangeRequestDto, @CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth) {
         /* 비밀번호 변경(로그인 상태) */
         if(!passwordChangeRequestDto.getIsReset() && !passwordChangeRequestDto.getUsername().equals(auth.getUsername()))
-            return ResponseEntity.badRequest().body("요청 아이디 미일치");
+            throw new RuntimeException("요청 아이디 미일치");
 
         User user = userService.findByUsername(passwordChangeRequestDto.getUsername());
         if (user == null)
-            return ResponseEntity.badRequest().body("없는 유저입니다");
+            throw new RuntimeException("없는 유저입니다");
         /* 로컬 유저 여부 확인 */
         if (!user.getLoginType().equals(LoginType.LOCAL))
-            return ResponseEntity.badRequest().body("소셜 회원은 비밀번호를 변경할 수 없습니다");
+            throw new RuntimeException("소셜 회원은 비밀번호를 변경할 수 없습니다");
         /* 비밀번호 찾기시 */
         if (passwordChangeRequestDto.getIsReset()) {
             if (auth != null)
-                return ResponseEntity.badRequest().body("로그아웃하고 비밀번호 찾기를 시도해주세요");
+                throw new RuntimeException("로그아웃하고 비밀번호 찾기를 시도해주세요");
             if (!mailService.isValidateUser(passwordChangeRequestDto.getUsername()))
-                return ResponseEntity.badRequest().body("인증 시간 초과");
+                throw new RuntimeException("인증 시간 초과");
         }
 
         userService.passwordChange(user, passwordChangeRequestDto);

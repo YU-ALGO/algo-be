@@ -54,9 +54,9 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
         //TODO : profile 사진 추가하기
         switch (clientName) {
             case "Google":
-                email = oAuth2User.getAttribute("email");
+                email = (String) attributes.get("email");
                 type = LoginType.GOOGLE;
-                profileImgUrl = oAuth2User.getAttribute("picture");
+                profileImgUrl = (String) attributes.get("picture");
                 break;
             case "Naver": {
                 Map<String, Object> response = (Map<String, Object>) oAuth2User.getAttributes().get("response");
@@ -127,6 +127,7 @@ public class CustomOAuth2UserDetailsService extends DefaultOAuth2UserService {
                 .build();
 
         user.addGrade(Grade.USER);
+        repository.saveAndFlush(user);
 
         return user;
     }

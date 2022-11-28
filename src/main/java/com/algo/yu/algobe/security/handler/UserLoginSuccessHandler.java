@@ -43,11 +43,12 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
         UserAuthDto userAuth = (UserAuthDto) authentication.getPrincipal();
         boolean isSocial = !userAuth.getLoginType().equals(LoginType.LOCAL);
         log.info("Need Modify Member? " + isSocial);
-        boolean isDefaultPassword = passwordEncoder.matches("1111", userAuth.getPassword());
+        boolean needFix = false;
 
         if(isSocial) { // 소셜 로그인이면서 기본 비밀번호 사용시 연결되는 리다이렉트 링크임 -> 이름변경/비밀번호 변경 링크로 연결
             if(!allergyInfoService.existsUserByUserId(userAuth.getUsername())) {
                 allergyInfoService.saveAllergyInfo(userAuth.getUsername());
+                needFix = true;
             }
         }
 
@@ -69,7 +70,12 @@ public class UserLoginSuccessHandler implements AuthenticationSuccessHandler {
         response.addHeader(HttpHeaders.SET_COOKIE, loginCookies.getRefreshCookie().toString());
 
         //TODO : 아래로 수정할 것 - 홈으로 갔을 때 특정 헤더를 붙이면 프론트에서
-        response.sendRedirect(Config.WEB_BASE_URL);
+
+        if(needFix) {
+            redirectStrategy.sendRedirect(request, response, Config.WEB_BASE_URL + "/profile/" + userAuth.getNickname());
+        }
+        else
+            response.sendRedirect(Config.WEB_BASE_URL);
         //redirectStrategy.sendRedirect(request, response, Config.WEB_BASE_URL);
     }
 }

@@ -41,6 +41,8 @@ public class BoardService {
     @Transactional
     public Long updateBoard(String name, Long boardId) {
         Board board = boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
+        if(board.getBoardName().equals(name))
+            throw new RuntimeException("이미 존재하는 게시판입니다");
         return boardRepository.save(board.update(name)).getBoardId();
     }
 
