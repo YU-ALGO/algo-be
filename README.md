@@ -3,7 +3,7 @@
 Vue.js와 Python으로 제작한 식품 정보 제공 웹 사이트입니다.
 
 + [ALGO Vue app](https://github.com/YU-ALGO/algo-fe)
-+ [ALGO python Server](https://github.com/AlpCar/solveit0604)
++ [ALGO python Server](https://github.com/YU-ALGO/algo-ai)
 
 ## Getting Started / 어떻게 시작하나요?
 querydsl
