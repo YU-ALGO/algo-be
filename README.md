@@ -13,7 +13,7 @@ querydsl
 아래 사항들이 설치가 되어있어야합니다.
 
 ```
-MySQL Server 8.0 이상의 서버, Spring Boot 2.7.1 
+MySQL Server 8.0 이상의 서버, Spring Boot 2.7.1, IntelliJ IDEA 2020.3.2 이상
 ```
 
 ### 모듈 설치
