@@ -1,6 +1,9 @@
 package com.algo.yu.algobe.food.infra;
 
+import com.algo.yu.algobe.board.domain.post.Post;
 import com.algo.yu.algobe.food.domain.*;
+import com.querydsl.core.types.Order;
+import com.querydsl.core.types.OrderSpecifier;
 import com.querydsl.core.types.Projections;
 import com.querydsl.core.types.dsl.BooleanExpression;
 import com.querydsl.core.types.dsl.PathBuilder;
@@ -10,8 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Repository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -23,6 +28,20 @@ import static com.algo.yu.algobe.food.domain.QFoodAllergyInfo.foodAllergyInfo;
 @RequiredArgsConstructor
 public class FoodRepositoryImpl implements FoodRepositoryCustom {
     private final JPAQueryFactory queryFactory;
+
+    private List<OrderSpecifier> getOrderSpecifier(Sort sort){
+        List<OrderSpecifier> orders = new ArrayList<>();
+
+        sort.stream().forEach(order -> {
+            Order direction = order.isAscending() ? Order.ASC : Order.DESC;
+            String prop = order.getProperty();
+            PathBuilder orderByExpression = new PathBuilder(Food.class, "food");
+            orders.add(new OrderSpecifier(direction, orderByExpression.get(prop)));
+            orders.add(new OrderSpecifier(Order.DESC, food.foodId));
+
+        });
+        return orders;
+    }
 
     @Override
     public Page<FoodListResponseDto> findAllFoodsBy(Map<String, Boolean> allergyFilter, Pageable pageable, String keyword) {
@@ -48,7 +67,9 @@ public class FoodRepositoryImpl implements FoodRepositoryCustom {
         int totalSize = query
                 .fetch().size();
 
-        List<FoodListResponseDto> results = query.offset(pageable.getOffset())
+        List<FoodListResponseDto> results = query
+                .orderBy(getOrderSpecifier(pageable.getSort()).toArray(OrderSpecifier[]::new))
+                .offset(pageable.getOffset())
                 .limit(pageable.getPageSize()).fetch();
 
         //int totalSize = query.fetch().size();
