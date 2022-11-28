@@ -6,7 +6,7 @@ Vue.js와 Python으로 제작한 식품 정보 제공 웹 사이트입니다.
 + [ALGO python Server](https://github.com/YU-ALGO/algo-ai)
 
 ## Getting Started / 어떻게 시작하나요?
-querydsl
+gradle에서 compileQuerydsl을 실행해야합니다.
 
 ### Prerequisites / 선행 조건
 
