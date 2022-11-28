@@ -53,7 +53,7 @@ public class UserBlockController {
         if(user.getNickname().equals(blockNickname))
             throw new RuntimeException("자기 자신을 차단할 수 없습니다.");
         User userBlock = userService.findByNickname(blockNickname);
-        if(userBlockService.existsByBlockUserIdAndUserBlockId(user, userBlock))
+        if(userBlockService.existsByBlockUserIdAndUserBlockId(userBlock, user))
             throw new RuntimeException("이미 차단된 사용자입니다.");
         Long ret = userBlockService.createUserBlock(user, userBlock);
         return ResponseEntity.status(HttpStatus.OK).body(ret);

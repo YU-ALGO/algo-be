@@ -28,6 +28,7 @@ import static com.algo.yu.algobe.food.domain.QFoodAllergyInfo.foodAllergyInfo;
 @RequiredArgsConstructor
 public class FoodRepositoryImpl implements FoodRepositoryCustom {
     private final JPAQueryFactory queryFactory;
+    
 
     private List<OrderSpecifier> getOrderSpecifier(Sort sort){
         List<OrderSpecifier> orders = new ArrayList<>();
@@ -54,6 +55,7 @@ public class FoodRepositoryImpl implements FoodRepositoryCustom {
                         food.likeCount
                 ))
                 .from(foodAllergyInfo)
+                .orderBy(getOrderSpecifier(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .innerJoin(foodAllergyInfo.food, food)
                 .where(isSearchable(keyword));
 
@@ -68,7 +70,6 @@ public class FoodRepositoryImpl implements FoodRepositoryCustom {
                 .fetch().size();
 
         List<FoodListResponseDto> results = query
-                .orderBy(getOrderSpecifier(pageable.getSort()).toArray(OrderSpecifier[]::new))
                 .offset(pageable.getOffset())
                 .limit(pageable.getPageSize()).fetch();
 

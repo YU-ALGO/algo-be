@@ -4,6 +4,7 @@ import com.algo.yu.algobe.board.domain.post.*;
 import com.algo.yu.algobe.board.domain.board.Board;
 import com.algo.yu.algobe.board.domain.board.BoardRepository;
 import com.algo.yu.algobe.board.domain.post.*;
+import com.algo.yu.algobe.user.domain.user.Grade;
 import com.algo.yu.algobe.user.domain.user.User;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -68,7 +69,7 @@ public class PostService {
     public Long deletePost(Long boardId, Long postId, User user){
         boardRepository.findById(boardId).orElseThrow(() -> new IllegalArgumentException("게시판이 존재하지 않습니다."));
         Post post = postRepository.findById(postId).orElseThrow(() -> new IllegalArgumentException("게시글이 존재하지 않습니다."));
-        if(!post.getUser().getUserId().equals(user.getUserId())){
+        if(!user.getGradeSet().contains(Grade.ADMIN) && !post.getUser().getUserId().equals(user.getUserId())){
             throw new RuntimeException("작성자와 일치하지 않습니다.");
         }
         if(!post.getBoard().getBoardId().equals(boardId)) {

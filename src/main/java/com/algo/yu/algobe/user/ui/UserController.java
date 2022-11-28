@@ -129,13 +129,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @PreAuthorize("isAuthenticated()")
-    @PostMapping("leave")
-    public ResponseEntity<String> leave(@CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth, @RequestBody String password) {
-        userService.leave(auth.getUsername(), password);
-
-        return ResponseEntity.ok("ok");
-    }
+//    @PreAuthorize("isAuthenticated()")
+//    @PostMapping("leave")
+//    public ResponseEntity<String> leave(@CurrentSecurityContext(expression = "authentication.principal") UserAuthDto auth, @RequestBody String password) {
+//        userService.leave(auth.getUsername(), password);
+//
+//        return ResponseEntity.ok("ok");
+//    }
 
     @GetMapping("users/{username}/exists")
     public ResponseEntity<Boolean> checkUserIdDuplication(@RequestBody @PathVariable("username") String username) {
